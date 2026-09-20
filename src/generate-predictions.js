@@ -28,6 +28,21 @@ function average(arr) {
   return arr && arr.length ? arr.reduce((a, b) => a + b, 0) / arr.length : null;
 }
 
+// Early in the season, a team's points-allowed/scored average is just 1-2
+// games, so a single blowout can make its "average" 2-3x the league norm.
+// Feeding that straight into the matchup multiplier produced absurd
+// projections (a RB "projected" for 70+ points off one shootout the
+// opponent was in). Clamp how much any single matchup can move a player's
+// season pace either way - still enough range to make a bold call on a
+// great or terrible matchup, just not enough to reach fantasy-impossible
+// point totals.
+const MIN_MULTIPLIER = 0.75;
+const MAX_MULTIPLIER = 1.35;
+
+function clampMultiplier(m) {
+  return Math.min(MAX_MULTIPLIER, Math.max(MIN_MULTIPLIER, m));
+}
+
 // team abbr -> { opponent, isHome, gameName }, for teams whose game THIS
 // week hasn't started yet.
 function buildNextOpponentMap(games) {
@@ -96,11 +111,11 @@ function buildStatPredictions(league, games, boardsSpec, pointsAllowed, pointsSc
       let multiplier = 1;
       if (opts.type === 'offense') {
         const oppAvgAllowed = teamAvgAllowed[opp.opponent];
-        if (oppAvgAllowed != null && leagueAvgAllowed) multiplier = oppAvgAllowed / leagueAvgAllowed;
+        if (oppAvgAllowed != null && leagueAvgAllowed) multiplier = clampMultiplier(oppAvgAllowed / leagueAvgAllowed);
       } else if (opts.type === 'idpDef') {
         // A stronger opposing offense means more plays/possessions to rack up tackles against - a loose proxy, not a precise model.
         const oppAvgScored = teamAvgScored[opp.opponent];
-        if (oppAvgScored != null && leagueAvgScored) multiplier = oppAvgScored / leagueAvgScored;
+        if (oppAvgScored != null && leagueAvgScored) multiplier = clampMultiplier(oppAvgScored / leagueAvgScored);
       }
       predicted.push({
         name: p.name,

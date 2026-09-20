@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-20T07:16:13.558Z",
+  "generatedAt": "2026-09-20T07:29:26.188Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -561,7 +561,7 @@
           "id": "passing-yards-non-qb",
           "label": "Passing Yards (Non-QB)",
           "section": "position",
-          "count": 7,
+          "count": 8,
           "available": true
         },
         {

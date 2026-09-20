@@ -1,0 +1,82 @@
+{
+  "generatedAt": "2026-09-20T02:37:57.602Z",
+  "leagues": {
+    "nfl": {
+      "season": 2026,
+      "seasonLabel": "Regular Season",
+      "format": "Full PPR",
+      "categories": [
+        {
+          "id": "all",
+          "label": "All Players",
+          "count": 50
+        },
+        {
+          "id": "qb",
+          "label": "All QB",
+          "count": 35
+        },
+        {
+          "id": "rb",
+          "label": "All RB",
+          "count": 50
+        },
+        {
+          "id": "wr",
+          "label": "All WR",
+          "count": 50
+        },
+        {
+          "id": "te",
+          "label": "All TE",
+          "count": 50
+        },
+        {
+          "id": "def",
+          "label": "All DEF",
+          "count": 32
+        },
+        {
+          "id": "k",
+          "label": "All Kicker",
+          "count": 32
+        }
+      ]
+    },
+    "cfb": {
+      "format": "Half PPR (offense) / IDP (defense)",
+      "categories": [
+        {
+          "id": "off",
+          "label": "All Offense",
+          "count": 50
+        },
+        {
+          "id": "qb",
+          "label": "All QB",
+          "count": 50
+        },
+        {
+          "id": "rb",
+          "label": "All RB",
+          "count": 50
+        },
+        {
+          "id": "wr",
+          "label": "All WR",
+          "count": 50
+        },
+        {
+          "id": "te",
+          "label": "All TE",
+          "count": 32
+        },
+        {
+          "id": "def",
+          "label": "All Defense (IDP)",
+          "count": 50
+        }
+      ]
+    }
+  }
+}

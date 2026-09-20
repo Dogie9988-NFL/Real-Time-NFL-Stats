@@ -2,7 +2,7 @@ const app = document.getElementById('app');
 const subtitle = document.getElementById('subtitle');
 const searchBox = document.getElementById('search');
 const conferenceFilter = document.getElementById('conferenceFilter');
-const tabs = document.querySelectorAll('.league-tabs button');
+const tabs = document.querySelectorAll('#mainTabs button');
 const settingsBtn = document.getElementById('settingsBtn');
 const settingsPanel = document.getElementById('settingsPanel');
 const generatedAtEl = document.getElementById('generatedAt');
@@ -11,6 +11,16 @@ const liveSection = document.getElementById('liveSection');
 const liveStrip = document.getElementById('liveStrip');
 const liveHeadingDot = document.getElementById('liveHeadingDot');
 const liveHeadingText = document.getElementById('liveHeadingText');
+
+const statsView = document.getElementById('statsView');
+const fantasyView = document.getElementById('fantasyView');
+const fantasySubtitle = document.getElementById('fantasySubtitle');
+const fantasyLeagueTabs = document.querySelectorAll('#fantasyLeagueTabs button');
+const fantasyModeTabs = document.querySelectorAll('#fantasyModeTabs button');
+const fantasyBoardsEl = document.getElementById('fantasyBoards');
+const fantasyLiveEl = document.getElementById('fantasyLive');
+const fantasyTradeEl = document.getElementById('fantasyTrade');
+const tradeVerdictEl = document.getElementById('tradeVerdict');
 
 const THEMES = [
   { id: 'green', name: 'Matrix Green', accent: '#39ff8a', accentDim: '#1f8f56', accent2: '#4fd8ff' },
@@ -298,9 +308,8 @@ function render() {
   }
 }
 
-async function switchLeague(league) {
+async function switchStatsLeague(league) {
   currentLeague = league;
-  tabs.forEach((t) => t.classList.toggle('active', t.dataset.league === league));
   conferenceFilter.style.display = league === 'cfb' ? '' : 'none';
   subtitle.textContent = 'Loading data…';
   await loadLeague(league);
@@ -308,13 +317,372 @@ async function switchLeague(league) {
   renderLive();
 }
 
-tabs.forEach((t) => t.addEventListener('click', () => switchLeague(t.dataset.league)));
+function switchMainView(view) {
+  tabs.forEach((t) => t.classList.toggle('active', t.dataset.league === view));
+  if (view === 'fantasy') {
+    statsView.hidden = true;
+    fantasyView.hidden = false;
+    subtitle.textContent = 'Fantasy leaderboards, live scoring, and a trade calculator';
+    initFantasyIfNeeded();
+  } else {
+    fantasyView.hidden = true;
+    statsView.hidden = false;
+    switchStatsLeague(view);
+  }
+}
+
+tabs.forEach((t) => t.addEventListener('click', () => switchMainView(t.dataset.league)));
 searchBox.addEventListener('input', render);
 conferenceFilter.addEventListener('change', render);
 settingsBtn.addEventListener('click', () => {
   settingsPanel.hidden = !settingsPanel.hidden;
 });
 initThemePicker();
+
+// ---------------------------------------------------------------------
+// Fantasy: season leaderboards, live in-game scoring, trade calculator.
+// Reuses the same .board/.board-grid presentation as the real stat
+// leaderboards - it's the same shape of data (ranked players + a value),
+// just fantasy points instead of a raw stat.
+// ---------------------------------------------------------------------
+
+let fantasyManifest = null;
+let currentFantasyLeague = 'nfl';
+let currentFantasyMode = 'leaderboards';
+let liveFantasyData = null;
+let fantasyLiveIntervalStarted = false;
+const fantasyCache = {}; // league -> { boardId -> board }
+const tradeIndex = { nfl: [], cfb: [] }; // league -> flat searchable player list
+const tradeSides = { a: [], b: [] }; // side -> array of player entries from tradeIndex
+
+async function initFantasyIfNeeded() {
+  if (!fantasyManifest) {
+    fantasySubtitle.textContent = 'Loading fantasy data…';
+    try {
+      const res = await fetch(`data/fantasy/manifest.json?t=${Date.now()}`);
+      fantasyManifest = await res.json();
+    } catch (e) {
+      fantasySubtitle.textContent = 'Failed to load fantasy data.';
+      console.error(e);
+      return;
+    }
+  }
+  await switchFantasyLeague(currentFantasyLeague);
+  if (!fantasyLiveIntervalStarted) {
+    fantasyLiveIntervalStarted = true;
+    loadLiveFantasy();
+    setInterval(loadLiveFantasy, 60000);
+  }
+}
+
+async function loadFantasyBoards(league) {
+  if (fantasyCache[league]) return fantasyCache[league];
+  const meta = fantasyManifest.leagues[league];
+  const results = await Promise.all(
+    meta.categories.map((c) =>
+      fetch(`data/fantasy/${league}/${c.id}.json`)
+        .then((r) => r.json())
+        .catch(() => ({ id: c.id, label: c.label, players: [] }))
+    )
+  );
+  const byId = {};
+  for (const board of results) byId[board.id] = board;
+  fantasyCache[league] = byId;
+  return byId;
+}
+
+function buildTradeIndex(league) {
+  const boards = fantasyCache[league];
+  if (!boards) return;
+  const primaryId = league === 'nfl' ? 'all' : 'off';
+  const extraIds = league === 'nfl' ? ['def', 'k'] : ['def'];
+  const seen = new Set();
+  const list = [];
+  for (const id of [primaryId, ...extraIds]) {
+    const board = boards[id];
+    if (!board) continue;
+    for (const p of board.players || []) {
+      const key = `${p.name}|${p.team}|${p.position}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      list.push(p);
+    }
+  }
+  tradeIndex[league] = list;
+}
+
+async function switchFantasyLeague(league) {
+  currentFantasyLeague = league;
+  fantasyLeagueTabs.forEach((t) => t.classList.toggle('active', t.dataset.flg === league));
+  fantasySubtitle.textContent = 'Loading fantasy data…';
+  await loadFantasyBoards(league);
+  buildTradeIndex(league);
+  const meta = fantasyManifest.leagues[league];
+  fantasySubtitle.textContent =
+    league === 'nfl'
+      ? `NFL Fantasy — ${meta.format} — ${meta.seasonLabel} ${meta.season}`
+      : `College Football Fantasy (Power 4 + Notre Dame) — ${meta.format}`;
+  renderFantasyMode();
+}
+
+function renderFantasyMode() {
+  fantasyBoardsEl.hidden = currentFantasyMode !== 'leaderboards';
+  fantasyLiveEl.hidden = currentFantasyMode !== 'live';
+  fantasyTradeEl.hidden = currentFantasyMode !== 'trade';
+  if (currentFantasyMode === 'leaderboards') renderFantasyBoards();
+  if (currentFantasyMode === 'live') renderFantasyLive();
+  if (currentFantasyMode === 'trade') {
+    renderTradeSide('a');
+    renderTradeSide('b');
+  }
+}
+
+fantasyLeagueTabs.forEach((t) => t.addEventListener('click', () => switchFantasyLeague(t.dataset.flg)));
+fantasyModeTabs.forEach((t) =>
+  t.addEventListener('click', () => {
+    currentFantasyMode = t.dataset.fmode;
+    fantasyModeTabs.forEach((b) => b.classList.toggle('active', b === t));
+    renderFantasyMode();
+  })
+);
+
+function fantasyPlayerTag(p) {
+  // Conference is deliberately left out here (team + position is what the
+  // real stat leaderboards already show, and it keeps long names from
+  // truncating in the fixed-width board cards).
+  const parts = [];
+  if (p.team && p.team !== p.name) parts.push(p.team);
+  if (p.position) parts.push(p.position);
+  return parts.join(' · ');
+}
+
+function renderFantasyBoard(board) {
+  const div = document.createElement('div');
+  div.className = 'board';
+  const h3 = document.createElement('h3');
+  h3.textContent = board.label;
+  div.appendChild(h3);
+
+  const meta = document.createElement('div');
+  meta.className = 'meta';
+  meta.textContent = board.format || '';
+  div.appendChild(meta);
+
+  const players = board.players || [];
+  if (players.length === 0) {
+    const p = document.createElement('div');
+    p.className = 'empty';
+    p.textContent = 'No qualifying players yet this season.';
+    div.appendChild(p);
+    return div;
+  }
+
+  let expanded = false;
+  const list = document.createElement('ol');
+  div.appendChild(list);
+
+  function renderList() {
+    list.innerHTML = '';
+    const shown = expanded ? players.slice(0, 50) : players.slice(0, 5);
+    for (const p of shown) {
+      const li = document.createElement('li');
+      li.className = p.rank === 1 ? 'rank-first' : '';
+      const tag = fantasyPlayerTag(p);
+      li.innerHTML = `
+        <span class="rank">${p.rank}</span>
+        <span class="player-name">${p.name}<span class="player-team">${tag ? ' ' + tag : ''}</span></span>
+        <span class="value">${p.points.toFixed(2)}</span>
+      `;
+      list.appendChild(li);
+    }
+  }
+  renderList();
+
+  if (players.length > 5) {
+    const btn = document.createElement('button');
+    btn.className = 'show-all';
+    btn.textContent = 'Show all (top 50)';
+    btn.addEventListener('click', () => {
+      expanded = !expanded;
+      btn.textContent = expanded ? 'Show top 5' : 'Show all (top 50)';
+      renderList();
+    });
+    div.appendChild(btn);
+  }
+
+  return div;
+}
+
+function renderFantasyBoards() {
+  const league = currentFantasyLeague;
+  const boards = fantasyCache[league];
+  fantasyBoardsEl.innerHTML = '';
+  if (!boards || !fantasyManifest) return;
+  const meta = fantasyManifest.leagues[league];
+  const grid = document.createElement('div');
+  grid.className = 'board-grid';
+  for (const c of meta.categories) {
+    const board = boards[c.id];
+    if (!board) continue;
+    grid.appendChild(renderFantasyBoard(board));
+  }
+  fantasyBoardsEl.appendChild(grid);
+}
+
+async function loadLiveFantasy() {
+  try {
+    const res = await fetch(`data/live-fantasy.json?t=${Date.now()}`);
+    liveFantasyData = await res.json();
+    if (currentFantasyMode === 'live' && !fantasyView.hidden) renderFantasyLive();
+  } catch (e) {
+    console.error('live fantasy data failed to load', e);
+  }
+}
+
+function renderLiveFantasyList(players, opts = {}) {
+  const board = document.createElement('div');
+  board.className = 'board fantasy-live-board';
+  const list = document.createElement('ol');
+  players.forEach((p, i) => {
+    const li = document.createElement('li');
+    li.className = i === 0 ? 'rank-first' : '';
+    const tag = opts.showTeam === false ? p.gameStatus : `${p.team} · ${p.gameStatus}`;
+    li.innerHTML = `
+      <span class="rank">${i + 1}</span>
+      <span class="player-name">${p.name}<span class="player-team"> ${tag}</span></span>
+      <span class="value">${p.points.toFixed(2)}</span>
+    `;
+    list.appendChild(li);
+  });
+  board.appendChild(list);
+  return board;
+}
+
+function renderFantasyLive() {
+  fantasyLiveEl.innerHTML = '';
+  if (!liveFantasyData) {
+    const p = document.createElement('div');
+    p.className = 'empty';
+    p.textContent = 'Loading live fantasy data…';
+    fantasyLiveEl.appendChild(p);
+    return;
+  }
+  const league = currentFantasyLeague;
+  const data = liveFantasyData[league] || {};
+  const gameCount = (liveFantasyData.liveGameCount && liveFantasyData.liveGameCount[league]) || 0;
+
+  const heading = document.createElement('div');
+  heading.className = 'section-heading live-heading';
+  const dot = document.createElement('span');
+  dot.className = 'live-dot';
+  dot.style.display = gameCount > 0 ? '' : 'none';
+  heading.appendChild(dot);
+  const text = document.createElement('span');
+  text.textContent =
+    gameCount > 0 ? `Live Fantasy — ${gameCount} game${gameCount === 1 ? '' : 's'} in progress` : 'No games in progress right now';
+  heading.appendChild(text);
+  fantasyLiveEl.appendChild(heading);
+
+  const performers = data.topPerformers || [];
+  if (performers.length === 0) {
+    const p = document.createElement('div');
+    p.className = 'empty';
+    p.textContent = 'No live fantasy performances yet. Check back once games kick off.';
+    fantasyLiveEl.appendChild(p);
+    return;
+  }
+  fantasyLiveEl.appendChild(renderLiveFantasyList(performers));
+
+  if (league === 'nfl' && data.teamDefLive && data.teamDefLive.length) {
+    const dstHeading = document.createElement('div');
+    dstHeading.className = 'section-heading';
+    dstHeading.textContent = 'Team Defense (Live)';
+    fantasyLiveEl.appendChild(dstHeading);
+    fantasyLiveEl.appendChild(renderLiveFantasyList(data.teamDefLive, { showTeam: false }));
+  }
+}
+
+// --- Trade calculator ---
+
+function tradeSideTag(p) {
+  return fantasyPlayerTag(p);
+}
+
+function renderTradeSide(side) {
+  const el = document.querySelector(`.trade-side[data-side="${side}"]`);
+  if (!el) return;
+  const list = el.querySelector('.trade-list');
+  const totalEl = el.querySelector('.trade-total-value');
+  list.innerHTML = '';
+  let total = 0;
+  tradeSides[side].forEach((p, i) => {
+    total += p.points;
+    const li = document.createElement('li');
+    const tag = tradeSideTag(p);
+    li.innerHTML = `
+      <span class="player-name">${p.name}<span class="player-team">${tag ? ' ' + tag : ''}</span></span>
+      <span class="value">${p.points.toFixed(2)}</span>
+      <button type="button" class="trade-remove" aria-label="Remove ${p.name}">&times;</button>
+    `;
+    li.querySelector('.trade-remove').addEventListener('click', () => {
+      tradeSides[side].splice(i, 1);
+      renderTradeSide(side);
+    });
+    list.appendChild(li);
+  });
+  totalEl.textContent = total.toFixed(2);
+  updateTradeVerdict();
+}
+
+function updateTradeVerdict() {
+  const totalA = tradeSides.a.reduce((s, p) => s + p.points, 0);
+  const totalB = tradeSides.b.reduce((s, p) => s + p.points, 0);
+  if (tradeSides.a.length === 0 && tradeSides.b.length === 0) {
+    tradeVerdictEl.textContent = 'Add players to both sides to evaluate the trade.';
+    return;
+  }
+  const diff = Math.abs(totalA - totalB);
+  if (diff < 0.01) {
+    tradeVerdictEl.textContent = `Even trade (${totalA.toFixed(2)} pts each side)`;
+  } else if (totalB > totalA) {
+    tradeVerdictEl.textContent = `Team A wins the trade by ${diff.toFixed(2)} pts`;
+  } else {
+    tradeVerdictEl.textContent = `Team B wins the trade by ${diff.toFixed(2)} pts`;
+  }
+}
+
+function setupTradeSide(el) {
+  const side = el.dataset.side;
+  const input = el.querySelector('.trade-search');
+  const results = el.querySelector('.trade-search-results');
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    results.innerHTML = '';
+    if (!q) {
+      results.hidden = true;
+      return;
+    }
+    const pool = tradeIndex[currentFantasyLeague] || [];
+    const matches = pool.filter((p) => p.name.toLowerCase().includes(q)).slice(0, 8);
+    results.hidden = matches.length === 0;
+    for (const p of matches) {
+      const item = document.createElement('div');
+      item.className = 'trade-result';
+      const tag = tradeSideTag(p);
+      item.textContent = `${p.name}${tag ? ' (' + tag + ')' : ''} — ${p.points.toFixed(2)} pts`;
+      item.addEventListener('click', () => {
+        tradeSides[side].push(p);
+        input.value = '';
+        results.innerHTML = '';
+        results.hidden = true;
+        renderTradeSide(side);
+      });
+      results.appendChild(item);
+    }
+  });
+}
+
+document.querySelectorAll('.trade-side').forEach(setupTradeSide);
 
 fetch('data/manifest.json')
   .then((r) => r.json())
@@ -324,7 +692,7 @@ fetch('data/manifest.json')
       const d = new Date(m.generatedAt);
       generatedAtEl.textContent = `Feed last refreshed: ${d.toLocaleString('en-US')}`;
     }
-    switchLeague('nfl');
+    switchMainView('nfl');
     loadLive();
     setInterval(loadLive, 60000);
   })

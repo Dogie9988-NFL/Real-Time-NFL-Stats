@@ -7,6 +7,10 @@ const settingsBtn = document.getElementById('settingsBtn');
 const settingsPanel = document.getElementById('settingsPanel');
 const generatedAtEl = document.getElementById('generatedAt');
 const swatchesEl = document.getElementById('swatches');
+const liveSection = document.getElementById('liveSection');
+const liveStrip = document.getElementById('liveStrip');
+const liveHeadingDot = document.getElementById('liveHeadingDot');
+const liveHeadingText = document.getElementById('liveHeadingText');
 
 const THEMES = [
   { id: 'green', name: 'Matrix Green', accent: '#39ff8a', accentDim: '#1f8f56', accent2: '#4fd8ff' },
@@ -67,7 +71,73 @@ function initThemePicker() {
 
 let manifest = null;
 let currentLeague = 'nfl';
+let liveData = null;
 const cache = {}; // league -> { boardId -> data }
+
+const STATE_ORDER = { in: 0, pre: 1, post: 2 };
+
+function renderLiveCard(game) {
+  const away = game.competitors.find((c) => c.homeAway === 'away') || game.competitors[0];
+  const home = game.competitors.find((c) => c.homeAway === 'home') || game.competitors[1];
+
+  const card = document.createElement('div');
+  card.className = `live-card state-${game.state}`;
+
+  const status = document.createElement('div');
+  status.className = 'live-status';
+  status.innerHTML = game.state === 'in' ? `<span class="live-dot"></span>${game.statusDetail}` : game.statusDetail;
+  card.appendChild(status);
+
+  const matchup = document.createElement('div');
+  matchup.className = 'live-matchup';
+  for (const team of [away, home]) {
+    const row = document.createElement('div');
+    row.className = `live-team${team.winner ? ' win' : ''}`;
+    row.innerHTML = `<span>${team.team}</span><span class="live-score">${game.state === 'pre' ? '' : team.score}</span>`;
+    matchup.appendChild(row);
+  }
+  card.appendChild(matchup);
+
+  if (game.leaders && game.leaders.length) {
+    const leaders = document.createElement('div');
+    leaders.className = 'live-leaders';
+    for (const l of game.leaders) {
+      const row = document.createElement('div');
+      row.className = 'live-leader';
+      const abbr = { Passing: 'PASS', Rushing: 'RUSH', Receiving: 'REC' }[l.category] || l.category.toUpperCase();
+      row.innerHTML = `<span class="ll-cat">${abbr}</span> ${l.name} <span class="ll-team">${l.team}</span><br><span class="ll-val">${l.displayValue}</span>`;
+      leaders.appendChild(row);
+    }
+    card.appendChild(leaders);
+  }
+
+  return card;
+}
+
+function renderLive() {
+  if (!liveData) return;
+  const games = (liveData[currentLeague] || []).slice().sort((a, b) => STATE_ORDER[a.state] - STATE_ORDER[b.state]);
+  liveStrip.innerHTML = '';
+  if (games.length === 0) {
+    liveSection.hidden = true;
+    return;
+  }
+  liveSection.hidden = false;
+  const anyLive = games.some((g) => g.state === 'in');
+  liveHeadingDot.style.display = anyLive ? '' : 'none';
+  liveHeadingText.textContent = anyLive ? 'Live Now' : "Today's Games";
+  for (const game of games) liveStrip.appendChild(renderLiveCard(game));
+}
+
+async function loadLive() {
+  try {
+    const res = await fetch(`data/live.json?t=${Date.now()}`);
+    liveData = await res.json();
+    renderLive();
+  } catch (e) {
+    console.error('live data failed to load', e);
+  }
+}
 
 function fmt(n) {
   return Number(n).toLocaleString('en-US');
@@ -235,6 +305,7 @@ async function switchLeague(league) {
   subtitle.textContent = 'Loading data…';
   await loadLeague(league);
   render();
+  renderLive();
 }
 
 tabs.forEach((t) => t.addEventListener('click', () => switchLeague(t.dataset.league)));
@@ -254,6 +325,8 @@ fetch('data/manifest.json')
       generatedAtEl.textContent = `Feed last refreshed: ${d.toLocaleString('en-US')}`;
     }
     switchLeague('nfl');
+    loadLive();
+    setInterval(loadLive, 60000);
   })
   .catch((e) => {
     subtitle.textContent = 'Failed to load data.';

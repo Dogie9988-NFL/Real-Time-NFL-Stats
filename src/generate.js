@@ -6,7 +6,7 @@ const { fetchLeaders } = require('./fetch-espn');
 const { fetchAllCfbPools } = require('./fetch-espn-cfb');
 const { FETCH_SPECS, LEADERBOARDS } = require('./categories');
 
-const DATA_DIR = path.join(__dirname, '..', 'public', 'data');
+const DATA_DIR = path.join(__dirname, '..', 'docs', 'data');
 const PROXY = process.env.HTTPS_PROXY || process.env.https_proxy;
 const agent = PROXY ? new HttpsProxyAgent(PROXY) : undefined;
 

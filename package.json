@@ -4,7 +4,8 @@
   "description": "NFL & CFB stat leaderboards by position, generated from ESPN data",
   "private": true,
   "scripts": {
-    "generate": "node src/generate.js"
+    "generate": "node src/generate.js",
+    "generate:live": "node src/generate-live.js"
   },
   "dependencies": {
     "https-proxy-agent": "^9.1.0"

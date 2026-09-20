@@ -24,8 +24,9 @@ const tradeVerdictEl = document.getElementById('tradeVerdict');
 const fantasyWeekEl = document.getElementById('fantasyWeek');
 const fantasyWeekBoardsEl = document.getElementById('fantasyWeekBoards');
 const weekSelectorEl = document.getElementById('weekSelector');
-const fantasyPredictionsEl = document.getElementById('fantasyPredictions');
-const fantasyPredictionsBodyEl = document.getElementById('fantasyPredictionsBody');
+const predictionsView = document.getElementById('predictionsView');
+const predictionsLeagueTabs = document.querySelectorAll('#predictionsLeagueTabs button');
+const predictionsBodyEl = document.getElementById('predictionsBody');
 const fantasyMyTeamEl = document.getElementById('fantasyMyTeam');
 const myTeamNoteEl = document.getElementById('myTeamNote');
 const myTeamSuggestionsEl = document.getElementById('myTeamSuggestions');
@@ -34,12 +35,12 @@ const tradeSettingsPanel = document.getElementById('tradeSettingsPanel');
 const tradeSettingsSummaryEl = document.getElementById('tradeSettingsSummary');
 
 const THEMES = [
-  { id: 'green', name: 'Matrix Green', accent: '#39ff8a', accentDim: '#1f8f56', accent2: '#4fd8ff' },
-  { id: 'cyan', name: 'Cyber Cyan', accent: '#4fe1ff', accentDim: '#1f7f96', accent2: '#39ff8a' },
-  { id: 'magenta', name: 'Hot Magenta', accent: '#ff4fd8', accentDim: '#96286f', accent2: '#4fd8ff' },
-  { id: 'amber', name: 'Amber', accent: '#ffb84f', accentDim: '#96702f', accent2: '#4fd8ff' },
-  { id: 'violet', name: 'Ultraviolet', accent: '#b84fff', accentDim: '#6b2f96', accent2: '#4fd8ff' },
-  { id: 'red', name: 'Blood Red', accent: '#ff4f5f', accentDim: '#962f38', accent2: '#4fd8ff' },
+  { id: 'green', name: 'Skyline Cyan', accent: '#5fc9e8', accentDim: '#2c7a94', accent2: '#a68cf0' },
+  { id: 'cyan', name: 'Aurora Teal', accent: '#4fd6c4', accentDim: '#227f72', accent2: '#5fc9e8' },
+  { id: 'magenta', name: 'Dusk Magenta', accent: '#d685c9', accentDim: '#7a3f70', accent2: '#5fc9e8' },
+  { id: 'amber', name: 'Muted Amber', accent: '#e0a866', accentDim: '#7a5e34', accent2: '#5fc9e8' },
+  { id: 'violet', name: 'Ultraviolet', accent: '#9d7fe0', accentDim: '#5a4187', accent2: '#5fc9e8' },
+  { id: 'red', name: 'Ember Red', accent: '#e07480', accentDim: '#803f47', accent2: '#5fc9e8' },
 ];
 const THEME_KEY = 'statLeadersAccentTheme';
 
@@ -330,13 +331,18 @@ async function switchStatsLeague(league) {
 
 function switchMainView(view) {
   tabs.forEach((t) => t.classList.toggle('active', t.dataset.league === view));
+  statsView.hidden = true;
+  fantasyView.hidden = true;
+  predictionsView.hidden = true;
   if (view === 'fantasy') {
-    statsView.hidden = true;
     fantasyView.hidden = false;
     subtitle.textContent = 'Fantasy leaderboards, live scoring, and a trade calculator';
     initFantasyIfNeeded();
+  } else if (view === 'predictions') {
+    predictionsView.hidden = false;
+    subtitle.textContent = 'Simple heuristic game picks and predicted stat leaders';
+    switchPredictionsLeague(currentPredictionsLeague);
   } else {
-    fantasyView.hidden = true;
     statsView.hidden = false;
     switchStatsLeague(view);
   }
@@ -440,13 +446,11 @@ function renderFantasyMode() {
   fantasyBoardsEl.hidden = currentFantasyMode !== 'leaderboards';
   fantasyWeekEl.hidden = currentFantasyMode !== 'week';
   fantasyLiveEl.hidden = currentFantasyMode !== 'live';
-  fantasyPredictionsEl.hidden = currentFantasyMode !== 'predictions';
   fantasyMyTeamEl.hidden = currentFantasyMode !== 'myteam';
   fantasyTradeEl.hidden = currentFantasyMode !== 'trade';
   if (currentFantasyMode === 'leaderboards') renderFantasyBoards();
   if (currentFantasyMode === 'week') renderFantasyWeek();
   if (currentFantasyMode === 'live') renderFantasyLive();
-  if (currentFantasyMode === 'predictions') renderFantasyPredictions();
   if (currentFantasyMode === 'myteam') {
     renderMyTeamSide('mine');
     renderMyTeamSide('fa');
@@ -626,7 +630,10 @@ weekSelectorEl.addEventListener('change', () => {
 });
 
 // --- Predictions: upcoming game picks + predicted stat leaders ---
+// Its own top-level tab with an independent NFL/CFB toggle, separate from
+// the Fantasy tab's league selector.
 
+let currentPredictionsLeague = 'nfl';
 const predictionsCache = { nfl: null, cfb: null };
 
 async function loadPredictions(league) {
@@ -664,41 +671,47 @@ function renderGamePredictionCard(g) {
   return card;
 }
 
-async function renderFantasyPredictions() {
-  const league = currentFantasyLeague;
-  fantasyPredictionsBodyEl.innerHTML = '<div class="empty">Loading predictions…</div>';
+async function switchPredictionsLeague(league) {
+  currentPredictionsLeague = league;
+  predictionsLeagueTabs.forEach((t) => t.classList.toggle('active', t.dataset.plg === league));
+  await renderPredictionsView();
+}
+
+async function renderPredictionsView() {
+  const league = currentPredictionsLeague;
+  predictionsBodyEl.innerHTML = '<div class="empty">Loading predictions…</div>';
   const data = await loadPredictions(league);
-  fantasyPredictionsBodyEl.innerHTML = '';
+  predictionsBodyEl.innerHTML = '';
   if (!data) {
     const p = document.createElement('div');
     p.className = 'empty';
     p.textContent = 'Prediction data not available yet.';
-    fantasyPredictionsBodyEl.appendChild(p);
+    predictionsBodyEl.appendChild(p);
     return;
   }
 
   const gamesHeading = document.createElement('div');
   gamesHeading.className = 'section-heading';
   gamesHeading.textContent = `Predicted Game Winners — Week ${data.games.week}`;
-  fantasyPredictionsBodyEl.appendChild(gamesHeading);
+  predictionsBodyEl.appendChild(gamesHeading);
 
   const games = data.games.games || [];
   if (games.length === 0) {
     const p = document.createElement('div');
     p.className = 'empty';
-    p.textContent = "All of this week's games are already underway or finished — check Live or Week Leaders.";
-    fantasyPredictionsBodyEl.appendChild(p);
+    p.textContent = "All of this week's games are already underway or finished — check Week Leaders (inside Fantasy).";
+    predictionsBodyEl.appendChild(p);
   } else {
     const gameGrid = document.createElement('div');
     gameGrid.className = 'board-grid';
     for (const g of games) gameGrid.appendChild(renderGamePredictionCard(g));
-    fantasyPredictionsBodyEl.appendChild(gameGrid);
+    predictionsBodyEl.appendChild(gameGrid);
   }
 
   const statsHeading = document.createElement('div');
   statsHeading.className = 'section-heading';
   statsHeading.textContent = `Predicted Stat Leaders — Week ${data.stats.week}`;
-  fantasyPredictionsBodyEl.appendChild(statsHeading);
+  predictionsBodyEl.appendChild(statsHeading);
 
   const labels = league === 'nfl' ? NFL_WEEK_LABELS : CFB_WEEK_LABELS;
   const anyBoardHasPlayers = Object.values(data.stats.boards || {}).some((arr) => arr.length > 0);
@@ -706,7 +719,7 @@ async function renderFantasyPredictions() {
     const p = document.createElement('div');
     p.className = 'empty';
     p.textContent = 'No players with an upcoming game to predict right now.';
-    fantasyPredictionsBodyEl.appendChild(p);
+    predictionsBodyEl.appendChild(p);
     return;
   }
   const statGrid = document.createElement('div');
@@ -715,8 +728,10 @@ async function renderFantasyPredictions() {
     const players = (data.stats.boards && data.stats.boards[id]) || [];
     statGrid.appendChild(renderFantasyBoard({ label, format: 'Predicted, not actual', players }));
   }
-  fantasyPredictionsBodyEl.appendChild(statGrid);
+  predictionsBodyEl.appendChild(statGrid);
 }
+
+predictionsLeagueTabs.forEach((t) => t.addEventListener('click', () => switchPredictionsLeague(t.dataset.plg)));
 
 // --- Trade calculator data: team schedules/SOS and player news ---
 
@@ -1165,10 +1180,181 @@ function renderMyTeamSuggestions() {
   }
 }
 
+// --- OCR: import a roster/free-agent list from a screenshot ---
+// Tesseract.js is loaded lazily from a CDN only when a screenshot is
+// actually uploaded, so the base page never pays for the OCR engine.
+// Recognized text lines are fuzzy-matched against the existing player
+// index, and nothing is added to a roster list without the user
+// reviewing and checking each match first.
+
+let tesseractLoadPromise = null;
+function loadTesseract() {
+  if (window.Tesseract) return Promise.resolve();
+  if (tesseractLoadPromise) return tesseractLoadPromise;
+  tesseractLoadPromise = new Promise((resolve, reject) => {
+    const script = document.createElement('script');
+    script.src = 'https://cdn.jsdelivr.net/npm/tesseract.js@5/dist/tesseract.min.js';
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error('Failed to load the OCR engine.'));
+    document.head.appendChild(script);
+  });
+  return tesseractLoadPromise;
+}
+
+function levenshtein(a, b) {
+  const m = a.length, n = b.length;
+  const dp = Array.from({ length: m + 1 }, () => new Array(n + 1).fill(0));
+  for (let i = 0; i <= m; i++) dp[i][0] = i;
+  for (let j = 0; j <= n; j++) dp[0][j] = j;
+  for (let i = 1; i <= m; i++) {
+    for (let j = 1; j <= n; j++) {
+      dp[i][j] = a[i - 1] === b[j - 1] ? dp[i - 1][j - 1] : 1 + Math.min(dp[i - 1][j], dp[i][j - 1], dp[i - 1][j - 1]);
+    }
+  }
+  return dp[m][n];
+}
+
+function nameSimilarity(a, b) {
+  return 1 - levenshtein(a.toLowerCase(), b.toLowerCase()) / Math.max(a.length, b.length, 1);
+}
+
+function bestPlayerMatch(line, pool) {
+  let best = null;
+  let bestScore = 0;
+  for (const p of pool) {
+    const score = nameSimilarity(line, p.name);
+    if (score > bestScore) {
+      bestScore = score;
+      best = p;
+    }
+  }
+  return { player: best, score: bestScore };
+}
+
+function extractCandidateLines(rawText) {
+  return rawText
+    .split('\n')
+    .map((l) => l.trim())
+    .filter((l) => l.length >= 3 && l.length <= 40)
+    .slice(0, 80);
+}
+
+const MATCH_THRESHOLD = 0.55;
+const AUTOCHECK_THRESHOLD = 0.75;
+
+// Renders a checkbox list of candidate matches into el's .ocr-review panel.
+// Nothing is added to the roster until the user hits "Add checked" - the
+// mandatory human review step before any OCR result becomes real data.
+function showOcrReview(el, side, candidates) {
+  const reviewEl = el.querySelector('.ocr-review');
+  reviewEl.hidden = false;
+  reviewEl.innerHTML = '';
+
+  const heading = document.createElement('div');
+  heading.className = 'ocr-review-heading';
+  heading.textContent = `Found ${candidates.length} possible player${candidates.length === 1 ? '' : 's'} — review before adding:`;
+  reviewEl.appendChild(heading);
+
+  const list = document.createElement('div');
+  list.className = 'ocr-review-list';
+  candidates.forEach((c, i) => {
+    const row = document.createElement('label');
+    row.className = 'ocr-review-row';
+    const checkbox = document.createElement('input');
+    checkbox.type = 'checkbox';
+    checkbox.checked = c.score >= AUTOCHECK_THRESHOLD;
+    checkbox.dataset.index = String(i);
+    row.appendChild(checkbox);
+    const tag = fantasyPlayerTag(c.player);
+    const span = document.createElement('span');
+    span.textContent = `${c.player.name}${tag ? ' (' + tag + ')' : ''} — matched "${c.line}" (${Math.round(c.score * 100)}%)`;
+    row.appendChild(span);
+    list.appendChild(row);
+  });
+  reviewEl.appendChild(list);
+
+  const actions = document.createElement('div');
+  actions.className = 'ocr-review-actions';
+
+  const addBtn = document.createElement('button');
+  addBtn.type = 'button';
+  addBtn.className = 'ocr-add-btn';
+  addBtn.textContent = 'Add checked';
+  addBtn.addEventListener('click', () => {
+    list.querySelectorAll('input[type="checkbox"]:checked').forEach((cb) => {
+      const c = candidates[Number(cb.dataset.index)];
+      if (c) myTeamLists[side].push(c.player);
+    });
+    reviewEl.hidden = true;
+    reviewEl.innerHTML = '';
+    renderMyTeamSide(side);
+  });
+  actions.appendChild(addBtn);
+
+  const cancelBtn = document.createElement('button');
+  cancelBtn.type = 'button';
+  cancelBtn.className = 'ocr-cancel-btn';
+  cancelBtn.textContent = 'Cancel';
+  cancelBtn.addEventListener('click', () => {
+    reviewEl.hidden = true;
+    reviewEl.innerHTML = '';
+  });
+  actions.appendChild(cancelBtn);
+
+  reviewEl.appendChild(actions);
+}
+
+async function handleRosterImageUpload(el, side, file) {
+  const statusEl = el.querySelector('.ocr-status');
+  const reviewEl = el.querySelector('.ocr-review');
+  reviewEl.hidden = true;
+  reviewEl.innerHTML = '';
+  statusEl.hidden = false;
+  statusEl.textContent = 'Loading OCR engine…';
+  try {
+    await loadTesseract();
+    statusEl.textContent = 'Reading image…';
+    const { data } = await window.Tesseract.recognize(file, 'eng');
+    statusEl.textContent = 'Matching players…';
+
+    const pool = tradeIndex[currentFantasyLeague] || [];
+    const lines = extractCandidateLines(data.text || '');
+    const seen = new Set();
+    const candidates = [];
+    for (const line of lines) {
+      const { player, score } = bestPlayerMatch(line, pool);
+      if (!player || score < MATCH_THRESHOLD) continue;
+      const key = `${player.name}|${player.team}|${player.position}`;
+      if (seen.has(key)) continue;
+      seen.add(key);
+      candidates.push({ player, score, line });
+    }
+    candidates.sort((a, b) => b.score - a.score);
+
+    statusEl.hidden = true;
+    if (candidates.length === 0) {
+      statusEl.hidden = false;
+      statusEl.textContent = 'No matching players found in that image. Try a clearer screenshot or add players manually.';
+      return;
+    }
+    showOcrReview(el, side, candidates);
+  } catch (e) {
+    console.error('OCR failed', e);
+    statusEl.hidden = false;
+    statusEl.textContent = 'Could not read that image. Try a clearer screenshot or add players manually.';
+  }
+}
+
 function setupMyTeamSide(el) {
   const side = el.dataset.roster;
   const input = el.querySelector('.trade-search');
   const results = el.querySelector('.trade-search-results');
+  const fileInput = el.querySelector('.ocr-file-input');
+  fileInput.addEventListener('change', () => {
+    const file = fileInput.files && fileInput.files[0];
+    if (file) handleRosterImageUpload(el, side, file);
+    fileInput.value = '';
+  });
   input.addEventListener('input', () => {
     const q = input.value.trim().toLowerCase();
     results.innerHTML = '';

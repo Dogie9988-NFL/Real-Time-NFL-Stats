@@ -22,6 +22,7 @@
     <button data-league="nfl" class="active">NFL</button>
     <button data-league="cfb">College Football</button>
     <button data-league="fantasy">Fantasy</button>
+    <button data-league="predictions">Predictions</button>
   </div>
 </header>
 
@@ -74,7 +75,6 @@
       <button data-fmode="leaderboards" class="active">Leaderboards</button>
       <button data-fmode="week">Week Leaders</button>
       <button data-fmode="live">Live</button>
-      <button data-fmode="predictions">Predictions</button>
       <button data-fmode="myteam">My Team</button>
       <button data-fmode="trade">Trade Calculator</button>
     </div>
@@ -93,15 +93,6 @@
 
   <main id="fantasyLive" hidden></main>
 
-  <main id="fantasyPredictions" hidden>
-    <p class="callout-text trade-note">
-      &gt; Simple heuristic forecasts, not real projections: game picks come from each team's points scored/allowed so
-      far this season (plus a small home-field bonus); stat-leader picks are a player's points-per-game adjusted for
-      their upcoming opponent's strength. Once a game starts, check Week Leaders for the real result instead.
-    </p>
-    <div id="fantasyPredictionsBody"></div>
-  </main>
-
   <main id="fantasyMyTeam" hidden>
     <p class="callout-text trade-note">
       &gt; Add your current roster and the free agents available in your league, and get simple swap suggestions
@@ -113,6 +104,12 @@
         <h3>My Roster</h3>
         <input type="search" class="trade-search" placeholder="&gt; search a player to add..." />
         <div class="trade-search-results" hidden></div>
+        <label class="ocr-upload-btn">
+          &gt; upload a roster screenshot
+          <input type="file" accept="image/*" class="ocr-file-input" hidden />
+        </label>
+        <div class="ocr-status" hidden></div>
+        <div class="ocr-review" hidden></div>
         <ol class="trade-list"></ol>
       </div>
       <div class="trade-verdict" id="myTeamNote">Add players to both lists to see suggestions.</div>
@@ -120,6 +117,12 @@
         <h3>Free Agents</h3>
         <input type="search" class="trade-search" placeholder="&gt; search a player to add..." />
         <div class="trade-search-results" hidden></div>
+        <label class="ocr-upload-btn">
+          &gt; upload a free-agents screenshot
+          <input type="file" accept="image/*" class="ocr-file-input" hidden />
+        </label>
+        <div class="ocr-status" hidden></div>
+        <div class="ocr-review" hidden></div>
         <ol class="trade-list"></ol>
       </div>
     </div>
@@ -191,6 +194,21 @@
       </div>
     </div>
   </main>
+</section>
+
+<section id="predictionsView" hidden>
+  <div class="controls">
+    <div class="sub-tabs" id="predictionsLeagueTabs">
+      <button data-plg="nfl" class="active">NFL</button>
+      <button data-plg="cfb">CFB</button>
+    </div>
+  </div>
+  <p class="callout-text trade-note">
+    &gt; Simple heuristic forecasts, not real projections: game picks come from each team's points scored/allowed so
+    far this season (plus a small home-field bonus); stat-leader picks are a player's points-per-game adjusted for
+    their upcoming opponent's strength. Once a game starts, check Week Leaders (inside Fantasy) for the real result.
+  </p>
+  <div id="predictionsBody"></div>
 </section>
 
 <script src="app.js"></script>

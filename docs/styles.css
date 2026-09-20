@@ -1,15 +1,15 @@
 :root {
-  --bg: #05080a;
-  --panel: #0a1210;
-  --panel-2: #0d1917;
-  --border: #1c3a30;
-  --border-bright: #2c5a48;
-  --text: #dcf3e8;
-  --text-dim: #5f8577;
-  --accent: #39ff8a;
-  --accent-dim: #1f8f56;
-  --accent-2: #4fd8ff;
-  --danger: #ff5f5f;
+  --bg: #0a0f16;
+  --panel: #111820;
+  --panel-2: #161f29;
+  --border: #223140;
+  --border-bright: #33485a;
+  --text: #d6e0e6;
+  --text-dim: #6c8494;
+  --accent: #5fc9e8;
+  --accent-dim: #2c7a94;
+  --accent-2: #a68cf0;
+  --danger: #f0707a;
   --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --display: "Orbitron", var(--mono);
 }
@@ -20,8 +20,8 @@ body {
   margin: 0;
   background: var(--bg);
   background-image:
-    linear-gradient(rgba(57, 255, 138, 0.035) 1px, transparent 1px),
-    linear-gradient(90deg, rgba(57, 255, 138, 0.035) 1px, transparent 1px);
+    linear-gradient(color-mix(in srgb, var(--accent) 4%, transparent) 1px, transparent 1px),
+    linear-gradient(90deg, color-mix(in srgb, var(--accent) 4%, transparent) 1px, transparent 1px);
   background-size: 28px 28px;
   color: var(--text);
   min-height: 100vh;
@@ -62,7 +62,7 @@ header {
   width: 8px;
   height: 8px;
   background: var(--accent);
-  box-shadow: 0 0 8px var(--accent), 0 0 2px var(--accent);
+  box-shadow: 0 0 5px var(--accent), 0 0 1px var(--accent);
   display: inline-block;
 }
 
@@ -128,7 +128,7 @@ h1 .slash {
 .league-tabs button.active {
   color: var(--accent);
   border-bottom-color: var(--accent);
-  text-shadow: 0 0 10px rgba(57, 255, 138, 0.5);
+  text-shadow: 0 0 6px currentColor;
 }
 
 .league-tabs button.active::before {
@@ -293,7 +293,7 @@ h1 .slash {
   height: 7px;
   border-radius: 50%;
   background: var(--accent);
-  box-shadow: 0 0 6px var(--accent);
+  box-shadow: 0 0 4px var(--accent);
   display: inline-block;
   animation: live-pulse 1.4s ease-in-out infinite;
   flex-shrink: 0;
@@ -445,7 +445,7 @@ main {
   font-size: 0.85rem;
   background: var(--accent);
   color: var(--bg);
-  box-shadow: 0 0 10px var(--accent);
+  box-shadow: 0 0 6px var(--accent);
 }
 
 .board li.match {
@@ -545,7 +545,7 @@ main {
 .sub-tabs button.active {
   color: var(--accent);
   background: var(--panel);
-  text-shadow: 0 0 8px rgba(57, 255, 138, 0.4);
+  text-shadow: 0 0 5px currentColor;
 }
 
 .tag {
@@ -817,7 +817,7 @@ main {
 
 /* Predictions */
 
-#fantasyPredictionsBody {
+#predictionsBody {
   max-width: 1160px;
   margin: 16px auto 60px;
   padding: 0 24px;
@@ -884,4 +884,90 @@ main {
 .suggestion-drop {
   color: var(--danger);
   font-weight: 600;
+}
+
+/* My Team: OCR roster/free-agent screenshot import */
+
+.ocr-upload-btn {
+  display: block;
+  margin-top: 8px;
+  padding: 8px 10px;
+  border: 1px dashed var(--border-bright);
+  color: var(--accent-2);
+  font-size: 0.76rem;
+  letter-spacing: 0.03em;
+  text-align: center;
+  cursor: pointer;
+}
+
+.ocr-upload-btn:hover {
+  border-color: var(--accent);
+  color: var(--accent);
+}
+
+.ocr-status {
+  margin-top: 8px;
+  font-size: 0.78rem;
+  color: var(--text-dim);
+}
+
+.ocr-review {
+  margin-top: 10px;
+  border: 1px solid var(--border-bright);
+  background: var(--panel-2);
+  padding: 10px 12px;
+}
+
+.ocr-review-heading {
+  font-size: 0.76rem;
+  color: var(--accent-2);
+  margin-bottom: 8px;
+}
+
+.ocr-review-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.ocr-review-row {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+  font-size: 0.82rem;
+  cursor: pointer;
+}
+
+.ocr-review-row input {
+  flex-shrink: 0;
+}
+
+.ocr-review-actions {
+  display: flex;
+  gap: 8px;
+  margin-top: 10px;
+}
+
+.ocr-add-btn,
+.ocr-cancel-btn {
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 7px 12px;
+  cursor: pointer;
+}
+
+.ocr-add-btn {
+  background: var(--accent-dim);
+  border: 1px solid var(--accent);
+  color: var(--bg);
+}
+
+.ocr-cancel-btn {
+  background: none;
+  border: 1px solid var(--border-bright);
+  color: var(--text-dim);
 }

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-20T03:23:18.704Z",
+  "generatedAt": "2026-09-20T03:31:22.662Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -673,7 +673,7 @@
           "id": "receiving-td-rb",
           "label": "Receiving TD (RB)",
           "section": "position",
-          "count": 30,
+          "count": 31,
           "available": true
         },
         {
@@ -694,7 +694,7 @@
           "id": "sacks-dt",
           "label": "Sacks (DT)",
           "section": "position",
-          "count": 24,
+          "count": 25,
           "available": true
         },
         {
@@ -715,7 +715,7 @@
           "id": "sacks-db",
           "label": "Sacks (DB)",
           "section": "position",
-          "count": 39,
+          "count": 40,
           "available": true
         },
         {
@@ -736,7 +736,7 @@
           "id": "interceptions-other",
           "label": "Interceptions (Non LB/DB)",
           "section": "position",
-          "count": 9,
+          "count": 10,
           "available": true
         },
         {

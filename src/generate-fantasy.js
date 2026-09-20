@@ -246,8 +246,14 @@ async function generateCfbFantasy(previousManifest) {
   console.log(
     `  pools: passing=${pools.passing.length} rushing=${pools.rushing.length} receiving=${pools.receiving.length} scoring=${pools.scoring.length} defensive=${pools.defensive.length}`
   );
-  if (pools.passing.length === 0 && pools.rushing.length === 0 && pools.receiving.length === 0 && pools.defensive.length === 0) {
-    console.warn('  [WARN] every CFB pool came back empty - keeping previous data instead of overwriting');
+  // ESPN's CFB stats pages occasionally come back mostly/entirely blocked
+  // for a whole run (a bot-protection flake, not a real "no games yet"
+  // case - normal totals are in the hundreds), so a plain all-zero check
+  // isn't enough to catch a partially-blocked run. Treat anything under a
+  // token amount as a failed fetch and keep previous data.
+  const totalRows = pools.passing.length + pools.rushing.length + pools.receiving.length + pools.scoring.length + pools.defensive.length;
+  if (totalRows < 20) {
+    console.warn('  [WARN] CFB pools came back essentially empty - keeping previous data instead of overwriting');
     if (previousCfb) return previousCfb;
   }
 

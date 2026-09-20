@@ -377,7 +377,7 @@ async function initFantasyIfNeeded() {
   if (!fantasyLiveIntervalStarted) {
     fantasyLiveIntervalStarted = true;
     loadLiveFantasy();
-    setInterval(loadLiveFantasy, 60000);
+    setInterval(loadLiveFantasy, 30000);
   }
 }
 
@@ -974,7 +974,7 @@ fetch('data/manifest.json')
     }
     switchMainView('nfl');
     loadLive();
-    setInterval(loadLive, 60000);
+    setInterval(loadLive, 30000);
   })
   .catch((e) => {
     subtitle.textContent = 'Failed to load data.';

@@ -24,6 +24,9 @@ const tradeVerdictEl = document.getElementById('tradeVerdict');
 const fantasyWeekEl = document.getElementById('fantasyWeek');
 const fantasyWeekBoardsEl = document.getElementById('fantasyWeekBoards');
 const weekSelectorEl = document.getElementById('weekSelector');
+const tradeSettingsBtn = document.getElementById('tradeSettingsBtn');
+const tradeSettingsPanel = document.getElementById('tradeSettingsPanel');
+const tradeSettingsSummaryEl = document.getElementById('tradeSettingsSummary');
 
 const THEMES = [
   { id: 'green', name: 'Matrix Green', accent: '#39ff8a', accentDim: '#1f8f56', accent2: '#4fd8ff' },
@@ -437,8 +440,7 @@ function renderFantasyMode() {
   if (currentFantasyMode === 'week') renderFantasyWeek();
   if (currentFantasyMode === 'live') renderFantasyLive();
   if (currentFantasyMode === 'trade') {
-    renderTradeSide('a');
-    renderTradeSide('b');
+    refreshTradeUI();
   }
 }
 
@@ -715,13 +717,94 @@ function tradeSideTag(p) {
   return fantasyPlayerTag(p);
 }
 
+// League Settings: lets a player's trade value be recomputed live from
+// their real raw stat line (p.stats, from generate-fantasy.js) under a
+// different scoring format, instead of being stuck with whatever one
+// fixed format the season boards were generated with.
+const TRADE_SETTINGS_KEY = 'tradeCalcSettings';
+let tradeSettings = { type: 'redraft', scoring: 'full', qbFormat: '1qb' };
+
+function loadTradeSettings() {
+  try {
+    const saved = JSON.parse(localStorage.getItem(TRADE_SETTINGS_KEY));
+    if (saved) tradeSettings = { ...tradeSettings, ...saved };
+  } catch {
+    /* private browsing / storage blocked - falls back to the defaults above */
+  }
+}
+
+function saveTradeSettings() {
+  try {
+    localStorage.setItem(TRADE_SETTINGS_KEY, JSON.stringify(tradeSettings));
+  } catch {
+    /* private browsing / storage blocked - setting just won't persist */
+  }
+}
+
+const PPR_VALUES = { non: 0, half: 0.5, full: 1, tep: 1 };
+const QB_FORMAT_MULTIPLIERS = { '1qb': 1, '2qb': 1.35, sf: 1.5 };
+const QB_FORMAT_LABELS = { '1qb': '1QB', '2qb': '2QB', sf: 'Superflex' };
+const SCORING_LABELS = { non: 'Non-PPR', half: 'Half PPR', full: 'Full PPR', tep: 'TEP' };
+
+// Same shape as nflOffensePoints/cfbOffensePoints in fantasy-scoring.js,
+// parameterized by the chosen PPR value instead of a fixed one - every
+// field defaults to 0 via `|| 0`, so it works whether `stats` came from
+// the NFL pool (has fumbles-lost/return-TD fields) or the CFB pool
+// (doesn't - see the site's documented CFB data gaps).
+function recomputeOffenseSeasonPoints(stats, position, scoring) {
+  const ppr = PPR_VALUES[scoring] ?? PPR_VALUES.full;
+  const teBonus = scoring === 'tep' && position === 'TE' ? 0.5 : 0;
+  return (
+    (stats.passingYards || 0) * 0.04 +
+    (stats.passingTouchdowns || 0) * 4 +
+    (stats.interceptions || 0) * -2 +
+    (stats.rushingYards || 0) * 0.1 +
+    (stats.rushingTouchdowns || 0) * 6 +
+    (stats.rushingFumblesLost || 0) * -2 +
+    (stats.receivingYards || 0) * 0.1 +
+    (stats.receivingTouchdowns || 0) * 6 +
+    (stats.receptions || 0) * (ppr + teBonus) +
+    (stats.receivingFumblesLost || 0) * -2 +
+    (stats.kickReturnTouchdowns || 0) * 6 +
+    (stats.puntReturnTouchdowns || 0) * 6
+  );
+}
+
+// The season-total value under the current League Settings - QB format's
+// scarcity multiplier included, PPR/TEP recompute included, but NOT the
+// Redraft PPG divide (see effectivePoints) so callers needing a stable
+// season-scale number (e.g. the PPG/rest-of-season detail line) aren't
+// affected by the Redraft/Dynasty toggle.
+function seasonPointsFor(p, settings) {
+  if (!p.stats) return p.points; // K / team DEF / CFB IDP - not PPR-sensitive, settings don't apply
+  let pts = recomputeOffenseSeasonPoints(p.stats, p.position, settings.scoring);
+  if (p.position === 'QB') pts *= QB_FORMAT_MULTIPLIERS[settings.qbFormat] ?? 1;
+  return pts;
+}
+
+// The number actually shown/summed for trading: Dynasty is the season
+// total above; Redraft is points-per-game wherever we have games-played
+// data (see the trade calculator's own callout note for who doesn't).
+function effectivePoints(p, settings) {
+  const season = seasonPointsFor(p, settings);
+  if (settings.type === 'redraft' && p.gamesPlayed) return season / p.gamesPlayed;
+  return season;
+}
+
+function pointsUnitLabel(p, settings) {
+  return settings.type === 'redraft' && p.gamesPlayed ? 'pts/gm' : 'pts';
+}
+
 // Points-per-game, a rest-of-season estimate, a schedule-strength badge,
-// and any ESPN news matched to this player - everything beyond raw season
-// points that the trade calculator shows for a player once added to a side.
+// and any ESPN news matched to this player - everything beyond the headline
+// trade value that the trade calculator shows for a player once added to a
+// side. Always at season pace under the current scoring format, regardless
+// of the Redraft/Dynasty toggle (see the League Settings note in the UI).
 function renderPlayerDetail(p, league) {
   const statParts = [];
   const gp = p.gamesPlayed;
-  const ppg = gp && gp > 0 ? p.points / gp : null;
+  const seasonPts = seasonPointsFor(p, tradeSettings);
+  const ppg = gp && gp > 0 ? seasonPts / gp : null;
   if (ppg != null) statParts.push(`<span class="detail-stat">${gp} GP &middot; ${ppg.toFixed(1)} PPG</span>`);
 
   const info = (teamInfoCache[league] || {})[p.team];
@@ -760,16 +843,20 @@ function renderTradeSide(side) {
   if (!el) return;
   const list = el.querySelector('.trade-list');
   const totalEl = el.querySelector('.trade-total-value');
+  const unitEl = el.querySelector('.trade-total-unit');
   list.innerHTML = '';
   let total = 0;
+  let unit = 'pts';
   tradeSides[side].forEach((p, i) => {
-    total += p.points;
+    const pts = effectivePoints(p, tradeSettings);
+    total += pts;
+    unit = pointsUnitLabel(p, tradeSettings);
     const li = document.createElement('li');
     const tag = tradeSideTag(p);
     li.innerHTML = `
       <div class="trade-item-row">
         <span class="player-name">${p.name}<span class="player-team">${tag ? ' ' + tag : ''}</span></span>
-        <span class="value">${p.points.toFixed(2)}</span>
+        <span class="value">${pts.toFixed(2)}</span>
         <button type="button" class="trade-remove" aria-label="Remove ${p.name}">&times;</button>
       </div>
       ${renderPlayerDetail(p, currentFantasyLeague)}
@@ -781,58 +868,101 @@ function renderTradeSide(side) {
     list.appendChild(li);
   });
   totalEl.textContent = total.toFixed(2);
+  unitEl.textContent = unit;
   updateTradeVerdict();
 }
 
 function updateTradeVerdict() {
-  const totalA = tradeSides.a.reduce((s, p) => s + p.points, 0);
-  const totalB = tradeSides.b.reduce((s, p) => s + p.points, 0);
+  const totalA = tradeSides.a.reduce((s, p) => s + effectivePoints(p, tradeSettings), 0);
+  const totalB = tradeSides.b.reduce((s, p) => s + effectivePoints(p, tradeSettings), 0);
   if (tradeSides.a.length === 0 && tradeSides.b.length === 0) {
     tradeVerdictEl.textContent = 'Add players to both sides to evaluate the trade.';
     return;
   }
   const diff = Math.abs(totalA - totalB);
   if (diff < 0.01) {
-    tradeVerdictEl.textContent = `Even trade (${totalA.toFixed(2)} pts each side)`;
+    tradeVerdictEl.textContent = `Even trade (${totalA.toFixed(2)} each side)`;
   } else if (totalB > totalA) {
-    tradeVerdictEl.textContent = `Team A wins the trade by ${diff.toFixed(2)} pts`;
+    tradeVerdictEl.textContent = `Team A wins the trade by ${diff.toFixed(2)}`;
   } else {
-    tradeVerdictEl.textContent = `Team B wins the trade by ${diff.toFixed(2)} pts`;
+    tradeVerdictEl.textContent = `Team B wins the trade by ${diff.toFixed(2)}`;
   }
 }
 
-function setupTradeSide(el) {
-  const side = el.dataset.side;
+// Renders a browsable, clickable list of candidate players for this side -
+// the current search text narrows it, but (unlike a plain autocomplete) an
+// empty search still shows the top players by current trade value, so you
+// can add someone without already knowing their exact name.
+function renderTradeCandidates(el, side) {
   const input = el.querySelector('.trade-search');
   const results = el.querySelector('.trade-search-results');
-  input.addEventListener('input', () => {
-    const q = input.value.trim().toLowerCase();
-    results.innerHTML = '';
-    if (!q) {
-      results.hidden = true;
-      return;
-    }
-    const pool = tradeIndex[currentFantasyLeague] || [];
-    const matches = pool.filter((p) => p.name.toLowerCase().includes(q)).slice(0, 8);
-    results.hidden = matches.length === 0;
-    for (const p of matches) {
-      const item = document.createElement('div');
-      item.className = 'trade-result';
-      const tag = tradeSideTag(p);
-      item.textContent = `${p.name}${tag ? ' (' + tag + ')' : ''} — ${p.points.toFixed(2)} pts`;
-      item.addEventListener('click', () => {
-        tradeSides[side].push(p);
-        input.value = '';
-        results.innerHTML = '';
-        results.hidden = true;
-        renderTradeSide(side);
-      });
-      results.appendChild(item);
-    }
-  });
+  const q = input.value.trim().toLowerCase();
+  const pool = tradeIndex[currentFantasyLeague] || [];
+  const already = new Set(tradeSides[side].map((p) => `${p.name}|${p.team}|${p.position}`));
+  const scored = pool
+    .filter((p) => !already.has(`${p.name}|${p.team}|${p.position}`))
+    .map((p) => ({ p, pts: effectivePoints(p, tradeSettings) }))
+    .filter(({ p }) => !q || p.name.toLowerCase().includes(q));
+  scored.sort((a, b) => b.pts - a.pts);
+  const shown = scored.slice(0, 15);
+
+  results.innerHTML = '';
+  results.hidden = shown.length === 0;
+  for (const { p, pts } of shown) {
+    const item = document.createElement('div');
+    item.className = 'trade-result';
+    const tag = tradeSideTag(p);
+    const unit = pointsUnitLabel(p, tradeSettings);
+    item.textContent = `${p.name}${tag ? ' (' + tag + ')' : ''} — ${pts.toFixed(2)} ${unit}`;
+    item.addEventListener('click', () => {
+      tradeSides[side].push(p);
+      input.value = '';
+      renderTradeCandidates(el, side);
+      renderTradeSide(side);
+    });
+    results.appendChild(item);
+  }
+}
+
+function refreshTradeUI() {
+  document.querySelectorAll('.trade-side').forEach((el) => renderTradeCandidates(el, el.dataset.side));
+  renderTradeSide('a');
+  renderTradeSide('b');
+}
+
+function setupTradeSide(el) {
+  const input = el.querySelector('.trade-search');
+  input.addEventListener('input', () => renderTradeCandidates(el, el.dataset.side));
 }
 
 document.querySelectorAll('.trade-side').forEach(setupTradeSide);
+
+function syncTradeSettingsUI() {
+  document.querySelectorAll('#tradeTypeTabs button').forEach((b) => b.classList.toggle('active', b.dataset.value === tradeSettings.type));
+  document.querySelectorAll('#tradeScoringTabs button').forEach((b) => b.classList.toggle('active', b.dataset.value === tradeSettings.scoring));
+  document.querySelectorAll('#tradeQbTabs button').forEach((b) => b.classList.toggle('active', b.dataset.value === tradeSettings.qbFormat));
+  tradeSettingsSummaryEl.textContent = `${tradeSettings.type === 'dynasty' ? 'Dynasty' : 'Redraft'} · ${SCORING_LABELS[tradeSettings.scoring]} · ${QB_FORMAT_LABELS[tradeSettings.qbFormat]}`;
+}
+
+function setupTradeSettingsTabs(containerId, key) {
+  document.querySelectorAll(`#${containerId} button`).forEach((btn) => {
+    btn.addEventListener('click', () => {
+      tradeSettings[key] = btn.dataset.value;
+      saveTradeSettings();
+      syncTradeSettingsUI();
+      refreshTradeUI();
+    });
+  });
+}
+
+loadTradeSettings();
+syncTradeSettingsUI();
+setupTradeSettingsTabs('tradeTypeTabs', 'type');
+setupTradeSettingsTabs('tradeScoringTabs', 'scoring');
+setupTradeSettingsTabs('tradeQbTabs', 'qbFormat');
+tradeSettingsBtn.addEventListener('click', () => {
+  tradeSettingsPanel.hidden = !tradeSettingsPanel.hidden;
+});
 
 fetch('data/manifest.json')
   .then((r) => r.json())

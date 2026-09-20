@@ -91,6 +91,25 @@ function mergePool(target, rows, categoryKey) {
   }
 }
 
+// Only the fields the offense scoring formulas actually read (see
+// fantasy-scoring.js) - the raw per-category objects have dozens of ESPN
+// fields we don't need, and every one of them gets shipped to the client
+// for the trade calculator's PPR/TEP recompute, so trimming keeps board
+// files small.
+const OFFENSE_STAT_KEYS = [
+  'passingYards', 'passingTouchdowns', 'interceptions',
+  'rushingYards', 'rushingTouchdowns', 'rushingFumblesLost',
+  'receivingYards', 'receivingTouchdowns', 'receptions', 'receivingFumblesLost',
+  'kickReturnTouchdowns', 'puntReturnTouchdowns',
+];
+function pickOffenseStats(stats) {
+  const out = {};
+  for (const k of OFFENSE_STAT_KEYS) {
+    if (stats[k]) out[k] = stats[k];
+  }
+  return out;
+}
+
 function writeBoard(outDir, id, label, players, meta) {
   fs.writeFileSync(path.join(outDir, `${id}.json`), JSON.stringify({ id, label, players, ...meta }));
   return { id, label, count: players.length };
@@ -153,7 +172,11 @@ async function generateNflFantasy(season) {
     if (hasOffense && ['QB', 'RB', 'WR', 'TE'].includes(p.position)) {
       const points = nflOffensePoints(offenseStats);
       if (points > 0) {
-        const entry = { id: p.id, name: p.name, team: p.team, position: p.position, points, gamesPlayed };
+        // stats: the raw box-score line the points above were computed
+        // from, so the trade calculator can recompute under a different
+        // PPR/TEP setting client-side instead of being stuck with one
+        // fixed scoring format.
+        const entry = { id: p.id, name: p.name, team: p.team, position: p.position, points, gamesPlayed, stats: pickOffenseStats(offenseStats) };
         offenseBoards.all.push(entry);
         offenseBoards[p.position.toLowerCase()].push({ ...entry });
       }
@@ -267,7 +290,16 @@ async function generateCfbFantasy(previousManifest) {
     if (hasOffense && ['QB', 'RB', 'WR', 'TE'].includes(p.position)) {
       const points = cfbOffensePoints(offenseStats);
       if (points > 0) {
-        const entry = { id: null, name: p.name, team: p.team, conference: p.conference, position: p.position, points, gamesPlayed };
+        const entry = {
+          id: null,
+          name: p.name,
+          team: p.team,
+          conference: p.conference,
+          position: p.position,
+          points,
+          gamesPlayed,
+          stats: pickOffenseStats(offenseStats),
+        };
         offenseBoards.off.push(entry);
         offenseBoards[p.position.toLowerCase()].push({ ...entry });
       }

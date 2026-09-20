@@ -717,6 +717,12 @@ main {
   }
 }
 
+.trade-settings-summary {
+  color: var(--text-dim);
+  font-size: 0.78rem;
+  letter-spacing: 0.03em;
+}
+
 /* Week Leaders */
 
 .week-controls {

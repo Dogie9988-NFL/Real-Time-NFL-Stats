@@ -92,9 +92,48 @@
   <main id="fantasyLive" hidden></main>
 
   <main id="fantasyTrade" hidden>
+    <div class="controls">
+      <button id="tradeSettingsBtn" class="icon-btn" title="League Settings" aria-label="League Settings">&#9881;</button>
+      <span class="trade-settings-summary" id="tradeSettingsSummary"></span>
+    </div>
+    <div class="settings-panel" id="tradeSettingsPanel" hidden>
+      <div class="settings-block">
+        <div class="settings-label">&gt; type</div>
+        <div class="sub-tabs" id="tradeTypeTabs">
+          <button data-value="redraft" class="active">Redraft</button>
+          <button data-value="dynasty">Dynasty</button>
+        </div>
+      </div>
+      <div class="settings-block">
+        <div class="settings-label">&gt; scoring</div>
+        <div class="sub-tabs" id="tradeScoringTabs">
+          <button data-value="non">Non-PPR</button>
+          <button data-value="half">Half PPR</button>
+          <button data-value="full" class="active">Full PPR</button>
+          <button data-value="tep">TEP</button>
+        </div>
+      </div>
+      <div class="settings-block">
+        <div class="settings-label">&gt; qb format</div>
+        <div class="sub-tabs" id="tradeQbTabs">
+          <button data-value="1qb" class="active">1QB</button>
+          <button data-value="2qb">2QB</button>
+          <button data-value="sf">Superflex</button>
+        </div>
+      </div>
+      <div class="settings-block callout-text">
+        Every player's points are recomputed live from their real raw stat line under the scoring you pick above -
+        not a separate fixed number per format. <strong>Redraft</strong> shows points-per-game wherever we have
+        games-played data (NFL skill players and kickers); everything else (CFB players, NFL team defense) has no
+        games-played data to divide by, so it falls back to season total. <strong>QB format</strong> applies a
+        scarcity multiplier to QBs (1.35&times; for 2QB, 1.5&times; for Superflex) as a simplified estimate, not
+        scraped market data. Roster construction (RB/WR/TE/FLEX/bench counts, team count) isn't modeled - we have no
+        legitimate way to price that without real market data, so those controls aren't included rather than faked.
+      </div>
+    </div>
     <p class="callout-text trade-note">
-      &gt; "Scored so far" is real season points, full PPR for NFL / half PPR for CFB. "Rest of season" is a simple
-      estimate (points/game so far &times; games remaining) &mdash; not an official projection. Schedule strength
+      &gt; "Rest of season" is a simple estimate (points/game so far &times; games remaining, always at Full/Half
+      PPR season pace regardless of the League Settings above) &mdash; not an official projection. Schedule strength
       compares each team's remaining opponents' points allowed against the league average. News links come straight
       from ESPN, matched to the player (NFL only for now &mdash; CFB player ids come from CollegeFootballData.com and
       don't map to ESPN's news feed).
@@ -102,18 +141,18 @@
     <div class="trade-grid">
       <div class="trade-side" data-side="a">
         <h3>Team A sends</h3>
-        <input type="search" class="trade-search" placeholder="&gt; search a player to add..." />
-        <div class="trade-search-results" hidden></div>
+        <input type="search" class="trade-search" placeholder="&gt; search or browse players..." />
+        <div class="trade-search-results"></div>
         <ol class="trade-list"></ol>
-        <div class="trade-total">Total: <span class="trade-total-value">0.00</span> pts</div>
+        <div class="trade-total">Total: <span class="trade-total-value">0.00</span> <span class="trade-total-unit">pts</span></div>
       </div>
       <div class="trade-verdict" id="tradeVerdict">Add players to both sides to evaluate the trade.</div>
       <div class="trade-side" data-side="b">
         <h3>Team B sends</h3>
-        <input type="search" class="trade-search" placeholder="&gt; search a player to add..." />
-        <div class="trade-search-results" hidden></div>
+        <input type="search" class="trade-search" placeholder="&gt; search or browse players..." />
+        <div class="trade-search-results"></div>
         <ol class="trade-list"></ol>
-        <div class="trade-total">Total: <span class="trade-total-value">0.00</span> pts</div>
+        <div class="trade-total">Total: <span class="trade-total-value">0.00</span> <span class="trade-total-unit">pts</span></div>
       </div>
     </div>
   </main>

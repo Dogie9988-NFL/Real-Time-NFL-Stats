@@ -3,12 +3,20 @@
 <head>
 <meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<title>NFL &amp; CFB Stat Leaders</title>
+<title>NFL / College Football Stat Leaders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
+<div class="frame-corner frame-corner-tl"></div>
+<div class="frame-corner frame-corner-tr"></div>
+
 <header>
-  <h1>NFL &amp; CFB Stat Leaders</h1>
+  <div class="status-bar"><span class="status-dot"></span>SYSTEM ONLINE &middot; LIVE STAT FEED</div>
+  <h1>NFL <span class="slash">/</span> COLLEGE FOOTBALL</h1>
+  <p class="intro">&gt; Real 2026-season leaders pulled straight from ESPN's own stat pages, top 5 per category. Anything ESPN doesn't publicly track is flagged, not faked.</p>
   <p class="subtitle" id="subtitle">Loading data&hellip;</p>
   <div class="league-tabs">
     <button data-league="nfl" class="active">NFL</button>
@@ -17,7 +25,7 @@
 </header>
 
 <div class="controls">
-  <input type="search" id="search" placeholder="Filter categories (e.g. sacks, receiving)" />
+  <input type="search" id="search" placeholder="&gt; search player or stat..." />
   <select id="conferenceFilter" style="display:none;">
     <option value="">All Power 4 + Notre Dame</option>
     <option value="ACC">ACC</option>
@@ -26,18 +34,26 @@
     <option value="SEC">SEC</option>
     <option value="FBS Indep.">Notre Dame</option>
   </select>
+  <button id="settingsBtn" class="icon-btn" title="Settings" aria-label="Settings">&#9881;</button>
+</div>
+
+<div class="settings-panel" id="settingsPanel" hidden>
+  <div class="settings-block">
+    <div class="settings-label">&gt; accent color</div>
+    <div class="swatches" id="swatches"></div>
+  </div>
+  <div class="settings-block callout-text">
+    Data source: ESPN's public stats pages &mdash; not hand-typed. College football is limited to Power 4 conferences
+    (ACC, Big 12, Big Ten, SEC) plus Notre Dame, the set Yahoo Fantasy College Football uses. Two categories can't be
+    sourced from any free public data and are flagged rather than guessed: <strong>Sacks Allowed (OL)</strong> isn't
+    tracked publicly anywhere, and <strong>CFB Fumbles Recovered</strong> isn't exposed by ESPN's public CFB stats
+    (NFL Fumbles Recovered is available). A small number of CFB defensive linemen are tagged generically "DL" by ESPN
+    with no DT/Edge split, so they're excluded from both of those position boards rather than guessed into one.
+    <br /><span id="generatedAt"></span>
+  </div>
 </div>
 
 <main id="app"></main>
-
-<footer>
-  Data source: ESPN public stats pages. CFB is limited to Power 4 conferences (ACC, Big 12, Big Ten, SEC) plus
-  Notre Dame &mdash; the set Yahoo Fantasy College Football uses. Two categories can't be sourced from any free
-  public data: Sacks Allowed (OL) isn't tracked publicly anywhere (min. 50-snap qualifier included), and CFB
-  Fumbles Recovered isn't exposed by ESPN's public CFB stats pages (NFL Fumbles Recovered is available).
-  A small number of CFB defensive linemen are tagged generically "DL" by ESPN with no DT/Edge split, so they're
-  excluded from both of those position boards rather than guessed into one.
-</footer>
 
 <script src="app.js"></script>
 </body>

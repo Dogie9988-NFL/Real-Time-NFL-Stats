@@ -651,7 +651,7 @@ async function loadPredictions(league) {
   return predictionsCache[league];
 }
 
-function renderGamePredictionCard(g) {
+function renderGamePredictionCard(g, league, week) {
   const card = document.createElement('div');
   card.className = 'board game-pick-card';
   const h3 = document.createElement('h3');
@@ -668,7 +668,151 @@ function renderGamePredictionCard(g) {
   } else {
     card.innerHTML += `<div class="empty">Not enough season data yet to pick this one.</div>`;
   }
+
+  const existing = loadUserPicks()[pickKey(league, week, g.away, g.home)];
+  const row = document.createElement('div');
+  row.className = 'your-pick-row';
+  const label = document.createElement('span');
+  label.className = 'your-pick-label';
+  label.textContent = 'Your pick:';
+  row.appendChild(label);
+  for (const team of [g.away, g.home]) {
+    const btn = document.createElement('button');
+    btn.type = 'button';
+    btn.className = 'your-pick-btn';
+    btn.textContent = team;
+    btn.classList.toggle('active', !!existing && existing.yourPick === team);
+    btn.addEventListener('click', () => {
+      setUserPick(league, week, g, team);
+      renderPredictionsView();
+    });
+    row.appendChild(btn);
+  }
+  card.appendChild(row);
+
   return card;
+}
+
+// --- Your Picks: the visitor's own game picks, kept in this browser only ---
+// No backend on a static GitHub Pages site, so picks live in localStorage.
+// They're checked against data/live.json (today's scoreboard) whenever the
+// Predictions view is opened; once a picked game shows as final there, the
+// result is locked in locally so it still shows even after that game drops
+// off the live feed.
+
+const USER_PICKS_KEY = 'nflstats-user-picks';
+
+function loadUserPicks() {
+  try {
+    return JSON.parse(localStorage.getItem(USER_PICKS_KEY)) || {};
+  } catch {
+    return {};
+  }
+}
+
+function saveUserPicks(picks) {
+  try {
+    localStorage.setItem(USER_PICKS_KEY, JSON.stringify(picks));
+  } catch {
+    // Storage unavailable (private browsing, quota, etc.) - picks just won't persist.
+  }
+}
+
+function pickKey(league, week, away, home) {
+  return `${league}-w${week}-${away}-${home}`;
+}
+
+function setUserPick(league, week, g, teamAbbr) {
+  const picks = loadUserPicks();
+  const key = pickKey(league, week, g.away, g.home);
+  if (picks[key] && picks[key].yourPick === teamAbbr) {
+    delete picks[key]; // clicking your current pick again clears it
+  } else {
+    picks[key] = {
+      league,
+      week,
+      away: g.away,
+      home: g.home,
+      gameName: g.name,
+      modelPick: g.predictedWinner || null,
+      yourPick: teamAbbr,
+      resolved: false,
+      correct: null,
+      finalScore: null,
+    };
+  }
+  saveUserPicks(picks);
+}
+
+async function resolveUserPicks(league) {
+  const picks = loadUserPicks();
+  const pending = Object.values(picks).filter((p) => p.league === league && !p.resolved);
+  if (pending.length === 0) return picks;
+  try {
+    const res = await fetch(`data/live.json?t=${Date.now()}`);
+    const live = await res.json();
+    const games = live[league] || [];
+    for (const p of pending) {
+      const g = games.find(
+        (game) =>
+          game.state === 'post' &&
+          game.competitors.some((c) => c.team === p.away) &&
+          game.competitors.some((c) => c.team === p.home)
+      );
+      if (!g) continue;
+      const winner = g.competitors.find((c) => c.winner);
+      picks[pickKey(p.league, p.week, p.away, p.home)] = {
+        ...p,
+        resolved: true,
+        correct: winner ? winner.team === p.yourPick : null,
+        finalScore: g.competitors.map((c) => `${c.team} ${c.score}`).join(' - '),
+      };
+    }
+    saveUserPicks(picks);
+  } catch (e) {
+    console.error('resolving your picks failed', e);
+  }
+  return picks;
+}
+
+async function renderYourPicksSection(league) {
+  const picks = await resolveUserPicks(league);
+  const leaguePicks = Object.values(picks)
+    .filter((p) => p.league === league)
+    .sort((a, b) => b.week - a.week);
+
+  const wrap = document.createElement('div');
+  if (leaguePicks.length === 0) return wrap;
+
+  const heading = document.createElement('div');
+  heading.className = 'section-heading';
+  heading.textContent = 'Your Picks';
+  wrap.appendChild(heading);
+
+  const correct = leaguePicks.filter((p) => p.resolved && p.correct).length;
+  const missed = leaguePicks.filter((p) => p.resolved && p.correct === false).length;
+  const pending = leaguePicks.filter((p) => !p.resolved).length;
+  const record = document.createElement('p');
+  record.className = 'callout-text your-picks-record';
+  record.textContent = `Record: ${correct}-${missed}` + (pending ? ` (${pending} pending)` : '');
+  wrap.appendChild(record);
+
+  const board = document.createElement('div');
+  board.className = 'board your-picks-board';
+  const ol = document.createElement('ol');
+  for (const p of leaguePicks) {
+    const li = document.createElement('li');
+    const status = p.resolved ? (p.correct ? 'Correct' : 'Missed') : 'Pending';
+    li.innerHTML = `
+      <span class="your-pick-game">Wk ${p.week} &middot; ${p.gameName}</span>
+      <span class="your-pick-detail">You: ${p.yourPick} &middot; Model: ${p.modelPick || '—'}</span>
+      <span class="your-pick-status status-${status.toLowerCase()}">${status}${p.finalScore ? ` (${p.finalScore})` : ''}</span>
+    `;
+    ol.appendChild(li);
+  }
+  board.appendChild(ol);
+  wrap.appendChild(board);
+  return wrap;
 }
 
 async function switchPredictionsLeague(league) {
@@ -704,9 +848,11 @@ async function renderPredictionsView() {
   } else {
     const gameGrid = document.createElement('div');
     gameGrid.className = 'board-grid';
-    for (const g of games) gameGrid.appendChild(renderGamePredictionCard(g));
+    for (const g of games) gameGrid.appendChild(renderGamePredictionCard(g, league, data.games.week));
     predictionsBodyEl.appendChild(gameGrid);
   }
+
+  predictionsBodyEl.appendChild(await renderYourPicksSection(league));
 
   const statsHeading = document.createElement('div');
   statsHeading.className = 'section-heading';

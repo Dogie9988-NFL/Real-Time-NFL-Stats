@@ -851,6 +851,82 @@ main {
   font-variant-numeric: tabular-nums;
 }
 
+.your-pick-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: 10px;
+  padding-top: 10px;
+  border-top: 1px dashed var(--border);
+}
+
+.your-pick-label {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.your-pick-btn {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text-dim);
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  font-weight: 700;
+  padding: 5px 10px;
+  cursor: pointer;
+}
+
+.your-pick-btn.active {
+  color: var(--bg);
+  background: var(--accent-2);
+  border-color: var(--accent-2);
+}
+
+.your-picks-record {
+  margin: 0 0 14px;
+}
+
+.your-picks-board {
+  max-width: 640px;
+}
+
+.your-picks-board li {
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 2px;
+}
+
+.your-pick-game {
+  font-weight: 600;
+  font-size: 0.85rem;
+}
+
+.your-pick-detail {
+  font-size: 0.76rem;
+  color: var(--text-dim);
+}
+
+.your-pick-status {
+  font-size: 0.76rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-correct {
+  color: var(--accent);
+}
+
+.status-missed {
+  color: var(--danger);
+}
+
+.status-pending {
+  color: var(--text-dim);
+}
+
 /* My Team suggestions */
 
 #myTeamSuggestions {

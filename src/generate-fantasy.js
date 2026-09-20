@@ -4,7 +4,7 @@ const https = require('https');
 const { execFile } = require('child_process');
 const { HttpsProxyAgent } = require('https-proxy-agent');
 const { fetchCategoryPool } = require('./fetch-espn-category');
-const { fetchAllCfbPools } = require('./fetch-espn-cfb');
+const { fetchAllCfbPools } = require('./fetch-cfbd');
 const { nflOffensePoints, cfbOffensePoints, nflKickerPoints, nflDstPoints, cfbIdpPoints } = require('./fantasy-scoring');
 
 const DATA_DIR = path.join(__dirname, '..', 'docs', 'data', 'fantasy');
@@ -180,12 +180,38 @@ async function generateNflFantasy(season) {
   return { season: season.year, seasonLabel: season.label, format: 'Full PPR', categories: categoriesMeta };
 }
 
-async function generateCfbFantasy() {
+function loadPreviousFantasyManifest() {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'manifest.json'), 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+async function generateCfbFantasy(previousManifest) {
   console.log('\n=== CFB Fantasy (Half PPR / IDP) ===');
-  const pools = await fetchAllCfbPools(new Date().getFullYear());
+  const previousCfb = previousManifest && previousManifest.leagues && previousManifest.leagues.cfb;
+
+  let pools;
+  try {
+    pools = await fetchAllCfbPools(new Date().getFullYear());
+  } catch (err) {
+    // Same failure mode fixed in generate.js: don't let a CFBD outage/rate
+    // limit/bad key wipe good boards - keep whatever was already there.
+    console.error(`  [ERROR] CFBD fetch failed: ${err.message}`);
+    if (previousCfb) {
+      console.warn('  keeping previous CFB fantasy data for this run');
+      return previousCfb;
+    }
+    pools = { passing: [], rushing: [], receiving: [], scoring: [], defensive: [] };
+  }
   console.log(
     `  pools: passing=${pools.passing.length} rushing=${pools.rushing.length} receiving=${pools.receiving.length} scoring=${pools.scoring.length} defensive=${pools.defensive.length}`
   );
+  if (pools.passing.length === 0 && pools.rushing.length === 0 && pools.receiving.length === 0 && pools.defensive.length === 0) {
+    console.warn('  [WARN] every CFB pool came back empty - keeping previous data instead of overwriting');
+    if (previousCfb) return previousCfb;
+  }
 
   const players = {};
   const assign = (rows, key) => {
@@ -241,11 +267,25 @@ async function generateCfbFantasy() {
   return { format: 'Half PPR (offense) / IDP (defense)', categories: categoriesMeta };
 }
 
+// Optional CLI arg restricts this run to one league ("nfl" or "cfb"), same
+// reason as generate.js: NFL fantasy uses ESPN's free JSON API (fine every
+// 5 min), CFB fantasy now shares CFBD's 1,000-calls/month quota with the
+// main CFB leaderboard, so it runs on its own, less-frequent schedule.
+const which = process.argv[2];
+
 async function main() {
-  const nflSeason = await detectNflSeason();
-  const manifest = { generatedAt: new Date().toISOString(), leagues: {} };
-  manifest.leagues.nfl = await generateNflFantasy(nflSeason);
-  manifest.leagues.cfb = await generateCfbFantasy();
+  const previousManifest = loadPreviousFantasyManifest();
+  const manifest = previousManifest ? { ...previousManifest } : { leagues: {} };
+  manifest.generatedAt = new Date().toISOString();
+
+  if (!which || which === 'nfl') {
+    const nflSeason = await detectNflSeason();
+    manifest.leagues.nfl = await generateNflFantasy(nflSeason);
+  }
+  if (!which || which === 'cfb') {
+    manifest.leagues.cfb = await generateCfbFantasy(previousManifest);
+  }
+
   fs.mkdirSync(DATA_DIR, { recursive: true });
   fs.writeFileSync(path.join(DATA_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2));
   console.log('\nDone. Fantasy manifest written.');

@@ -9,6 +9,8 @@
     "generate:cfb": "node src/generate.js cfb",
     "generate:live": "node src/generate-live.js",
     "generate:fantasy": "node src/generate-fantasy.js",
+    "generate:fantasy:nfl": "node src/generate-fantasy.js nfl",
+    "generate:fantasy:cfb": "node src/generate-fantasy.js cfb",
     "generate:live-fantasy": "node src/generate-live-fantasy.js"
   },
   "dependencies": {

@@ -1,15 +1,15 @@
-name: Refresh NFL season stats
+name: Refresh CFB fantasy leaderboards
 
 on:
   schedule:
-    - cron: '*/5 * * * *' # every 5 minutes - ESPN's JSON API has no meaningful quota
+    - cron: '35 */3 * * *' # every 3 hours, at :35 - shares CFBD's 1,000/month quota with refresh-stats-cfb.yml
   workflow_dispatch: {}
 
 permissions:
   contents: write
 
 concurrency:
-  group: refresh-stats-nfl
+  group: refresh-fantasy-cfb
   cancel-in-progress: false
 
 jobs:
@@ -21,17 +21,18 @@ jobs:
         with:
           node-version: '20'
       - run: npm install
-      - run: node src/generate.js nfl
-      - run: node src/generate-fantasy.js nfl
+      - run: node src/generate-fantasy.js cfb
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
       - name: Commit and push if data changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/data
+          git add docs/data/fantasy
           if git diff --cached --quiet; then
-            echo "No stat changes."
+            echo "No fantasy stat changes."
           else
-            git commit -m "Auto-refresh NFL season stats and fantasy leaderboards"
+            git commit -m "Auto-refresh CFB fantasy leaderboards"
             git pull --rebase
             git push
           fi

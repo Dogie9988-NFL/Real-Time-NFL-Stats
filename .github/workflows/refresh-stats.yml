@@ -2,7 +2,7 @@ name: Refresh season stats
 
 on:
   schedule:
-    - cron: '15 * * * *' # hourly, at :15
+    - cron: '*/5 * * * *' # every 5 minutes, so leaderboards move during live games
   workflow_dispatch: {}
 
 permissions:

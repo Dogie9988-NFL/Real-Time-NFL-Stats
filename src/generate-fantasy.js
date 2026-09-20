@@ -246,11 +246,14 @@ async function generateCfbFantasy(previousManifest) {
   const defBoard = [];
 
   for (const p of Object.values(players)) {
+    // rushingTouchdowns/receivingTouchdowns live in the "scoring" pool (a
+    // separate CFBD category from rushing/receiving yardage), so it has to
+    // be spread in here too or every CFB skill player scores 0 TD points.
     const offenseStats = {
       ...(p.passing || {}),
       ...(p.rushing || {}),
       ...(p.receiving || {}),
-      returnTouchdowns: p.scoring ? p.scoring.returnTouchdowns : 0,
+      ...(p.scoring || {}),
     };
     const hasOffense = p.passing || p.rushing || p.receiving;
     // CFBD's per-player stats don't expose games played, unlike ESPN's NFL

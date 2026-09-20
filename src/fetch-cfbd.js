@@ -50,7 +50,7 @@ function getJson(urlPath) {
 const POOL_STAT_MAP = {
   passing: { passing: { YDS: 'passingYards', TD: 'passingTouchdowns', INT: 'interceptions' } },
   rushing: { rushing: { YDS: 'rushingYards' } },
-  receiving: { receiving: { YDS: 'receivingYards' } },
+  receiving: { receiving: { YDS: 'receivingYards', REC: 'receptions' } },
   scoring: { rushing: { TD: 'rushingTouchdowns' }, receiving: { TD: 'receivingTouchdowns' } },
   defensive: {
     defensive: { SACKS: 'sacks', TOT: 'totalTackles', PD: 'passesDefended' },

@@ -117,7 +117,7 @@ function liveOffensePoints(v, pprValue) {
   return (
     (v.passingYards || 0) * 0.04 +
     (v.passingTouchdowns || 0) * 4 +
-    (v.passingInterceptions || 0) * -2 +
+    (v.interceptions || 0) * -2 + // the live boxscore's "passing" group key is "interceptions", not "passingInterceptions"
     (v.rushingYards || 0) * 0.1 +
     (v.rushingTouchdowns || 0) * 6 +
     (v.receivingYards || 0) * 0.1 +

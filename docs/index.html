@@ -72,6 +72,7 @@
     </div>
     <div class="sub-tabs" id="fantasyModeTabs">
       <button data-fmode="leaderboards" class="active">Leaderboards</button>
+      <button data-fmode="week">Week Leaders</button>
       <button data-fmode="live">Live</button>
       <button data-fmode="trade">Trade Calculator</button>
     </div>
@@ -80,12 +81,23 @@
 
   <main id="fantasyBoards"></main>
 
+  <main id="fantasyWeek" hidden>
+    <div class="week-controls">
+      <label for="weekSelector">&gt; week</label>
+      <select id="weekSelector"></select>
+    </div>
+    <div id="fantasyWeekBoards"></div>
+  </main>
+
   <main id="fantasyLive" hidden></main>
 
   <main id="fantasyTrade" hidden>
     <p class="callout-text trade-note">
-      &gt; Based on real season fantasy points scored so far this year (not projections) &mdash; full PPR for NFL,
-      half PPR for CFB. Search a player, click to add them to a side, then compare totals.
+      &gt; "Scored so far" is real season points, full PPR for NFL / half PPR for CFB. "Rest of season" is a simple
+      estimate (points/game so far &times; games remaining) &mdash; not an official projection. Schedule strength
+      compares each team's remaining opponents' points allowed against the league average. News links come straight
+      from ESPN, matched to the player (NFL only for now &mdash; CFB player ids come from CollegeFootballData.com and
+      don't map to ESPN's news feed).
     </p>
     <div class="trade-grid">
       <div class="trade-side" data-side="a">

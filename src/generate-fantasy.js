@@ -101,6 +101,19 @@ function rankAndTrim(list) {
   return list.slice(0, 50).map((p, i) => ({ rank: i + 1, ...p, points: Math.round(p.points * 100) / 100 }));
 }
 
+// The season boards are trimmed to the top 50 per category, but the live
+// and week-by-week views need to look up ANY player's position (the
+// boxscore API doesn't return one) - including plenty of players who never
+// crack a top-50 season board. So this writes every non-zero player seen
+// this run, untrimmed, keyed by "name|team".
+function writePositionLookup(outDir, ...playerLists) {
+  const lookup = {};
+  for (const list of playerLists) {
+    for (const p of list) lookup[`${p.name}|${p.team}`] = p.position;
+  }
+  fs.writeFileSync(path.join(outDir, 'position-lookup.json'), JSON.stringify(lookup));
+}
+
 async function generateNflFantasy(season) {
   console.log('\n=== NFL Fantasy (Full PPR) ===');
   const [passing, rushing, receiving, returning, kicking, defensive, defInt, general, pointsAllowed] = await Promise.all([
@@ -136,17 +149,18 @@ async function generateNflFantasy(season) {
   for (const p of Object.values(players)) {
     const offenseStats = { ...(p.passing || {}), ...(p.rushing || {}), ...(p.receiving || {}), ...(p.returning || {}) };
     const hasOffense = p.passing || p.rushing || p.receiving;
+    const gamesPlayed = (p.general && p.general.gamesPlayed) || null;
     if (hasOffense && ['QB', 'RB', 'WR', 'TE'].includes(p.position)) {
       const points = nflOffensePoints(offenseStats);
       if (points > 0) {
-        const entry = { name: p.name, team: p.team, position: p.position, points };
+        const entry = { id: p.id, name: p.name, team: p.team, position: p.position, points, gamesPlayed };
         offenseBoards.all.push(entry);
         offenseBoards[p.position.toLowerCase()].push({ ...entry });
       }
     }
     if (p.position === 'PK' && p.kicking) {
       const points = nflKickerPoints(p.kicking);
-      if (points > 0) kickerBoard.push({ name: p.name, team: p.team, position: 'K', points });
+      if (points > 0) kickerBoard.push({ id: p.id, name: p.name, team: p.team, position: 'K', points, gamesPlayed });
     }
     if (DEF_POSITIONS.has(p.position) && p.team) {
       const t = (teamDef[p.team] = teamDef[p.team] || { sacks: 0, defInterceptions: 0, fumblesForced: 0, defTds: 0 });
@@ -166,6 +180,7 @@ async function generateNflFantasy(season) {
 
   const outDir = path.join(DATA_DIR, 'nfl');
   fs.mkdirSync(outDir, { recursive: true });
+  writePositionLookup(outDir, offenseBoards.all, kickerBoard);
   const meta = { league: 'nfl', season: season.year, seasonLabel: season.label, format: 'Full PPR' };
   const categoriesMeta = [
     writeBoard(outDir, 'all', 'All Players', rankAndTrim(offenseBoards.all), meta),
@@ -238,22 +253,31 @@ async function generateCfbFantasy(previousManifest) {
       returnTouchdowns: p.scoring ? p.scoring.returnTouchdowns : 0,
     };
     const hasOffense = p.passing || p.rushing || p.receiving;
+    // CFBD's per-player stats don't expose games played, unlike ESPN's NFL
+    // feed - leave null rather than guess (the trade calculator's PPG/
+    // rest-of-season estimate simply won't show for CFB players).
+    const gamesPlayed = null;
+    // CFBD player ids aren't ESPN athlete ids, so they can't be matched to
+    // ESPN's news-by-athlete-id feed (see generate-trade-extras.js) - leave
+    // id unset for CFB rather than pass through an id that will just silently
+    // never match.
     if (hasOffense && ['QB', 'RB', 'WR', 'TE'].includes(p.position)) {
       const points = cfbOffensePoints(offenseStats);
       if (points > 0) {
-        const entry = { name: p.name, team: p.team, conference: p.conference, position: p.position, points };
+        const entry = { id: null, name: p.name, team: p.team, conference: p.conference, position: p.position, points, gamesPlayed };
         offenseBoards.off.push(entry);
         offenseBoards[p.position.toLowerCase()].push({ ...entry });
       }
     }
     if (p.defensive && (p.position === 'DT' || p.position === 'DE' || p.position === 'LB' || p.position === 'CB' || p.position === 'S' || p.position === 'DB')) {
       const points = cfbIdpPoints(p.defensive);
-      if (points > 0) defBoard.push({ name: p.name, team: p.team, conference: p.conference, position: p.position, points });
+      if (points > 0) defBoard.push({ id: null, name: p.name, team: p.team, conference: p.conference, position: p.position, points, gamesPlayed });
     }
   }
 
   const outDir = path.join(DATA_DIR, 'cfb');
   fs.mkdirSync(outDir, { recursive: true });
+  writePositionLookup(outDir, offenseBoards.off, defBoard);
   const meta = { league: 'cfb', format: 'Half PPR (offense) / IDP (defense)' };
   const categoriesMeta = [
     writeBoard(outDir, 'off', 'All Offense', rankAndTrim(offenseBoards.off), meta),

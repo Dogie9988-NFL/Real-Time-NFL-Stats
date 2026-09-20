@@ -21,6 +21,9 @@ const fantasyBoardsEl = document.getElementById('fantasyBoards');
 const fantasyLiveEl = document.getElementById('fantasyLive');
 const fantasyTradeEl = document.getElementById('fantasyTrade');
 const tradeVerdictEl = document.getElementById('tradeVerdict');
+const fantasyWeekEl = document.getElementById('fantasyWeek');
+const fantasyWeekBoardsEl = document.getElementById('fantasyWeekBoards');
+const weekSelectorEl = document.getElementById('weekSelector');
 
 const THEMES = [
   { id: 'green', name: 'Matrix Green', accent: '#39ff8a', accentDim: '#1f8f56', accent2: '#4fd8ff' },
@@ -340,10 +343,10 @@ settingsBtn.addEventListener('click', () => {
 initThemePicker();
 
 // ---------------------------------------------------------------------
-// Fantasy: season leaderboards, live in-game scoring, trade calculator.
-// Reuses the same .board/.board-grid presentation as the real stat
-// leaderboards - it's the same shape of data (ranked players + a value),
-// just fantasy points instead of a raw stat.
+// Fantasy: season leaderboards, week leaders, live in-game scoring, and a
+// trade calculator. Reuses the same .board/.board-grid presentation as the
+// real stat leaderboards - it's the same shape of data (ranked players + a
+// value), just fantasy points instead of a raw stat.
 // ---------------------------------------------------------------------
 
 let fantasyManifest = null;
@@ -415,7 +418,7 @@ async function switchFantasyLeague(league) {
   currentFantasyLeague = league;
   fantasyLeagueTabs.forEach((t) => t.classList.toggle('active', t.dataset.flg === league));
   fantasySubtitle.textContent = 'Loading fantasy data…';
-  await loadFantasyBoards(league);
+  await Promise.all([loadFantasyBoards(league), loadTeamInfo(league), loadNews()]);
   buildTradeIndex(league);
   const meta = fantasyManifest.leagues[league];
   fantasySubtitle.textContent =
@@ -427,9 +430,11 @@ async function switchFantasyLeague(league) {
 
 function renderFantasyMode() {
   fantasyBoardsEl.hidden = currentFantasyMode !== 'leaderboards';
+  fantasyWeekEl.hidden = currentFantasyMode !== 'week';
   fantasyLiveEl.hidden = currentFantasyMode !== 'live';
   fantasyTradeEl.hidden = currentFantasyMode !== 'trade';
   if (currentFantasyMode === 'leaderboards') renderFantasyBoards();
+  if (currentFantasyMode === 'week') renderFantasyWeek();
   if (currentFantasyMode === 'live') renderFantasyLive();
   if (currentFantasyMode === 'trade') {
     renderTradeSide('a');
@@ -529,6 +534,108 @@ function renderFantasyBoards() {
   fantasyBoardsEl.appendChild(grid);
 }
 
+// --- Week Leaders ---
+// Same board shape/rendering as the season leaderboards, just scored from
+// one week's games instead of the whole season - reuses renderFantasyBoard
+// by wrapping each week's raw ranked array with the label that board would
+// have on the season view.
+
+const NFL_WEEK_LABELS = { all: 'All Players', qb: 'All QB', rb: 'All RB', wr: 'All WR', te: 'All TE', def: 'All DEF', k: 'All Kicker' };
+const CFB_WEEK_LABELS = { off: 'All Offense', qb: 'All QB', rb: 'All RB', wr: 'All WR', te: 'All TE', def: 'All Defense (IDP)' };
+
+const weekManifestCache = { nfl: null, cfb: null };
+const weekBoardCache = { nfl: {}, cfb: {} };
+const selectedWeek = { nfl: null, cfb: null };
+
+async function loadWeekManifest(league) {
+  if (weekManifestCache[league]) return weekManifestCache[league];
+  try {
+    const res = await fetch(`data/fantasy/${league}/weeks/manifest.json?t=${Date.now()}`);
+    weekManifestCache[league] = await res.json();
+  } catch (e) {
+    console.error('week manifest failed to load', e);
+    weekManifestCache[league] = { currentWeek: null, weeks: [] };
+  }
+  return weekManifestCache[league];
+}
+
+async function loadWeekBoard(league, week) {
+  if (weekBoardCache[league][week]) return weekBoardCache[league][week];
+  const res = await fetch(`data/fantasy/${league}/weeks/week-${week}.json?t=${Date.now()}`);
+  const data = await res.json();
+  weekBoardCache[league][week] = data;
+  return data;
+}
+
+async function renderFantasyWeek() {
+  const league = currentFantasyLeague;
+  const manifest = await loadWeekManifest(league);
+  if (!manifest.weeks || manifest.weeks.length === 0) {
+    fantasyWeekBoardsEl.innerHTML = '';
+    weekSelectorEl.innerHTML = '';
+    const p = document.createElement('div');
+    p.className = 'empty';
+    p.textContent = 'No week data yet this season.';
+    fantasyWeekBoardsEl.appendChild(p);
+    return;
+  }
+  if (!selectedWeek[league]) selectedWeek[league] = manifest.weeks[manifest.weeks.length - 1];
+
+  weekSelectorEl.innerHTML = '';
+  for (const w of manifest.weeks) {
+    const opt = document.createElement('option');
+    opt.value = w;
+    opt.textContent = `Week ${w}`;
+    if (w === selectedWeek[league]) opt.selected = true;
+    weekSelectorEl.appendChild(opt);
+  }
+
+  fantasyWeekBoardsEl.innerHTML = '<div class="empty">Loading week…</div>';
+  const weekData = await loadWeekBoard(league, selectedWeek[league]);
+  fantasyWeekBoardsEl.innerHTML = '';
+
+  const labels = league === 'nfl' ? NFL_WEEK_LABELS : CFB_WEEK_LABELS;
+  const grid = document.createElement('div');
+  grid.className = 'board-grid';
+  for (const [id, label] of Object.entries(labels)) {
+    const players = (weekData.boards && weekData.boards[id]) || [];
+    grid.appendChild(renderFantasyBoard({ label, format: `Week ${weekData.week}${weekData.allFinal ? '' : ' (in progress)'}`, players }));
+  }
+  fantasyWeekBoardsEl.appendChild(grid);
+}
+
+weekSelectorEl.addEventListener('change', () => {
+  selectedWeek[currentFantasyLeague] = Number(weekSelectorEl.value);
+  renderFantasyWeek();
+});
+
+// --- Trade calculator data: team schedules/SOS and player news ---
+
+const teamInfoCache = { nfl: null, cfb: null };
+let newsCache = null;
+
+async function loadTeamInfo(league) {
+  if (teamInfoCache[league]) return teamInfoCache[league];
+  try {
+    const res = await fetch(`data/fantasy/${league}/team-info.json?t=${Date.now()}`);
+    teamInfoCache[league] = await res.json();
+  } catch {
+    teamInfoCache[league] = {};
+  }
+  return teamInfoCache[league];
+}
+
+async function loadNews() {
+  if (newsCache) return newsCache;
+  try {
+    const res = await fetch(`data/fantasy/news.json?t=${Date.now()}`);
+    newsCache = await res.json();
+  } catch {
+    newsCache = {};
+  }
+  return newsCache;
+}
+
 async function loadLiveFantasy() {
   try {
     const res = await fetch(`data/live-fantasy.json?t=${Date.now()}`);
@@ -608,6 +715,46 @@ function tradeSideTag(p) {
   return fantasyPlayerTag(p);
 }
 
+// Points-per-game, a rest-of-season estimate, a schedule-strength badge,
+// and any ESPN news matched to this player - everything beyond raw season
+// points that the trade calculator shows for a player once added to a side.
+function renderPlayerDetail(p, league) {
+  const statParts = [];
+  const gp = p.gamesPlayed;
+  const ppg = gp && gp > 0 ? p.points / gp : null;
+  if (ppg != null) statParts.push(`<span class="detail-stat">${gp} GP &middot; ${ppg.toFixed(1)} PPG</span>`);
+
+  const info = (teamInfoCache[league] || {})[p.team];
+  if (info) {
+    if (ppg != null && info.gamesRemaining) {
+      const proj = ppg * info.gamesRemaining;
+      statParts.push(`<span class="detail-stat">Rest of season (est.): +${proj.toFixed(1)} pts / ${info.gamesRemaining} gm</span>`);
+    } else if (info.gamesRemaining != null) {
+      statParts.push(`<span class="detail-stat">${info.gamesRemaining} games remaining</span>`);
+    }
+    if (info.sosTier && info.sosTier !== 'Unknown') {
+      statParts.push(`<span class="sos-badge sos-${info.sosTier.toLowerCase()}">${info.sosTier} schedule</span>`);
+    }
+  }
+
+  let newsHtml = '';
+  if (p.id) {
+    const articles = (newsCache || {})[`${league}-${p.id}`];
+    if (articles && articles.length) {
+      newsHtml =
+        '<div class="player-news">' +
+        articles
+          .slice(0, 2)
+          .map((a) => `<a href="${a.link}" target="_blank" rel="noopener noreferrer">${a.headline}</a>`)
+          .join('') +
+        '</div>';
+    }
+  }
+
+  if (!statParts.length && !newsHtml) return '';
+  return `<div class="player-detail">${statParts.join('')}</div>${newsHtml}`;
+}
+
 function renderTradeSide(side) {
   const el = document.querySelector(`.trade-side[data-side="${side}"]`);
   if (!el) return;
@@ -620,9 +767,12 @@ function renderTradeSide(side) {
     const li = document.createElement('li');
     const tag = tradeSideTag(p);
     li.innerHTML = `
-      <span class="player-name">${p.name}<span class="player-team">${tag ? ' ' + tag : ''}</span></span>
-      <span class="value">${p.points.toFixed(2)}</span>
-      <button type="button" class="trade-remove" aria-label="Remove ${p.name}">&times;</button>
+      <div class="trade-item-row">
+        <span class="player-name">${p.name}<span class="player-team">${tag ? ' ' + tag : ''}</span></span>
+        <span class="value">${p.points.toFixed(2)}</span>
+        <button type="button" class="trade-remove" aria-label="Remove ${p.name}">&times;</button>
+      </div>
+      ${renderPlayerDetail(p, currentFantasyLeague)}
     `;
     li.querySelector('.trade-remove').addEventListener('click', () => {
       tradeSides[side].splice(i, 1);

@@ -716,3 +716,95 @@ main {
     order: 3;
   }
 }
+
+/* Week Leaders */
+
+.week-controls {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 20px;
+}
+
+.week-controls label {
+  color: var(--text-dim);
+  font-size: 0.8rem;
+}
+
+.week-controls select {
+  background: var(--panel-2);
+  border: 1px solid var(--border);
+  color: var(--text);
+  padding: 8px 12px;
+  font-family: var(--mono);
+  font-size: 0.85rem;
+}
+
+.week-controls select:focus {
+  outline: none;
+  border-color: var(--accent);
+}
+
+/* Trade calculator: player detail (PPG, projection, SOS, news) */
+
+.trade-list li {
+  flex-direction: column;
+  gap: 6px;
+}
+
+.trade-item-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.player-detail {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 14px;
+  padding-left: 2px;
+}
+
+.detail-stat {
+  font-size: 0.72rem;
+  color: var(--text-dim);
+}
+
+.sos-badge {
+  font-size: 0.62rem;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  padding: 1px 6px;
+  border: 1px solid var(--border-bright);
+}
+
+.sos-easy {
+  color: var(--accent);
+  border-color: var(--accent-dim);
+}
+
+.sos-tough {
+  color: var(--danger);
+  border-color: var(--danger);
+}
+
+.sos-neutral {
+  color: var(--text-dim);
+}
+
+.player-news {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+  padding-left: 2px;
+}
+
+.player-news a {
+  font-size: 0.72rem;
+  color: var(--accent-2);
+  text-decoration: none;
+}
+
+.player-news a:hover {
+  text-decoration: underline;
+}

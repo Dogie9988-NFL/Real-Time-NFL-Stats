@@ -11,7 +11,9 @@
     "generate:fantasy": "node src/generate-fantasy.js",
     "generate:fantasy:nfl": "node src/generate-fantasy.js nfl",
     "generate:fantasy:cfb": "node src/generate-fantasy.js cfb",
-    "generate:live-fantasy": "node src/generate-live-fantasy.js"
+    "generate:live-fantasy": "node src/generate-live-fantasy.js",
+    "generate:week-fantasy": "node src/generate-week-fantasy.js",
+    "generate:trade-extras": "node src/generate-trade-extras.js"
   },
   "dependencies": {
     "https-proxy-agent": "^9.1.0"

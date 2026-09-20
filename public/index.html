@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>NFL &amp; CFB Stat Leaders</title>
+<link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+<header>
+  <h1>NFL &amp; CFB Stat Leaders</h1>
+  <p class="subtitle" id="subtitle">Loading data&hellip;</p>
+  <div class="league-tabs">
+    <button data-league="nfl" class="active">NFL</button>
+    <button data-league="cfb">College Football</button>
+  </div>
+</header>
+
+<div class="controls">
+  <input type="search" id="search" placeholder="Filter categories (e.g. sacks, receiving)" />
+  <select id="conferenceFilter" style="display:none;">
+    <option value="">All Power 4 + Notre Dame</option>
+    <option value="ACC">ACC</option>
+    <option value="Big 12">Big 12</option>
+    <option value="Big Ten">Big Ten</option>
+    <option value="SEC">SEC</option>
+    <option value="FBS Indep.">Notre Dame</option>
+  </select>
+</div>
+
+<main id="app"></main>
+
+<footer>
+  Data source: ESPN public stats pages. CFB is limited to Power 4 conferences (ACC, Big 12, Big Ten, SEC) plus
+  Notre Dame &mdash; the set Yahoo Fantasy College Football uses. Two categories can't be sourced from any free
+  public data: Sacks Allowed (OL) isn't tracked publicly anywhere (min. 50-snap qualifier included), and CFB
+  Fumbles Recovered isn't exposed by ESPN's public CFB stats pages (NFL Fumbles Recovered is available).
+  A small number of CFB defensive linemen are tagged generically "DL" by ESPN with no DT/Edge split, so they're
+  excluded from both of those position boards rather than guessed into one.
+</footer>
+
+<script src="app.js"></script>
+</body>
+</html>

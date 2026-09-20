@@ -1,0 +1,12 @@
+{
+  "name": "sports-stat-leaders",
+  "version": "1.0.0",
+  "description": "NFL & CFB stat leaderboards by position, generated from ESPN data",
+  "private": true,
+  "scripts": {
+    "generate": "node src/generate.js"
+  },
+  "dependencies": {
+    "https-proxy-agent": "^9.1.0"
+  }
+}

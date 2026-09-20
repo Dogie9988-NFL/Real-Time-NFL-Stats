@@ -1,0 +1,857 @@
+{
+  "generatedAt": "2026-09-20T00:01:12.364Z",
+  "leagues": {
+    "nfl": {
+      "season": 2026,
+      "seasonLabel": "Regular Season",
+      "categories": [
+        {
+          "id": "passing-yards",
+          "label": "Passing Yards",
+          "section": "overall",
+          "count": 35,
+          "available": true
+        },
+        {
+          "id": "rushing-yards",
+          "label": "Rushing Yards",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "passing-td",
+          "label": "Passing Touchdowns",
+          "section": "overall",
+          "count": 28,
+          "available": true
+        },
+        {
+          "id": "rushing-td",
+          "label": "Rushing Touchdowns",
+          "section": "overall",
+          "count": 29,
+          "available": true
+        },
+        {
+          "id": "receiving-yards",
+          "label": "Receiving Yards",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "receiving-td",
+          "label": "Receiving Touchdowns",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "sacks",
+          "label": "Sacks",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "interceptions",
+          "label": "Interceptions",
+          "section": "overall",
+          "count": 22,
+          "available": true
+        },
+        {
+          "id": "tackles",
+          "label": "Tackles",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "pass-deflections",
+          "label": "Pass Deflections",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "forced-fumbles",
+          "label": "Forced Fumbles",
+          "section": "overall",
+          "count": 33,
+          "available": true
+        },
+        {
+          "id": "fumbles-recovered",
+          "label": "Fumbles Recovered",
+          "section": "overall",
+          "count": 42,
+          "available": true
+        },
+        {
+          "id": "interceptions-thrown",
+          "label": "Interceptions Thrown",
+          "section": "overall",
+          "count": 17,
+          "available": true
+        },
+        {
+          "id": "kick-return-yards",
+          "label": "Kick Return Yards",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "punt-return-yards",
+          "label": "Punt Return Yards",
+          "section": "overall",
+          "count": 22,
+          "available": true
+        },
+        {
+          "id": "kick-return-td",
+          "label": "Kick Return Touchdowns",
+          "section": "overall",
+          "count": 0,
+          "available": true
+        },
+        {
+          "id": "punt-return-td",
+          "label": "Punt Return Touchdowns",
+          "section": "overall",
+          "count": 0,
+          "available": true
+        },
+        {
+          "id": "passing-yards-qb",
+          "label": "Passing Yards (QB)",
+          "section": "position",
+          "count": 35,
+          "available": true
+        },
+        {
+          "id": "passing-yards-non-qb",
+          "label": "Passing Yards (Non-QB)",
+          "section": "position",
+          "count": 0,
+          "available": true
+        },
+        {
+          "id": "passing-td-qb",
+          "label": "Passing TD (QB)",
+          "section": "position",
+          "count": 28,
+          "available": true
+        },
+        {
+          "id": "passing-td-non-qb",
+          "label": "Passing TD (Non-QB)",
+          "section": "position",
+          "count": 0,
+          "available": true
+        },
+        {
+          "id": "rushing-yards-qb",
+          "label": "Rushing Yards (QB)",
+          "section": "position",
+          "count": 29,
+          "available": true
+        },
+        {
+          "id": "rushing-yards-wr",
+          "label": "Rushing Yards (WR)",
+          "section": "position",
+          "count": 11,
+          "available": true
+        },
+        {
+          "id": "rushing-yards-te",
+          "label": "Rushing Yards (TE)",
+          "section": "position",
+          "count": 1,
+          "available": true
+        },
+        {
+          "id": "rushing-yards-rb",
+          "label": "Rushing Yards (RB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "rushing-td-qb",
+          "label": "Rushing TD (QB)",
+          "section": "position",
+          "count": 7,
+          "available": true
+        },
+        {
+          "id": "rushing-td-wr",
+          "label": "Rushing TD (WR)",
+          "section": "position",
+          "count": 0,
+          "available": true
+        },
+        {
+          "id": "rushing-td-te",
+          "label": "Rushing TD (TE)",
+          "section": "position",
+          "count": 1,
+          "available": true
+        },
+        {
+          "id": "rushing-td-rb",
+          "label": "Rushing TD (RB)",
+          "section": "position",
+          "count": 21,
+          "available": true
+        },
+        {
+          "id": "receiving-yards-wr",
+          "label": "Receiving Yards (WR)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "receiving-yards-rb",
+          "label": "Receiving Yards (RB)",
+          "section": "position",
+          "count": 43,
+          "available": true
+        },
+        {
+          "id": "receiving-yards-te",
+          "label": "Receiving Yards (TE)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "receiving-yards-other",
+          "label": "Receiving Yards (Non WR/RB/TE)",
+          "section": "position",
+          "count": 2,
+          "available": true
+        },
+        {
+          "id": "receiving-td-wr",
+          "label": "Receiving TD (WR)",
+          "section": "position",
+          "count": 26,
+          "available": true
+        },
+        {
+          "id": "receiving-td-rb",
+          "label": "Receiving TD (RB)",
+          "section": "position",
+          "count": 8,
+          "available": true
+        },
+        {
+          "id": "receiving-td-te",
+          "label": "Receiving TD (TE)",
+          "section": "position",
+          "count": 16,
+          "available": true
+        },
+        {
+          "id": "receiving-td-other",
+          "label": "Receiving TD (Non WR/RB/TE)",
+          "section": "position",
+          "count": 0,
+          "available": true
+        },
+        {
+          "id": "sacks-dt",
+          "label": "Sacks (DT)",
+          "section": "position",
+          "count": 15,
+          "available": true
+        },
+        {
+          "id": "sacks-edge",
+          "label": "Sacks (Edge)",
+          "section": "position",
+          "count": 21,
+          "available": true
+        },
+        {
+          "id": "sacks-lb",
+          "label": "Sacks (LB)",
+          "section": "position",
+          "count": 31,
+          "available": true
+        },
+        {
+          "id": "sacks-db",
+          "label": "Sacks (DB)",
+          "section": "position",
+          "count": 6,
+          "available": true
+        },
+        {
+          "id": "interceptions-db",
+          "label": "Interceptions (DB)",
+          "section": "position",
+          "count": 17,
+          "available": true
+        },
+        {
+          "id": "interceptions-lb",
+          "label": "Interceptions (LB)",
+          "section": "position",
+          "count": 5,
+          "available": true
+        },
+        {
+          "id": "interceptions-other",
+          "label": "Interceptions (Non LB/DB)",
+          "section": "position",
+          "count": 0,
+          "available": true
+        },
+        {
+          "id": "tackles-dt",
+          "label": "Tackles (DT)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "tackles-edge",
+          "label": "Tackles (Edge)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "tackles-lb",
+          "label": "Tackles (LB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "tackles-db",
+          "label": "Tackles (DB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "pass-deflections-db",
+          "label": "Pass Deflections (DB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "pass-deflections-lb",
+          "label": "Pass Deflections (LB)",
+          "section": "position",
+          "count": 21,
+          "available": true
+        },
+        {
+          "id": "pass-deflections-other",
+          "label": "Pass Deflections (Non DB/LB)",
+          "section": "position",
+          "count": 15,
+          "available": true
+        },
+        {
+          "id": "forced-fumbles-dt",
+          "label": "Forced Fumbles (DT)",
+          "section": "position",
+          "count": 3,
+          "available": true
+        },
+        {
+          "id": "forced-fumbles-edge",
+          "label": "Forced Fumbles (Edge)",
+          "section": "position",
+          "count": 7,
+          "available": true
+        },
+        {
+          "id": "forced-fumbles-lb",
+          "label": "Forced Fumbles (LB)",
+          "section": "position",
+          "count": 10,
+          "available": true
+        },
+        {
+          "id": "forced-fumbles-db",
+          "label": "Forced Fumbles (DB)",
+          "section": "position",
+          "count": 13,
+          "available": true
+        },
+        {
+          "id": "fumbles-recovered-dt",
+          "label": "Fumbles Recovered (DT)",
+          "section": "position",
+          "count": 5,
+          "available": true
+        },
+        {
+          "id": "fumbles-recovered-edge",
+          "label": "Fumbles Recovered (Edge)",
+          "section": "position",
+          "count": 3,
+          "available": true
+        },
+        {
+          "id": "fumbles-recovered-lb",
+          "label": "Fumbles Recovered (LB)",
+          "section": "position",
+          "count": 7,
+          "available": true
+        },
+        {
+          "id": "fumbles-recovered-db",
+          "label": "Fumbles Recovered (DB)",
+          "section": "position",
+          "count": 6,
+          "available": true
+        },
+        {
+          "id": "sacks-allowed-ol",
+          "label": "Sacks Allowed (OL, min. 50 snaps, least to most)",
+          "section": "position",
+          "count": 0,
+          "available": false
+        }
+      ]
+    },
+    "cfb": {
+      "season": 2026,
+      "seasonLabel": "Regular Season",
+      "categories": [
+        {
+          "id": "passing-yards",
+          "label": "Passing Yards",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "rushing-yards",
+          "label": "Rushing Yards",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "passing-td",
+          "label": "Passing Touchdowns",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "rushing-td",
+          "label": "Rushing Touchdowns",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "receiving-yards",
+          "label": "Receiving Yards",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "receiving-td",
+          "label": "Receiving Touchdowns",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "sacks",
+          "label": "Sacks",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "interceptions",
+          "label": "Interceptions",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "tackles",
+          "label": "Tackles",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "pass-deflections",
+          "label": "Pass Deflections",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "forced-fumbles",
+          "label": "Forced Fumbles",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "fumbles-recovered",
+          "label": "Fumbles Recovered",
+          "section": "overall",
+          "count": 0,
+          "available": false
+        },
+        {
+          "id": "interceptions-thrown",
+          "label": "Interceptions Thrown",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "kick-return-yards",
+          "label": "Kick Return Yards",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "punt-return-yards",
+          "label": "Punt Return Yards",
+          "section": "overall",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "kick-return-td",
+          "label": "Kick Return Touchdowns",
+          "section": "overall",
+          "count": 3,
+          "available": true
+        },
+        {
+          "id": "punt-return-td",
+          "label": "Punt Return Touchdowns",
+          "section": "overall",
+          "count": 12,
+          "available": true
+        },
+        {
+          "id": "passing-yards-qb",
+          "label": "Passing Yards (QB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "passing-yards-non-qb",
+          "label": "Passing Yards (Non-QB)",
+          "section": "position",
+          "count": 3,
+          "available": true
+        },
+        {
+          "id": "passing-td-qb",
+          "label": "Passing TD (QB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "passing-td-non-qb",
+          "label": "Passing TD (Non-QB)",
+          "section": "position",
+          "count": 1,
+          "available": true
+        },
+        {
+          "id": "rushing-yards-qb",
+          "label": "Rushing Yards (QB)",
+          "section": "position",
+          "count": 36,
+          "available": true
+        },
+        {
+          "id": "rushing-yards-wr",
+          "label": "Rushing Yards (WR)",
+          "section": "position",
+          "count": 1,
+          "available": true
+        },
+        {
+          "id": "rushing-yards-te",
+          "label": "Rushing Yards (TE)",
+          "section": "position",
+          "count": 0,
+          "available": true
+        },
+        {
+          "id": "rushing-yards-rb",
+          "label": "Rushing Yards (RB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "rushing-td-qb",
+          "label": "Rushing TD (QB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "rushing-td-wr",
+          "label": "Rushing TD (WR)",
+          "section": "position",
+          "count": 7,
+          "available": true
+        },
+        {
+          "id": "rushing-td-te",
+          "label": "Rushing TD (TE)",
+          "section": "position",
+          "count": 0,
+          "available": true
+        },
+        {
+          "id": "rushing-td-rb",
+          "label": "Rushing TD (RB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "receiving-yards-wr",
+          "label": "Receiving Yards (WR)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "receiving-yards-rb",
+          "label": "Receiving Yards (RB)",
+          "section": "position",
+          "count": 12,
+          "available": true
+        },
+        {
+          "id": "receiving-yards-te",
+          "label": "Receiving Yards (TE)",
+          "section": "position",
+          "count": 32,
+          "available": true
+        },
+        {
+          "id": "receiving-yards-other",
+          "label": "Receiving Yards (Non WR/RB/TE)",
+          "section": "position",
+          "count": 0,
+          "available": true
+        },
+        {
+          "id": "receiving-td-wr",
+          "label": "Receiving TD (WR)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "receiving-td-rb",
+          "label": "Receiving TD (RB)",
+          "section": "position",
+          "count": 22,
+          "available": true
+        },
+        {
+          "id": "receiving-td-te",
+          "label": "Receiving TD (TE)",
+          "section": "position",
+          "count": 49,
+          "available": true
+        },
+        {
+          "id": "receiving-td-other",
+          "label": "Receiving TD (Non WR/RB/TE)",
+          "section": "position",
+          "count": 1,
+          "available": true
+        },
+        {
+          "id": "sacks-dt",
+          "label": "Sacks (DT)",
+          "section": "position",
+          "count": 9,
+          "available": true
+        },
+        {
+          "id": "sacks-edge",
+          "label": "Sacks (Edge)",
+          "section": "position",
+          "count": 31,
+          "available": true
+        },
+        {
+          "id": "sacks-lb",
+          "label": "Sacks (LB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "sacks-db",
+          "label": "Sacks (DB)",
+          "section": "position",
+          "count": 20,
+          "available": true
+        },
+        {
+          "id": "interceptions-db",
+          "label": "Interceptions (DB)",
+          "section": "position",
+          "count": 33,
+          "available": true
+        },
+        {
+          "id": "interceptions-lb",
+          "label": "Interceptions (LB)",
+          "section": "position",
+          "count": 17,
+          "available": true
+        },
+        {
+          "id": "interceptions-other",
+          "label": "Interceptions (Non LB/DB)",
+          "section": "position",
+          "count": 4,
+          "available": true
+        },
+        {
+          "id": "tackles-dt",
+          "label": "Tackles (DT)",
+          "section": "position",
+          "count": 12,
+          "available": true
+        },
+        {
+          "id": "tackles-edge",
+          "label": "Tackles (Edge)",
+          "section": "position",
+          "count": 36,
+          "available": true
+        },
+        {
+          "id": "tackles-lb",
+          "label": "Tackles (LB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "tackles-db",
+          "label": "Tackles (DB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "pass-deflections-db",
+          "label": "Pass Deflections (DB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "pass-deflections-lb",
+          "label": "Pass Deflections (LB)",
+          "section": "position",
+          "count": 50,
+          "available": true
+        },
+        {
+          "id": "pass-deflections-other",
+          "label": "Pass Deflections (Non DB/LB)",
+          "section": "position",
+          "count": 40,
+          "available": true
+        },
+        {
+          "id": "forced-fumbles-dt",
+          "label": "Forced Fumbles (DT)",
+          "section": "position",
+          "count": 1,
+          "available": true
+        },
+        {
+          "id": "forced-fumbles-edge",
+          "label": "Forced Fumbles (Edge)",
+          "section": "position",
+          "count": 4,
+          "available": true
+        },
+        {
+          "id": "forced-fumbles-lb",
+          "label": "Forced Fumbles (LB)",
+          "section": "position",
+          "count": 21,
+          "available": true
+        },
+        {
+          "id": "forced-fumbles-db",
+          "label": "Forced Fumbles (DB)",
+          "section": "position",
+          "count": 19,
+          "available": true
+        },
+        {
+          "id": "fumbles-recovered-dt",
+          "label": "Fumbles Recovered (DT)",
+          "section": "position",
+          "count": 0,
+          "available": false
+        },
+        {
+          "id": "fumbles-recovered-edge",
+          "label": "Fumbles Recovered (Edge)",
+          "section": "position",
+          "count": 0,
+          "available": false
+        },
+        {
+          "id": "fumbles-recovered-lb",
+          "label": "Fumbles Recovered (LB)",
+          "section": "position",
+          "count": 0,
+          "available": false
+        },
+        {
+          "id": "fumbles-recovered-db",
+          "label": "Fumbles Recovered (DB)",
+          "section": "position",
+          "count": 0,
+          "available": false
+        },
+        {
+          "id": "sacks-allowed-ol",
+          "label": "Sacks Allowed (OL, min. 50 snaps, least to most)",
+          "section": "position",
+          "count": 0,
+          "available": false
+        }
+      ]
+    }
+  }
+}

@@ -158,6 +158,21 @@ function accumulatePointsAllowed(weeks) {
   return byTeam;
 }
 
+// Same idea, but each team's OWN points scored per game - used by
+// generate-predictions.js for game-winner picks (net rating) and for the
+// opponent-strength side of defensive fantasy predictions.
+function accumulatePointsScored(weeks) {
+  const byTeam = {};
+  for (const w of weeks) {
+    for (const g of w.gameScores || []) {
+      if (g.state !== 'post') continue;
+      if (g.away) (byTeam[g.away] = byTeam[g.away] || []).push(g.awayScore);
+      if (g.home) (byTeam[g.home] = byTeam[g.home] || []).push(g.homeScore);
+    }
+  }
+  return byTeam;
+}
+
 async function processLeague(league, currentWeek, year, generateFn) {
   const weeks = [];
   for (let w = 1; w <= currentWeek; w++) {
@@ -178,6 +193,7 @@ async function processLeague(league, currentWeek, year, generateFn) {
     JSON.stringify({ currentWeek, weeks: weeks.map((w) => w.week) })
   );
   fs.writeFileSync(path.join(DATA_DIR, league, 'points-allowed.json'), JSON.stringify(accumulatePointsAllowed(weeks)));
+  fs.writeFileSync(path.join(DATA_DIR, league, 'points-scored.json'), JSON.stringify(accumulatePointsScored(weeks)));
   return weeks;
 }
 

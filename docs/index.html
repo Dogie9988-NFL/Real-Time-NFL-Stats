@@ -74,6 +74,8 @@
       <button data-fmode="leaderboards" class="active">Leaderboards</button>
       <button data-fmode="week">Week Leaders</button>
       <button data-fmode="live">Live</button>
+      <button data-fmode="predictions">Predictions</button>
+      <button data-fmode="myteam">My Team</button>
       <button data-fmode="trade">Trade Calculator</button>
     </div>
   </div>
@@ -90,6 +92,39 @@
   </main>
 
   <main id="fantasyLive" hidden></main>
+
+  <main id="fantasyPredictions" hidden>
+    <p class="callout-text trade-note">
+      &gt; Simple heuristic forecasts, not real projections: game picks come from each team's points scored/allowed so
+      far this season (plus a small home-field bonus); stat-leader picks are a player's points-per-game adjusted for
+      their upcoming opponent's strength. Once a game starts, check Week Leaders for the real result instead.
+    </p>
+    <div id="fantasyPredictionsBody"></div>
+  </main>
+
+  <main id="fantasyMyTeam" hidden>
+    <p class="callout-text trade-note">
+      &gt; Add your current roster and the free agents available in your league, and get simple swap suggestions
+      based on recent form (last few weeks), season points/game, and strength of schedule. A heuristic, not real
+      advice from your specific league's rules.
+    </p>
+    <div class="trade-grid">
+      <div class="trade-side" data-roster="mine">
+        <h3>My Roster</h3>
+        <input type="search" class="trade-search" placeholder="&gt; search a player to add..." />
+        <div class="trade-search-results" hidden></div>
+        <ol class="trade-list"></ol>
+      </div>
+      <div class="trade-verdict" id="myTeamNote">Add players to both lists to see suggestions.</div>
+      <div class="trade-side" data-roster="fa">
+        <h3>Free Agents</h3>
+        <input type="search" class="trade-search" placeholder="&gt; search a player to add..." />
+        <div class="trade-search-results" hidden></div>
+        <ol class="trade-list"></ol>
+      </div>
+    </div>
+    <div id="myTeamSuggestions"></div>
+  </main>
 
   <main id="fantasyTrade" hidden>
     <div class="controls">

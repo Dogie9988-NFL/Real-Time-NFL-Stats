@@ -24,6 +24,11 @@ const tradeVerdictEl = document.getElementById('tradeVerdict');
 const fantasyWeekEl = document.getElementById('fantasyWeek');
 const fantasyWeekBoardsEl = document.getElementById('fantasyWeekBoards');
 const weekSelectorEl = document.getElementById('weekSelector');
+const fantasyPredictionsEl = document.getElementById('fantasyPredictions');
+const fantasyPredictionsBodyEl = document.getElementById('fantasyPredictionsBody');
+const fantasyMyTeamEl = document.getElementById('fantasyMyTeam');
+const myTeamNoteEl = document.getElementById('myTeamNote');
+const myTeamSuggestionsEl = document.getElementById('myTeamSuggestions');
 const tradeSettingsBtn = document.getElementById('tradeSettingsBtn');
 const tradeSettingsPanel = document.getElementById('tradeSettingsPanel');
 const tradeSettingsSummaryEl = document.getElementById('tradeSettingsSummary');
@@ -435,10 +440,18 @@ function renderFantasyMode() {
   fantasyBoardsEl.hidden = currentFantasyMode !== 'leaderboards';
   fantasyWeekEl.hidden = currentFantasyMode !== 'week';
   fantasyLiveEl.hidden = currentFantasyMode !== 'live';
+  fantasyPredictionsEl.hidden = currentFantasyMode !== 'predictions';
+  fantasyMyTeamEl.hidden = currentFantasyMode !== 'myteam';
   fantasyTradeEl.hidden = currentFantasyMode !== 'trade';
   if (currentFantasyMode === 'leaderboards') renderFantasyBoards();
   if (currentFantasyMode === 'week') renderFantasyWeek();
   if (currentFantasyMode === 'live') renderFantasyLive();
+  if (currentFantasyMode === 'predictions') renderFantasyPredictions();
+  if (currentFantasyMode === 'myteam') {
+    renderMyTeamSide('mine');
+    renderMyTeamSide('fa');
+    ensureMyTeamDataLoaded(currentFantasyLeague);
+  }
   if (currentFantasyMode === 'trade') {
     refreshTradeUI();
   }
@@ -460,6 +473,7 @@ function fantasyPlayerTag(p) {
   const parts = [];
   if (p.team && p.team !== p.name) parts.push(p.team);
   if (p.position) parts.push(p.position);
+  if (p.opponent) parts.push(`${p.isHome ? 'vs' : '@'} ${p.opponent}`);
   return parts.join(' · ');
 }
 
@@ -610,6 +624,99 @@ weekSelectorEl.addEventListener('change', () => {
   selectedWeek[currentFantasyLeague] = Number(weekSelectorEl.value);
   renderFantasyWeek();
 });
+
+// --- Predictions: upcoming game picks + predicted stat leaders ---
+
+const predictionsCache = { nfl: null, cfb: null };
+
+async function loadPredictions(league) {
+  if (predictionsCache[league]) return predictionsCache[league];
+  try {
+    const [statsRes, gamesRes] = await Promise.all([
+      fetch(`data/predictions/${league}/stat-leaders.json?t=${Date.now()}`),
+      fetch(`data/predictions/${league}/games.json?t=${Date.now()}`),
+    ]);
+    predictionsCache[league] = { stats: await statsRes.json(), games: await gamesRes.json() };
+  } catch (e) {
+    console.error('predictions failed to load', e);
+    predictionsCache[league] = null;
+  }
+  return predictionsCache[league];
+}
+
+function renderGamePredictionCard(g) {
+  const card = document.createElement('div');
+  card.className = 'board game-pick-card';
+  const h3 = document.createElement('h3');
+  h3.textContent = g.name;
+  card.appendChild(h3);
+  if (g.predictedWinner) {
+    card.innerHTML += `
+      <div class="game-pick-winner">Pick: ${g.predictedWinner}<span class="game-pick-margin"> (by ~${g.margin} net pts)</span></div>
+      <div class="game-pick-ratings">
+        <span>${g.away}: ${g.awayNetRating > 0 ? '+' : ''}${g.awayNetRating}</span>
+        <span>${g.home}: ${g.homeNetRating > 0 ? '+' : ''}${g.homeNetRating}</span>
+      </div>
+    `;
+  } else {
+    card.innerHTML += `<div class="empty">Not enough season data yet to pick this one.</div>`;
+  }
+  return card;
+}
+
+async function renderFantasyPredictions() {
+  const league = currentFantasyLeague;
+  fantasyPredictionsBodyEl.innerHTML = '<div class="empty">Loading predictions…</div>';
+  const data = await loadPredictions(league);
+  fantasyPredictionsBodyEl.innerHTML = '';
+  if (!data) {
+    const p = document.createElement('div');
+    p.className = 'empty';
+    p.textContent = 'Prediction data not available yet.';
+    fantasyPredictionsBodyEl.appendChild(p);
+    return;
+  }
+
+  const gamesHeading = document.createElement('div');
+  gamesHeading.className = 'section-heading';
+  gamesHeading.textContent = `Predicted Game Winners — Week ${data.games.week}`;
+  fantasyPredictionsBodyEl.appendChild(gamesHeading);
+
+  const games = data.games.games || [];
+  if (games.length === 0) {
+    const p = document.createElement('div');
+    p.className = 'empty';
+    p.textContent = "All of this week's games are already underway or finished — check Live or Week Leaders.";
+    fantasyPredictionsBodyEl.appendChild(p);
+  } else {
+    const gameGrid = document.createElement('div');
+    gameGrid.className = 'board-grid';
+    for (const g of games) gameGrid.appendChild(renderGamePredictionCard(g));
+    fantasyPredictionsBodyEl.appendChild(gameGrid);
+  }
+
+  const statsHeading = document.createElement('div');
+  statsHeading.className = 'section-heading';
+  statsHeading.textContent = `Predicted Stat Leaders — Week ${data.stats.week}`;
+  fantasyPredictionsBodyEl.appendChild(statsHeading);
+
+  const labels = league === 'nfl' ? NFL_WEEK_LABELS : CFB_WEEK_LABELS;
+  const anyBoardHasPlayers = Object.values(data.stats.boards || {}).some((arr) => arr.length > 0);
+  if (!anyBoardHasPlayers) {
+    const p = document.createElement('div');
+    p.className = 'empty';
+    p.textContent = 'No players with an upcoming game to predict right now.';
+    fantasyPredictionsBodyEl.appendChild(p);
+    return;
+  }
+  const statGrid = document.createElement('div');
+  statGrid.className = 'board-grid';
+  for (const [id, label] of Object.entries(labels)) {
+    const players = (data.stats.boards && data.stats.boards[id]) || [];
+    statGrid.appendChild(renderFantasyBoard({ label, format: 'Predicted, not actual', players }));
+  }
+  fantasyPredictionsBodyEl.appendChild(statGrid);
+}
 
 // --- Trade calculator data: team schedules/SOS and player news ---
 
@@ -800,12 +907,13 @@ function pointsUnitLabel(p, settings) {
 // trade value that the trade calculator shows for a player once added to a
 // side. Always at season pace under the current scoring format, regardless
 // of the Redraft/Dynasty toggle (see the League Settings note in the UI).
-function renderPlayerDetail(p, league) {
+function renderPlayerDetail(p, league, opts = {}) {
   const statParts = [];
   const gp = p.gamesPlayed;
   const seasonPts = seasonPointsFor(p, tradeSettings);
   const ppg = gp && gp > 0 ? seasonPts / gp : null;
   if (ppg != null) statParts.push(`<span class="detail-stat">${gp} GP &middot; ${ppg.toFixed(1)} PPG</span>`);
+  if (opts.recentPpg != null) statParts.push(`<span class="detail-stat">${opts.recentPpg.toFixed(1)} PPG (last ${opts.recentWeeks || 'few'} wks)</span>`);
 
   const info = (teamInfoCache[league] || {})[p.team];
   if (info) {
@@ -935,7 +1043,169 @@ function setupTradeSide(el) {
   input.addEventListener('input', () => renderTradeCandidates(el, el.dataset.side));
 }
 
-document.querySelectorAll('.trade-side').forEach(setupTradeSide);
+document.querySelectorAll('#fantasyTrade .trade-side').forEach(setupTradeSide);
+
+// --- My Team: roster + free agency advisor ---
+// Reuses the same .trade-side/.trade-list search-and-add UI as the trade
+// calculator, but instead of comparing two sides' point totals, it looks
+// for same-position swaps where a free agent's recent form clearly beats
+// a roster player's - a simple heuristic, not real league-specific advice.
+
+const myTeamLists = { mine: [], fa: [] };
+const recentFormCache = { nfl: null, cfb: null };
+const POSITION_BOARD_IDS = { nfl: ['qb', 'rb', 'wr', 'te', 'k', 'def'], cfb: ['qb', 'rb', 'wr', 'te', 'def'] };
+
+// Average fantasy points per player over the last few completed weeks,
+// keyed by "name|team" - built from the same week-board files Week
+// Leaders already uses, reading only the position-specific boards (not
+// "all"/"off", which would double-count each player alongside their
+// position board).
+async function loadRecentForm(league) {
+  if (recentFormCache[league]) return recentFormCache[league];
+  const manifest = await loadWeekManifest(league);
+  const weeks = (manifest.weeks || []).slice(-3);
+  const boards = await Promise.all(weeks.map((w) => loadWeekBoard(league, w).catch(() => null)));
+  const byPlayer = {};
+  for (const wb of boards) {
+    if (!wb || !wb.boards) continue;
+    for (const boardId of POSITION_BOARD_IDS[league]) {
+      for (const p of wb.boards[boardId] || []) {
+        const key = `${p.name}|${p.team}`;
+        (byPlayer[key] = byPlayer[key] || []).push(p.points);
+      }
+    }
+  }
+  const avg = {};
+  for (const [key, arr] of Object.entries(byPlayer)) avg[key] = { ppg: arr.reduce((a, b) => a + b, 0) / arr.length, weeks: arr.length };
+  recentFormCache[league] = avg;
+  return avg;
+}
+
+function outlookScore(p, league) {
+  const gp = p.gamesPlayed;
+  const seasonPpg = gp && gp > 0 ? p.points / gp : 0;
+  const recent = (recentFormCache[league] || {})[`${p.name}|${p.team}`];
+  let score = recent ? recent.ppg * 0.6 + seasonPpg * 0.4 : seasonPpg;
+  const info = (teamInfoCache[currentFantasyLeague] || {})[p.team];
+  if (info && info.sosTier === 'Easy') score *= 1.08;
+  if (info && info.sosTier === 'Tough') score *= 0.92;
+  return score;
+}
+
+function renderMyTeamSide(side) {
+  const el = document.querySelector(`#fantasyMyTeam .trade-side[data-roster="${side}"]`);
+  if (!el) return;
+  const list = el.querySelector('.trade-list');
+  list.innerHTML = '';
+  const league = currentFantasyLeague;
+  myTeamLists[side].forEach((p, i) => {
+    const li = document.createElement('li');
+    const tag = fantasyPlayerTag(p);
+    const recent = (recentFormCache[league] || {})[`${p.name}|${p.team}`];
+    li.innerHTML = `
+      <div class="trade-item-row">
+        <span class="player-name">${p.name}<span class="player-team">${tag ? ' ' + tag : ''}</span></span>
+        <span class="value">${p.points.toFixed(2)}</span>
+        <button type="button" class="trade-remove" aria-label="Remove ${p.name}">&times;</button>
+      </div>
+      ${renderPlayerDetail(p, league, recent ? { recentPpg: recent.ppg, recentWeeks: recent.weeks } : {})}
+    `;
+    li.querySelector('.trade-remove').addEventListener('click', () => {
+      myTeamLists[side].splice(i, 1);
+      renderMyTeamSide(side);
+      renderMyTeamSuggestions();
+    });
+    list.appendChild(li);
+  });
+  renderMyTeamSuggestions();
+}
+
+function renderMyTeamSuggestions() {
+  myTeamSuggestionsEl.innerHTML = '';
+  const { mine, fa } = myTeamLists;
+  if (mine.length === 0 || fa.length === 0) {
+    myTeamNoteEl.textContent = 'Add players to both lists to see suggestions.';
+    return;
+  }
+  const league = currentFantasyLeague;
+  const suggestions = [];
+  const positions = new Set(mine.map((p) => p.position));
+  for (const pos of positions) {
+    const mineAtPos = mine.filter((p) => p.position === pos);
+    const faAtPos = fa.filter((p) => p.position === pos);
+    if (!mineAtPos.length || !faAtPos.length) continue;
+    const worstMine = mineAtPos.map((p) => ({ p, score: outlookScore(p, league) })).sort((a, b) => a.score - b.score)[0];
+    const bestFa = faAtPos.map((p) => ({ p, score: outlookScore(p, league) })).sort((a, b) => b.score - a.score)[0];
+    if (bestFa.score > worstMine.score * 1.15) {
+      suggestions.push({ pos, drop: worstMine, add: bestFa });
+    }
+  }
+  suggestions.sort((a, b) => b.add.score - b.drop.score - (a.add.score - a.drop.score));
+
+  if (suggestions.length === 0) {
+    myTeamNoteEl.textContent = 'No clear upgrades found at shared positions right now.';
+    return;
+  }
+  myTeamNoteEl.textContent = `${suggestions.length} suggested move${suggestions.length === 1 ? '' : 's'}`;
+
+  const heading = document.createElement('div');
+  heading.className = 'section-heading';
+  heading.textContent = 'Suggested Moves';
+  myTeamSuggestionsEl.appendChild(heading);
+
+  for (const s of suggestions) {
+    const card = document.createElement('div');
+    card.className = 'board suggestion-card';
+    card.innerHTML = `
+      <h3>${s.pos}</h3>
+      <div class="suggestion-row"><span class="suggestion-add">+ Add ${s.add.p.name}</span><span class="detail-stat">${s.add.score.toFixed(1)} outlook pts/gm</span></div>
+      <div class="suggestion-row"><span class="suggestion-drop">&minus; Drop ${s.drop.p.name}</span><span class="detail-stat">${s.drop.score.toFixed(1)} outlook pts/gm</span></div>
+    `;
+    myTeamSuggestionsEl.appendChild(card);
+  }
+}
+
+function setupMyTeamSide(el) {
+  const side = el.dataset.roster;
+  const input = el.querySelector('.trade-search');
+  const results = el.querySelector('.trade-search-results');
+  input.addEventListener('input', () => {
+    const q = input.value.trim().toLowerCase();
+    results.innerHTML = '';
+    if (!q) {
+      results.hidden = true;
+      return;
+    }
+    const pool = tradeIndex[currentFantasyLeague] || [];
+    const matches = pool.filter((p) => p.name.toLowerCase().includes(q)).slice(0, 8);
+    results.hidden = matches.length === 0;
+    for (const p of matches) {
+      const item = document.createElement('div');
+      item.className = 'trade-result';
+      const tag = fantasyPlayerTag(p);
+      item.textContent = `${p.name}${tag ? ' (' + tag + ')' : ''} — ${p.points.toFixed(2)} pts`;
+      item.addEventListener('click', () => {
+        myTeamLists[side].push(p);
+        input.value = '';
+        results.innerHTML = '';
+        results.hidden = true;
+        renderMyTeamSide(side);
+      });
+      results.appendChild(item);
+    }
+  });
+}
+
+document.querySelectorAll('#fantasyMyTeam .trade-side').forEach(setupMyTeamSide);
+
+const myTeamLeagueLoaded = { nfl: false, cfb: false };
+async function ensureMyTeamDataLoaded(league) {
+  if (myTeamLeagueLoaded[league]) return;
+  myTeamLeagueLoaded[league] = true;
+  await loadRecentForm(league);
+  renderMyTeamSide('mine');
+  renderMyTeamSide('fa');
+}
 
 function syncTradeSettingsUI() {
   document.querySelectorAll('#tradeTypeTabs button').forEach((b) => b.classList.toggle('active', b.dataset.value === tradeSettings.type));

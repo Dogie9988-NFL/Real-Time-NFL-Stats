@@ -1,4 +1,4 @@
-name: Refresh week leaders and trade-calculator extras
+name: Refresh week leaders, trade-calculator extras, and predictions
 
 on:
   schedule:
@@ -23,15 +23,16 @@ jobs:
       - run: npm install
       - run: node src/generate-week-fantasy.js
       - run: node src/generate-trade-extras.js
+      - run: node src/generate-predictions.js
       - name: Commit and push if data changed
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add docs/data/fantasy
+          git add docs/data/fantasy docs/data/predictions
           if git diff --cached --quiet; then
-            echo "No week-leader or trade-calculator changes."
+            echo "No week-leader, trade-calculator, or prediction changes."
           else
-            git commit -m "Auto-refresh week leaders and trade-calculator extras"
+            git commit -m "Auto-refresh week leaders, trade-calculator extras, and predictions"
             git pull --rebase
             git push
           fi

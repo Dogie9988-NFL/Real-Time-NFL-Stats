@@ -814,3 +814,74 @@ main {
 .player-news a:hover {
   text-decoration: underline;
 }
+
+/* Predictions */
+
+#fantasyPredictionsBody {
+  max-width: 1160px;
+  margin: 16px auto 60px;
+  padding: 0 24px;
+}
+
+.game-pick-card h3 {
+  margin: 0 0 10px;
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.game-pick-winner {
+  color: var(--accent);
+  font-weight: 700;
+  font-size: 0.92rem;
+  margin-bottom: 8px;
+}
+
+.game-pick-margin {
+  color: var(--text-dim);
+  font-weight: 400;
+  font-size: 0.76rem;
+}
+
+.game-pick-ratings {
+  display: flex;
+  justify-content: space-between;
+  font-size: 0.76rem;
+  color: var(--text-dim);
+  font-variant-numeric: tabular-nums;
+}
+
+/* My Team suggestions */
+
+#myTeamSuggestions {
+  max-width: 1160px;
+  margin: 20px auto 60px;
+  padding: 0 24px;
+}
+
+.suggestion-card {
+  max-width: 360px;
+}
+
+.suggestion-card h3 {
+  margin: 0 0 10px;
+  color: var(--accent-2);
+}
+
+.suggestion-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 0.85rem;
+}
+
+.suggestion-add {
+  color: var(--accent);
+  font-weight: 600;
+}
+
+.suggestion-drop {
+  color: var(--danger);
+  font-weight: 600;
+}

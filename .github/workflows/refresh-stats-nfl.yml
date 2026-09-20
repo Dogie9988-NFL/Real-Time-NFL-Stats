@@ -1,15 +1,15 @@
-name: Refresh season stats
+name: Refresh NFL season stats
 
 on:
   schedule:
-    - cron: '*/5 * * * *' # every 5 minutes, so leaderboards move during live games
+    - cron: '*/5 * * * *' # every 5 minutes - ESPN's JSON API has no meaningful quota
   workflow_dispatch: {}
 
 permissions:
   contents: write
 
 concurrency:
-  group: refresh-stats
+  group: refresh-stats-nfl
   cancel-in-progress: false
 
 jobs:
@@ -21,7 +21,7 @@ jobs:
         with:
           node-version: '20'
       - run: npm install
-      - run: node src/generate.js
+      - run: node src/generate.js nfl
       - run: node src/generate-fantasy.js
       - name: Commit and push if data changed
         run: |
@@ -31,7 +31,7 @@ jobs:
           if git diff --cached --quiet; then
             echo "No stat changes."
           else
-            git commit -m "Auto-refresh season stats and fantasy leaderboards"
+            git commit -m "Auto-refresh NFL season stats and fantasy leaderboards"
             git pull --rebase
             git push
           fi

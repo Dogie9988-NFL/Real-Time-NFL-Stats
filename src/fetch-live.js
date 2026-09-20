@@ -1,10 +1,10 @@
 // Live scoreboard data: today's games, scores, status, and each game's
 // current passing/rushing/receiving leader. This host (site.api.espn.com)
-// sits behind the same Akamai bot-protection family as the college-football
-// stats webpage (see fetch-espn-cfb.js), but the opposite quirk applies
-// here: curl's own default User-Agent ("curl/...") gets through fine, while
-// ANY browser-looking UA string (even a generic one) gets blocked. So this
-// one is curl with NO -A override at all - don't "fix" that by adding one.
+// sits behind Akamai bot-protection, but the quirk here is the opposite of
+// what ESPN's HTML stats pages do elsewhere in this repo's history: curl's
+// own default User-Agent ("curl/...") gets through fine, while ANY
+// browser-looking UA string (even a generic one) gets blocked. So this one
+// is curl with NO -A override at all - don't "fix" that by adding one.
 const fs = require('fs');
 const path = require('path');
 const { execFile } = require('child_process');

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-20T03:00:01.819Z",
+  "generatedAt": "2026-09-20T03:05:28.397Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -49,32 +49,32 @@
         {
           "id": "off",
           "label": "All Offense",
-          "count": 0
+          "count": 50
         },
         {
           "id": "qb",
           "label": "All QB",
-          "count": 0
+          "count": 50
         },
         {
           "id": "rb",
           "label": "All RB",
-          "count": 0
+          "count": 50
         },
         {
           "id": "wr",
           "label": "All WR",
-          "count": 0
+          "count": 50
         },
         {
           "id": "te",
           "label": "All TE",
-          "count": 0
+          "count": 32
         },
         {
           "id": "def",
           "label": "All Defense (IDP)",
-          "count": 0
+          "count": 50
         }
       ]
     }

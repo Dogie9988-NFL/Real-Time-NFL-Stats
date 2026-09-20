@@ -3,7 +3,7 @@ const path = require('path');
 const https = require('https');
 const { HttpsProxyAgent } = require('https-proxy-agent');
 const { fetchLeaders } = require('./fetch-espn');
-const { fetchAllCfbPools } = require('./fetch-espn-cfb');
+const { fetchAllCfbPools } = require('./fetch-cfbd');
 const { FETCH_SPECS, LEADERBOARDS } = require('./categories');
 
 const DATA_DIR = path.join(__dirname, '..', 'docs', 'data');
@@ -121,10 +121,18 @@ async function generateNfl(season, previousManifest) {
 
 async function generateCfb(season, previousManifest) {
   console.log(`\n=== CFB === (season ${season.year}, ${season.label}, Power 4 + Notre Dame only)`);
-  console.log('  ESPN\'s fast stats API does not sort correctly for CFB; scraping the stats site directly (slower, ~70 requests).');
-  const pools = await fetchAllCfbPools(season.year);
-  for (const [name, rows] of Object.entries(pools)) {
-    console.log(`  pool ${name}: ${rows.length} players`);
+  let pools = {};
+  try {
+    pools = await fetchAllCfbPools(season.year);
+    for (const [name, rows] of Object.entries(pools)) {
+      console.log(`  pool ${name}: ${rows.length} players`);
+    }
+  } catch (err) {
+    // A CFBD outage/rate-limit/bad-key shouldn't crash the whole script (that
+    // would also block an NFL update sharing this run) - treat it the same
+    // as "every pool empty" so every board below falls back to its last
+    // known-good data instead.
+    console.error(`  [ERROR] CFBD fetch failed: ${err.message}`);
   }
 
   const outDir = path.join(DATA_DIR, 'cfb');
@@ -139,7 +147,7 @@ async function generateCfb(season, previousManifest) {
     }
     const spec = FETCH_SPECS[board.fetch];
     if (!spec.cfb) {
-      categoriesMeta.push(writeUnavailable(outDir, board, 'cfb', season, 'Not exposed by ESPN\'s public CFB stats for any source we could find.'));
+      categoriesMeta.push(writeUnavailable(outDir, board, 'cfb', season, 'Not exposed by any free public CFB stats source we could find.'));
       continue;
     }
     const pool = pools[spec.cfb.pool] || [];
@@ -170,15 +178,28 @@ async function generateCfb(season, previousManifest) {
   return categoriesMeta;
 }
 
+// Optional CLI arg restricts this run to one league ("nfl" or "cfb"), so
+// each league can run on its own schedule (NFL's ESPN JSON API is free and
+// fast; CFB's CFBD API is capped at 1,000 calls/month - see the two
+// refresh-stats-*.yml workflows). Omit it to do both, as a manual run does.
+const which = process.argv[2];
+
 async function main() {
   const previousManifest = loadPreviousManifest();
-  const manifest = { generatedAt: new Date().toISOString(), leagues: {} };
+  // Start from whatever was already there so a single-league run doesn't
+  // blank out the other league's manifest section.
+  const manifest = previousManifest ? { ...previousManifest } : { leagues: {} };
+  manifest.generatedAt = new Date().toISOString();
 
-  const nflSeason = await detectSeason('nfl');
-  manifest.leagues.nfl = { season: nflSeason.year, seasonLabel: nflSeason.label, categories: await generateNfl(nflSeason, previousManifest) };
+  if (!which || which === 'nfl') {
+    const nflSeason = await detectSeason('nfl');
+    manifest.leagues.nfl = { season: nflSeason.year, seasonLabel: nflSeason.label, categories: await generateNfl(nflSeason, previousManifest) };
+  }
 
-  const cfbSeason = await detectSeason('college-football');
-  manifest.leagues.cfb = { season: cfbSeason.year, seasonLabel: cfbSeason.label, categories: await generateCfb(cfbSeason, previousManifest) };
+  if (!which || which === 'cfb') {
+    const cfbSeason = await detectSeason('college-football');
+    manifest.leagues.cfb = { season: cfbSeason.year, seasonLabel: cfbSeason.label, categories: await generateCfb(cfbSeason, previousManifest) };
+  }
 
   fs.writeFileSync(path.join(DATA_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2));
   console.log('\nDone. Manifest written to data/manifest.json');

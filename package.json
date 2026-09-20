@@ -5,6 +5,8 @@
   "private": true,
   "scripts": {
     "generate": "node src/generate.js",
+    "generate:nfl": "node src/generate.js nfl",
+    "generate:cfb": "node src/generate.js cfb",
     "generate:live": "node src/generate-live.js",
     "generate:fantasy": "node src/generate-fantasy.js",
     "generate:live-fantasy": "node src/generate-live-fantasy.js"

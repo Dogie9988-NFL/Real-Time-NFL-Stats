@@ -1,0 +1,38 @@
+name: Refresh CFB season stats
+
+on:
+  schedule:
+    - cron: '20 * * * *' # hourly, at :20 - CollegeFootballData's free tier caps at 1,000 calls/month
+  workflow_dispatch: {}
+
+permissions:
+  contents: write
+
+concurrency:
+  group: refresh-stats-cfb
+  cancel-in-progress: false
+
+jobs:
+  refresh:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+      - run: npm install
+      - run: node src/generate.js cfb
+        env:
+          CFBD_API_KEY: ${{ secrets.CFBD_API_KEY }}
+      - name: Commit and push if data changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add docs/data
+          if git diff --cached --quiet; then
+            echo "No stat changes."
+          else
+            git commit -m "Auto-refresh CFB season stats"
+            git pull --rebase
+            git push
+          fi

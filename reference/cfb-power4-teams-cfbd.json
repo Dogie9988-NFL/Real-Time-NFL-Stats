@@ -1,0 +1,274 @@
+{
+  "Alabama": {
+    "abbreviation": "ALA",
+    "conference": "SEC"
+  },
+  "Arizona": {
+    "abbreviation": "ARIZ",
+    "conference": "Big 12"
+  },
+  "Arizona State": {
+    "abbreviation": "ASU",
+    "conference": "Big 12"
+  },
+  "Arkansas": {
+    "abbreviation": "ARK",
+    "conference": "SEC"
+  },
+  "Auburn": {
+    "abbreviation": "AUB",
+    "conference": "SEC"
+  },
+  "BYU": {
+    "abbreviation": "BYU",
+    "conference": "Big 12"
+  },
+  "Baylor": {
+    "abbreviation": "BAY",
+    "conference": "Big 12"
+  },
+  "Boston College": {
+    "abbreviation": "BC",
+    "conference": "ACC"
+  },
+  "California": {
+    "abbreviation": "CAL",
+    "conference": "ACC"
+  },
+  "Cincinnati": {
+    "abbreviation": "CIN",
+    "conference": "Big 12"
+  },
+  "Clemson": {
+    "abbreviation": "CLEM",
+    "conference": "ACC"
+  },
+  "Colorado": {
+    "abbreviation": "COLO",
+    "conference": "Big 12"
+  },
+  "Duke": {
+    "abbreviation": "DUKE",
+    "conference": "ACC"
+  },
+  "Florida": {
+    "abbreviation": "FLA",
+    "conference": "SEC"
+  },
+  "Florida State": {
+    "abbreviation": "FSU",
+    "conference": "ACC"
+  },
+  "Georgia": {
+    "abbreviation": "UGA",
+    "conference": "SEC"
+  },
+  "Georgia Tech": {
+    "abbreviation": "GT",
+    "conference": "ACC"
+  },
+  "Houston": {
+    "abbreviation": "HOU",
+    "conference": "Big 12"
+  },
+  "Illinois": {
+    "abbreviation": "ILL",
+    "conference": "Big Ten"
+  },
+  "Indiana": {
+    "abbreviation": "IU",
+    "conference": "Big Ten"
+  },
+  "Iowa": {
+    "abbreviation": "IOWA",
+    "conference": "Big Ten"
+  },
+  "Iowa State": {
+    "abbreviation": "ISU",
+    "conference": "Big 12"
+  },
+  "Kansas": {
+    "abbreviation": "KU",
+    "conference": "Big 12"
+  },
+  "Kansas State": {
+    "abbreviation": "KSU",
+    "conference": "Big 12"
+  },
+  "Kentucky": {
+    "abbreviation": "UK",
+    "conference": "SEC"
+  },
+  "LSU": {
+    "abbreviation": "LSU",
+    "conference": "SEC"
+  },
+  "Louisville": {
+    "abbreviation": "LOU",
+    "conference": "ACC"
+  },
+  "Maryland": {
+    "abbreviation": "MD",
+    "conference": "Big Ten"
+  },
+  "Miami": {
+    "abbreviation": "MIA",
+    "conference": "ACC"
+  },
+  "Michigan": {
+    "abbreviation": "MICH",
+    "conference": "Big Ten"
+  },
+  "Michigan State": {
+    "abbreviation": "MSU",
+    "conference": "Big Ten"
+  },
+  "Minnesota": {
+    "abbreviation": "MINN",
+    "conference": "Big Ten"
+  },
+  "Mississippi State": {
+    "abbreviation": "MSST",
+    "conference": "SEC"
+  },
+  "Missouri": {
+    "abbreviation": "MIZ",
+    "conference": "SEC"
+  },
+  "NC State": {
+    "abbreviation": "NCSU",
+    "conference": "ACC"
+  },
+  "Nebraska": {
+    "abbreviation": "NEB",
+    "conference": "Big Ten"
+  },
+  "North Carolina": {
+    "abbreviation": "UNC",
+    "conference": "ACC"
+  },
+  "Northwestern": {
+    "abbreviation": "NU",
+    "conference": "Big Ten"
+  },
+  "Notre Dame": {
+    "abbreviation": "ND",
+    "conference": "FBS Indep."
+  },
+  "Ohio State": {
+    "abbreviation": "OSU",
+    "conference": "Big Ten"
+  },
+  "Oklahoma": {
+    "abbreviation": "OU",
+    "conference": "SEC"
+  },
+  "Oklahoma State": {
+    "abbreviation": "OKST",
+    "conference": "Big 12"
+  },
+  "Ole Miss": {
+    "abbreviation": "MISS",
+    "conference": "SEC"
+  },
+  "Oregon": {
+    "abbreviation": "ORE",
+    "conference": "Big Ten"
+  },
+  "Penn State": {
+    "abbreviation": "PSU",
+    "conference": "Big Ten"
+  },
+  "Pittsburgh": {
+    "abbreviation": "PITT",
+    "conference": "ACC"
+  },
+  "Purdue": {
+    "abbreviation": "PUR",
+    "conference": "Big Ten"
+  },
+  "Rutgers": {
+    "abbreviation": "RUTG",
+    "conference": "Big Ten"
+  },
+  "SMU": {
+    "abbreviation": "SMU",
+    "conference": "ACC"
+  },
+  "South Carolina": {
+    "abbreviation": "SC",
+    "conference": "SEC"
+  },
+  "Stanford": {
+    "abbreviation": "STAN",
+    "conference": "ACC"
+  },
+  "Syracuse": {
+    "abbreviation": "SYR",
+    "conference": "ACC"
+  },
+  "TCU": {
+    "abbreviation": "TCU",
+    "conference": "Big 12"
+  },
+  "Tennessee": {
+    "abbreviation": "TENN",
+    "conference": "SEC"
+  },
+  "Texas": {
+    "abbreviation": "TEX",
+    "conference": "SEC"
+  },
+  "Texas A&M": {
+    "abbreviation": "TA&M",
+    "conference": "SEC"
+  },
+  "Texas Tech": {
+    "abbreviation": "TTU",
+    "conference": "Big 12"
+  },
+  "UCF": {
+    "abbreviation": "UCF",
+    "conference": "Big 12"
+  },
+  "UCLA": {
+    "abbreviation": "UCLA",
+    "conference": "Big Ten"
+  },
+  "USC": {
+    "abbreviation": "USC",
+    "conference": "Big Ten"
+  },
+  "Utah": {
+    "abbreviation": "UTAH",
+    "conference": "Big 12"
+  },
+  "Vanderbilt": {
+    "abbreviation": "VAN",
+    "conference": "SEC"
+  },
+  "Virginia": {
+    "abbreviation": "UVA",
+    "conference": "ACC"
+  },
+  "Virginia Tech": {
+    "abbreviation": "VT",
+    "conference": "ACC"
+  },
+  "Wake Forest": {
+    "abbreviation": "WAKE",
+    "conference": "ACC"
+  },
+  "Washington": {
+    "abbreviation": "WASH",
+    "conference": "Big Ten"
+  },
+  "West Virginia": {
+    "abbreviation": "WVU",
+    "conference": "Big 12"
+  },
+  "Wisconsin": {
+    "abbreviation": "WIS",
+    "conference": "Big Ten"
+  }
+}

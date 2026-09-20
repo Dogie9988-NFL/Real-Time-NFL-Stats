@@ -3,9 +3,9 @@
 // just sliced by position).
 
 // One entry per distinct ESPN "category.field" we need to sort by.
-// `cfb` says which CFB pool (from fetch-espn-cfb.js) and field to read the
-// same stat from; `cfb: null` means ESPN's CFB stats simply don't expose
-// that stat at all (see README "Known data gaps").
+// `cfb` says which CFB pool (from fetch-cfbd.js) and field to read the
+// same stat from; `cfb: null` means no free CFB data source exposes that
+// stat at all (see README "Known data gaps").
 const FETCH_SPECS = {
   passingYards: { category: 'passing', field: 'passingYards', cfb: { pool: 'passing', field: 'passingYards' } },
   passingTouchdowns: { category: 'passing', field: 'passingTouchdowns', cfb: { pool: 'passing', field: 'passingTouchdowns' } },
@@ -17,8 +17,8 @@ const FETCH_SPECS = {
   sacks: { category: 'defensive', field: 'sacks', cfb: { pool: 'defensive', field: 'sacks' } },
   totalTackles: { category: 'defensive', field: 'totalTackles', cfb: { pool: 'defensive', field: 'totalTackles' } },
   passesDefended: { category: 'defensive', field: 'passesDefended', cfb: { pool: 'defensive', field: 'passesDefended' } },
-  fumblesForced: { category: 'general', field: 'fumblesForced', cfb: { pool: 'defensive', field: 'fumblesForced' } },
-  fumblesRecovered: { category: 'general', field: 'fumblesRecovered', cfb: null }, // not exposed by ESPN for CFB
+  fumblesForced: { category: 'general', field: 'fumblesForced', cfb: null }, // CFBD doesn't track forced fumbles at all
+  fumblesRecovered: { category: 'general', field: 'fumblesRecovered', cfb: { pool: 'defensive', field: 'fumblesRecovered' } },
   // ESPN's sort param needs the camelCase category name even though the
   // response itself labels this category "defensiveinterceptions".
   defInterceptions: { category: 'defensiveinterceptions', sortCategory: 'defensiveInterceptions', field: 'interceptions', cfb: { pool: 'defensive', field: 'interceptions' } },

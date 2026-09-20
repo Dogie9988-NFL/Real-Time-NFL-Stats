@@ -53,7 +53,32 @@ function writeUnavailable(outDir, board, league, season, reason) {
   return { id: board.id, label: board.label, section: board.section, count: 0, available: false };
 }
 
-async function generateNfl(season) {
+function loadPreviousManifest() {
+  try {
+    return JSON.parse(fs.readFileSync(path.join(DATA_DIR, 'manifest.json'), 'utf8'));
+  } catch {
+    return null;
+  }
+}
+
+function previousCategoryMap(previousManifest, league) {
+  const cats = previousManifest && previousManifest.leagues && previousManifest.leagues[league] && previousManifest.leagues[league].categories;
+  return new Map(Array.isArray(cats) ? cats.map((c) => [c.id, c]) : []);
+}
+
+// A raw stat pool coming back empty means the fetch was blocked/failed, not
+// that zero players exist - ESPN always has data once a season has games.
+// Writing that through would silently wipe out a good, previously-fetched
+// board with an empty one, so instead we leave that board's on-disk file
+// untouched (keeping last-known-good data) and carry its previous manifest
+// entry forward.
+function keepPrevious(previous, board, outDir) {
+  const prev = previous.get(board.id);
+  if (prev) return prev;
+  return writeUnavailable(outDir, board, board.league || '', { year: null, label: null }, 'No data available yet.');
+}
+
+async function generateNfl(season, previousManifest) {
   console.log(`\n=== NFL === (season ${season.year}, ${season.label})`);
   const pools = {};
   for (const [fetchKey, spec] of Object.entries(FETCH_SPECS)) {
@@ -66,6 +91,7 @@ async function generateNfl(season) {
   const outDir = path.join(DATA_DIR, 'nfl');
   fs.mkdirSync(outDir, { recursive: true });
   const categoriesMeta = [];
+  const previous = previousCategoryMap(previousManifest, 'nfl');
 
   for (const board of LEADERBOARDS) {
     if (board.staticUnavailable) {
@@ -73,6 +99,11 @@ async function generateNfl(season) {
       continue;
     }
     const pool = pools[board.fetch];
+    if (!pool || pool.length === 0) {
+      console.warn(`  [WARN] pool "${board.fetch}" came back empty - keeping previous data for "${board.id}"`);
+      categoriesMeta.push(keepPrevious(previous, { ...board, league: 'nfl' }, outDir));
+      continue;
+    }
     const filtered = pool.filter((p) => board.filter(p.position) && p.value > 0);
     const players = filtered.slice(0, 50).map((p, i) => ({
       rank: i + 1,
@@ -88,7 +119,7 @@ async function generateNfl(season) {
   return categoriesMeta;
 }
 
-async function generateCfb(season) {
+async function generateCfb(season, previousManifest) {
   console.log(`\n=== CFB === (season ${season.year}, ${season.label}, Power 4 + Notre Dame only)`);
   console.log('  ESPN\'s fast stats API does not sort correctly for CFB; scraping the stats site directly (slower, ~70 requests).');
   const pools = await fetchAllCfbPools(season.year);
@@ -99,6 +130,7 @@ async function generateCfb(season) {
   const outDir = path.join(DATA_DIR, 'cfb');
   fs.mkdirSync(outDir, { recursive: true });
   const categoriesMeta = [];
+  const previous = previousCategoryMap(previousManifest, 'cfb');
 
   for (const board of LEADERBOARDS) {
     if (board.staticUnavailable) {
@@ -111,6 +143,11 @@ async function generateCfb(season) {
       continue;
     }
     const pool = pools[spec.cfb.pool] || [];
+    if (pool.length === 0) {
+      console.warn(`  [WARN] pool "${spec.cfb.pool}" came back empty (likely blocked) - keeping previous data for "${board.id}"`);
+      categoriesMeta.push(keepPrevious(previous, { ...board, league: 'cfb' }, outDir));
+      continue;
+    }
     const field = spec.cfb.field;
 
     const withValue = pool
@@ -134,13 +171,14 @@ async function generateCfb(season) {
 }
 
 async function main() {
+  const previousManifest = loadPreviousManifest();
   const manifest = { generatedAt: new Date().toISOString(), leagues: {} };
 
   const nflSeason = await detectSeason('nfl');
-  manifest.leagues.nfl = { season: nflSeason.year, seasonLabel: nflSeason.label, categories: await generateNfl(nflSeason) };
+  manifest.leagues.nfl = { season: nflSeason.year, seasonLabel: nflSeason.label, categories: await generateNfl(nflSeason, previousManifest) };
 
   const cfbSeason = await detectSeason('college-football');
-  manifest.leagues.cfb = { season: cfbSeason.year, seasonLabel: cfbSeason.label, categories: await generateCfb(cfbSeason) };
+  manifest.leagues.cfb = { season: cfbSeason.year, seasonLabel: cfbSeason.label, categories: await generateCfb(cfbSeason, previousManifest) };
 
   fs.writeFileSync(path.join(DATA_DIR, 'manifest.json'), JSON.stringify(manifest, null, 2));
   console.log('\nDone. Manifest written to data/manifest.json');

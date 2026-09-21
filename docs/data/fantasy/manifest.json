@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-21T08:05:04.115Z",
+  "generatedAt": "2026-09-21T08:24:17.199Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -14,7 +14,7 @@
         {
           "id": "qb",
           "label": "All QB",
-          "count": 38
+          "count": 39
         },
         {
           "id": "rb",

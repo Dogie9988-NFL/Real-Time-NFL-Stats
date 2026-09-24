@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-24T07:13:48.919Z",
+  "generatedAt": "2026-09-24T07:30:55.740Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -359,7 +359,7 @@
           "id": "pass-deflections-other",
           "label": "Pass Deflections (Non DB/LB)",
           "section": "position",
-          "count": 22,
+          "count": 23,
           "available": true
         },
         {

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-25T07:32:25.160Z",
+  "generatedAt": "2026-09-25T07:34:32.728Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -9,7 +9,7 @@
           "id": "passing-yards",
           "label": "Passing Yards",
           "section": "overall",
-          "count": 39,
+          "count": 40,
           "available": true
         },
         {
@@ -23,14 +23,14 @@
           "id": "passing-td",
           "label": "Passing Touchdowns",
           "section": "overall",
-          "count": 33,
+          "count": 34,
           "available": true
         },
         {
           "id": "rushing-td",
           "label": "Rushing Touchdowns",
           "section": "overall",
-          "count": 39,
+          "count": 41,
           "available": true
         },
         {
@@ -58,7 +58,7 @@
           "id": "interceptions",
           "label": "Interceptions",
           "section": "overall",
-          "count": 37,
+          "count": 39,
           "available": true
         },
         {
@@ -93,7 +93,7 @@
           "id": "interceptions-thrown",
           "label": "Interceptions Thrown",
           "section": "overall",
-          "count": 26,
+          "count": 27,
           "available": true
         },
         {
@@ -107,7 +107,7 @@
           "id": "punt-return-yards",
           "label": "Punt Return Yards",
           "section": "overall",
-          "count": 30,
+          "count": 31,
           "available": true
         },
         {
@@ -128,7 +128,7 @@
           "id": "passing-yards-qb",
           "label": "Passing Yards (QB)",
           "section": "position",
-          "count": 39,
+          "count": 40,
           "available": true
         },
         {
@@ -142,7 +142,7 @@
           "id": "passing-td-qb",
           "label": "Passing TD (QB)",
           "section": "position",
-          "count": 33,
+          "count": 34,
           "available": true
         },
         {
@@ -205,7 +205,7 @@
           "id": "rushing-td-rb",
           "label": "Rushing TD (RB)",
           "section": "position",
-          "count": 27,
+          "count": 29,
           "available": true
         },
         {
@@ -240,7 +240,7 @@
           "id": "receiving-td-wr",
           "label": "Receiving TD (WR)",
           "section": "position",
-          "count": 39,
+          "count": 40,
           "available": true
         },
         {
@@ -254,7 +254,7 @@
           "id": "receiving-td-te",
           "label": "Receiving TD (TE)",
           "section": "position",
-          "count": 24,
+          "count": 25,
           "available": true
         },
         {
@@ -296,7 +296,7 @@
           "id": "interceptions-db",
           "label": "Interceptions (DB)",
           "section": "position",
-          "count": 28,
+          "count": 30,
           "available": true
         },
         {
@@ -352,14 +352,14 @@
           "id": "pass-deflections-lb",
           "label": "Pass Deflections (LB)",
           "section": "position",
-          "count": 36,
+          "count": 38,
           "available": true
         },
         {
           "id": "pass-deflections-other",
           "label": "Pass Deflections (Non DB/LB)",
           "section": "position",
-          "count": 23,
+          "count": 24,
           "available": true
         },
         {

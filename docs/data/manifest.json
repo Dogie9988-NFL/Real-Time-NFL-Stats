@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-26T23:19:41.977Z",
+  "generatedAt": "2026-09-26T23:29:02.322Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -540,7 +540,7 @@
           "id": "kick-return-td",
           "label": "Kick Return Touchdowns",
           "section": "overall",
-          "count": 5,
+          "count": 6,
           "available": true
         },
         {
@@ -617,7 +617,7 @@
           "id": "rushing-td-wr",
           "label": "Rushing TD (WR)",
           "section": "position",
-          "count": 12,
+          "count": 13,
           "available": true
         },
         {
@@ -694,7 +694,7 @@
           "id": "sacks-dt",
           "label": "Sacks (DT)",
           "section": "position",
-          "count": 26,
+          "count": 30,
           "available": true
         },
         {
@@ -715,7 +715,7 @@
           "id": "sacks-db",
           "label": "Sacks (DB)",
           "section": "position",
-          "count": 43,
+          "count": 45,
           "available": true
         },
         {
@@ -736,7 +736,7 @@
           "id": "interceptions-other",
           "label": "Interceptions (Non LB/DB)",
           "section": "position",
-          "count": 10,
+          "count": 11,
           "available": true
         },
         {
@@ -820,7 +820,7 @@
           "id": "fumbles-recovered-dt",
           "label": "Fumbles Recovered (DT)",
           "section": "position",
-          "count": 7,
+          "count": 8,
           "available": true
         },
         {
@@ -834,14 +834,14 @@
           "id": "fumbles-recovered-lb",
           "label": "Fumbles Recovered (LB)",
           "section": "position",
-          "count": 40,
+          "count": 42,
           "available": true
         },
         {
           "id": "fumbles-recovered-db",
           "label": "Fumbles Recovered (DB)",
           "section": "position",
-          "count": 34,
+          "count": 38,
           "available": true
         },
         {

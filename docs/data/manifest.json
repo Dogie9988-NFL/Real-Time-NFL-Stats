@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-27T14:22:14.682Z",
+  "generatedAt": "2026-09-27T14:30:20.678Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -694,7 +694,7 @@
           "id": "sacks-dt",
           "label": "Sacks (DT)",
           "section": "position",
-          "count": 32,
+          "count": 33,
           "available": true
         },
         {
@@ -715,7 +715,7 @@
           "id": "sacks-db",
           "label": "Sacks (DB)",
           "section": "position",
-          "count": 49,
+          "count": 50,
           "available": true
         },
         {
@@ -834,7 +834,7 @@
           "id": "fumbles-recovered-lb",
           "label": "Fumbles Recovered (LB)",
           "section": "position",
-          "count": 44,
+          "count": 45,
           "available": true
         },
         {

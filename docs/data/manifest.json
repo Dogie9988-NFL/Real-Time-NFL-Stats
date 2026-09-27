@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-27T06:25:53.984Z",
+  "generatedAt": "2026-09-27T06:37:16.756Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -673,7 +673,7 @@
           "id": "receiving-td-rb",
           "label": "Receiving TD (RB)",
           "section": "position",
-          "count": 33,
+          "count": 34,
           "available": true
         },
         {
@@ -729,7 +729,7 @@
           "id": "interceptions-lb",
           "label": "Interceptions (LB)",
           "section": "position",
-          "count": 39,
+          "count": 41,
           "available": true
         },
         {

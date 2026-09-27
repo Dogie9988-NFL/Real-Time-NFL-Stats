@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-27T04:25:03.724Z",
+  "generatedAt": "2026-09-27T04:32:01.213Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -729,7 +729,7 @@
           "id": "interceptions-lb",
           "label": "Interceptions (LB)",
           "section": "position",
-          "count": 38,
+          "count": 39,
           "available": true
         },
         {

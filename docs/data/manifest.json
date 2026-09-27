@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-27T03:23:57.489Z",
+  "generatedAt": "2026-09-27T03:32:17.734Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -673,7 +673,7 @@
           "id": "receiving-td-rb",
           "label": "Receiving TD (RB)",
           "section": "position",
-          "count": 32,
+          "count": 33,
           "available": true
         },
         {
@@ -694,7 +694,7 @@
           "id": "sacks-dt",
           "label": "Sacks (DT)",
           "section": "position",
-          "count": 31,
+          "count": 32,
           "available": true
         },
         {
@@ -715,7 +715,7 @@
           "id": "sacks-db",
           "label": "Sacks (DB)",
           "section": "position",
-          "count": 47,
+          "count": 49,
           "available": true
         },
         {
@@ -834,14 +834,14 @@
           "id": "fumbles-recovered-lb",
           "label": "Fumbles Recovered (LB)",
           "section": "position",
-          "count": 42,
+          "count": 44,
           "available": true
         },
         {
           "id": "fumbles-recovered-db",
           "label": "Fumbles Recovered (DB)",
           "section": "position",
-          "count": 40,
+          "count": 43,
           "available": true
         },
         {

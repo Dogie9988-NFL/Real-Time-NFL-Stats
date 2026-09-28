@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-09-28T13:56:46.918Z",
+  "generatedAt": "2026-09-28T14:16:41.632Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -9,7 +9,7 @@
           "id": "passing-yards",
           "label": "Passing Yards",
           "section": "overall",
-          "count": 40,
+          "count": 43,
           "available": true
         },
         {
@@ -23,14 +23,14 @@
           "id": "passing-td",
           "label": "Passing Touchdowns",
           "section": "overall",
-          "count": 34,
+          "count": 36,
           "available": true
         },
         {
           "id": "rushing-td",
           "label": "Rushing Touchdowns",
           "section": "overall",
-          "count": 41,
+          "count": 48,
           "available": true
         },
         {
@@ -93,7 +93,7 @@
           "id": "interceptions-thrown",
           "label": "Interceptions Thrown",
           "section": "overall",
-          "count": 27,
+          "count": 31,
           "available": true
         },
         {
@@ -128,21 +128,21 @@
           "id": "passing-yards-qb",
           "label": "Passing Yards (QB)",
           "section": "position",
-          "count": 40,
+          "count": 41,
           "available": true
         },
         {
           "id": "passing-yards-non-qb",
           "label": "Passing Yards (Non-QB)",
           "section": "position",
-          "count": 0,
+          "count": 2,
           "available": true
         },
         {
           "id": "passing-td-qb",
           "label": "Passing TD (QB)",
           "section": "position",
-          "count": 34,
+          "count": 36,
           "available": true
         },
         {
@@ -156,14 +156,14 @@
           "id": "rushing-yards-qb",
           "label": "Rushing Yards (QB)",
           "section": "position",
-          "count": 36,
+          "count": 40,
           "available": true
         },
         {
           "id": "rushing-yards-wr",
           "label": "Rushing Yards (WR)",
           "section": "position",
-          "count": 20,
+          "count": 24,
           "available": true
         },
         {
@@ -184,14 +184,14 @@
           "id": "rushing-td-qb",
           "label": "Rushing TD (QB)",
           "section": "position",
-          "count": 10,
+          "count": 12,
           "available": true
         },
         {
           "id": "rushing-td-wr",
           "label": "Rushing TD (WR)",
           "section": "position",
-          "count": 0,
+          "count": 1,
           "available": true
         },
         {
@@ -205,7 +205,7 @@
           "id": "rushing-td-rb",
           "label": "Rushing TD (RB)",
           "section": "position",
-          "count": 29,
+          "count": 33,
           "available": true
         },
         {
@@ -233,28 +233,28 @@
           "id": "receiving-yards-other",
           "label": "Receiving Yards (Non WR/RB/TE)",
           "section": "position",
-          "count": 6,
+          "count": 8,
           "available": true
         },
         {
           "id": "receiving-td-wr",
           "label": "Receiving TD (WR)",
           "section": "position",
-          "count": 40,
+          "count": 50,
           "available": true
         },
         {
           "id": "receiving-td-rb",
           "label": "Receiving TD (RB)",
           "section": "position",
-          "count": 10,
+          "count": 13,
           "available": true
         },
         {
           "id": "receiving-td-te",
           "label": "Receiving TD (TE)",
           "section": "position",
-          "count": 25,
+          "count": 34,
           "available": true
         },
         {

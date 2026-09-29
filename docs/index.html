@@ -6,17 +6,14 @@
 <title>NFL / College Football Stat Leaders</title>
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@700;900&amp;family=JetBrains+Mono:wght@400;500;700&amp;display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&amp;display=swap" rel="stylesheet" />
 <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-<div class="frame-corner frame-corner-tl"></div>
-<div class="frame-corner frame-corner-tr"></div>
-
 <header>
-  <div class="status-bar"><span class="status-dot"></span>SYSTEM ONLINE &middot; LIVE STAT FEED</div>
-  <h1>NFL <span class="slash">/</span> COLLEGE FOOTBALL</h1>
-  <p class="intro">&gt; Real 2026-season leaders pulled straight from ESPN's own stat pages, top 5 per category. Anything ESPN doesn't publicly track is flagged, not faked.</p>
+  <div class="status-bar"><span class="status-dot"></span>Live stat feed</div>
+  <h1>NFL <span class="slash">/</span> College Football</h1>
+  <p class="intro">Real 2026-season leaders pulled straight from ESPN's own stat pages, top 5 per category. Anything ESPN doesn't publicly track is flagged, not faked.</p>
   <p class="subtitle" id="subtitle">Loading data&hellip;</p>
   <div class="league-tabs" id="mainTabs">
     <button data-league="nfl" class="active">NFL</button>
@@ -28,7 +25,7 @@
 
 <div id="statsView">
   <div class="controls">
-    <input type="search" id="search" placeholder="&gt; search player or stat..." />
+    <input type="search" id="search" placeholder="search player or stat..." />
     <select id="conferenceFilter" style="display:none;">
       <option value="">All Power 4 + Notre Dame</option>
       <option value="ACC">ACC</option>
@@ -42,7 +39,7 @@
 
   <div class="settings-panel" id="settingsPanel" hidden>
     <div class="settings-block">
-      <div class="settings-label">&gt; accent color</div>
+      <div class="settings-label">accent color</div>
       <div class="swatches" id="swatches"></div>
     </div>
     <div class="settings-block callout-text">
@@ -85,7 +82,7 @@
 
   <main id="fantasyWeek" hidden>
     <div class="week-controls">
-      <label for="weekSelector">&gt; week</label>
+      <label for="weekSelector">week</label>
       <select id="weekSelector"></select>
     </div>
     <div id="fantasyWeekBoards"></div>
@@ -95,17 +92,17 @@
 
   <main id="fantasyMyTeam" hidden>
     <p class="callout-text trade-note">
-      &gt; Add your current roster and the free agents available in your league, and get simple swap suggestions
+      Add your current roster and the free agents available in your league, and get simple swap suggestions
       based on recent form (last few weeks), season points/game, and strength of schedule. A heuristic, not real
       advice from your specific league's rules.
     </p>
     <div class="trade-grid">
       <div class="trade-side" data-roster="mine">
         <h3>My Roster</h3>
-        <input type="search" class="trade-search" placeholder="&gt; search a player to add..." />
+        <input type="search" class="trade-search" placeholder="search a player to add..." />
         <div class="trade-search-results" hidden></div>
         <label class="ocr-upload-btn">
-          &gt; upload a roster screenshot
+          upload a roster screenshot
           <input type="file" accept="image/*" class="ocr-file-input" hidden />
         </label>
         <div class="ocr-status" hidden></div>
@@ -115,10 +112,10 @@
       <div class="trade-verdict" id="myTeamNote">Add players to both lists to see suggestions.</div>
       <div class="trade-side" data-roster="fa">
         <h3>Free Agents</h3>
-        <input type="search" class="trade-search" placeholder="&gt; search a player to add..." />
+        <input type="search" class="trade-search" placeholder="search a player to add..." />
         <div class="trade-search-results" hidden></div>
         <label class="ocr-upload-btn">
-          &gt; upload a free-agents screenshot
+          upload a free-agents screenshot
           <input type="file" accept="image/*" class="ocr-file-input" hidden />
         </label>
         <div class="ocr-status" hidden></div>
@@ -136,14 +133,14 @@
     </div>
     <div class="settings-panel" id="tradeSettingsPanel" hidden>
       <div class="settings-block">
-        <div class="settings-label">&gt; type</div>
+        <div class="settings-label">type</div>
         <div class="sub-tabs" id="tradeTypeTabs">
           <button data-value="redraft" class="active">Redraft</button>
           <button data-value="dynasty">Dynasty</button>
         </div>
       </div>
       <div class="settings-block">
-        <div class="settings-label">&gt; scoring</div>
+        <div class="settings-label">scoring</div>
         <div class="sub-tabs" id="tradeScoringTabs">
           <button data-value="non">Non-PPR</button>
           <button data-value="half">Half PPR</button>
@@ -152,7 +149,7 @@
         </div>
       </div>
       <div class="settings-block">
-        <div class="settings-label">&gt; qb format</div>
+        <div class="settings-label">qb format</div>
         <div class="sub-tabs" id="tradeQbTabs">
           <button data-value="1qb" class="active">1QB</button>
           <button data-value="2qb">2QB</button>
@@ -170,7 +167,7 @@
       </div>
     </div>
     <p class="callout-text trade-note">
-      &gt; "Rest of season" is a simple estimate (points/game so far &times; games remaining, always at Full/Half
+      "Rest of season" is a simple estimate (points/game so far &times; games remaining, always at Full/Half
       PPR season pace regardless of the League Settings above) &mdash; not an official projection. Schedule strength
       compares each team's remaining opponents' points allowed against the league average. News links come straight
       from ESPN, matched to the player (NFL only for now &mdash; CFB player ids come from CollegeFootballData.com and
@@ -179,7 +176,7 @@
     <div class="trade-grid">
       <div class="trade-side" data-side="a">
         <h3>Team A sends</h3>
-        <input type="search" class="trade-search" placeholder="&gt; search or browse players..." />
+        <input type="search" class="trade-search" placeholder="search or browse players..." />
         <div class="trade-search-results"></div>
         <ol class="trade-list"></ol>
         <div class="trade-total">Total: <span class="trade-total-value">0.00</span> <span class="trade-total-unit">pts</span></div>
@@ -187,7 +184,7 @@
       <div class="trade-verdict" id="tradeVerdict">Add players to both sides to evaluate the trade.</div>
       <div class="trade-side" data-side="b">
         <h3>Team B sends</h3>
-        <input type="search" class="trade-search" placeholder="&gt; search or browse players..." />
+        <input type="search" class="trade-search" placeholder="search or browse players..." />
         <div class="trade-search-results"></div>
         <ol class="trade-list"></ol>
         <div class="trade-total">Total: <span class="trade-total-value">0.00</span> <span class="trade-total-unit">pts</span></div>
@@ -204,7 +201,7 @@
     </div>
   </div>
   <p class="callout-text trade-note">
-    &gt; Simple heuristic forecasts, not real projections: game picks come from each team's points scored/allowed so
+    Simple heuristic forecasts, not real projections: game picks come from each team's points scored/allowed so
     far this season (plus a small home-field bonus); stat-leader picks are a player's points-per-game adjusted for
     their upcoming opponent's strength. Once a game starts, check Week Leaders (inside Fantasy) for the real result.
     Use the "Your pick" buttons on each game to make your own call - it's saved in this browser only and scored

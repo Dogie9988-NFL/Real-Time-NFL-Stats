@@ -12,6 +12,8 @@
   --danger: #f0707a;
   --mono: "JetBrains Mono", ui-monospace, "SFMono-Regular", Menlo, Consolas, monospace;
   --display: "Orbitron", var(--mono);
+  --radius: 10px;
+  --radius-sm: 6px;
 }
 
 * { box-sizing: border-box; }
@@ -148,6 +150,7 @@ h1 .slash {
 .controls select, .controls input {
   background: var(--panel-2);
   border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   color: var(--text);
   padding: 10px 12px;
   font-family: var(--mono);
@@ -168,6 +171,7 @@ h1 .slash {
 .icon-btn {
   background: var(--panel-2);
   border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   color: var(--accent-2);
   width: 40px;
   height: 40px;
@@ -185,6 +189,7 @@ h1 .slash {
   margin: 16px auto 0;
   padding: 18px 20px;
   border: 1px solid var(--border-bright);
+  border-radius: var(--radius);
   background: var(--panel);
 }
 
@@ -212,6 +217,7 @@ h1 .slash {
   width: 32px;
   height: 32px;
   border: 2px solid var(--border-bright);
+  border-radius: var(--radius-sm);
   cursor: pointer;
   padding: 0;
 }
@@ -266,6 +272,7 @@ h1 .slash {
   flex: 0 0 240px;
   background: var(--panel);
   border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 12px 14px;
 }
 
@@ -367,6 +374,7 @@ main {
   padding: 6px 14px;
   color: var(--accent-2);
   border: 1px solid var(--border-bright);
+  border-radius: var(--radius-sm);
   text-transform: uppercase;
   letter-spacing: 0.12em;
 }
@@ -385,6 +393,7 @@ main {
   position: relative;
   background: var(--panel);
   border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 16px 18px;
 }
 
@@ -397,8 +406,8 @@ main {
   border: 1px solid var(--accent-2);
   opacity: 0.7;
 }
-.board::before { top: -1px; left: -1px; border-right: none; border-bottom: none; }
-.board::after { bottom: -1px; right: -1px; border-left: none; border-top: none; }
+.board::before { top: 3px; left: 3px; border-right: none; border-bottom: none; }
+.board::after { bottom: 3px; right: 3px; border-left: none; border-top: none; }
 
 .board h3 {
   margin: 0 0 2px;
@@ -456,6 +465,7 @@ main {
 .rank {
   color: var(--accent);
   border: 1px solid var(--accent-dim);
+  border-radius: var(--radius-sm);
   width: 1.6em;
   height: 1.6em;
   flex-shrink: 0;
@@ -523,7 +533,9 @@ main {
   display: flex;
   gap: 4px;
   border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   background: var(--panel-2);
+  overflow: hidden;
 }
 
 .sub-tabs button {
@@ -553,6 +565,7 @@ main {
   letter-spacing: 0.04em;
   color: var(--accent-2);
   border: 1px solid var(--border-bright);
+  border-radius: var(--radius-sm);
   padding: 1px 5px;
 }
 
@@ -599,6 +612,7 @@ main {
   position: relative;
   background: var(--panel);
   border: 1px solid var(--border);
+  border-radius: var(--radius);
   padding: 16px 18px;
 }
 
@@ -615,6 +629,7 @@ main {
   width: 100%;
   background: var(--panel-2);
   border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   color: var(--text);
   padding: 9px 10px;
   font-family: var(--mono);
@@ -629,6 +644,7 @@ main {
 .trade-search-results {
   margin-top: 6px;
   border: 1px solid var(--border-bright);
+  border-radius: var(--radius-sm);
   background: var(--panel-2);
   max-height: 220px;
   overflow-y: auto;
@@ -674,6 +690,7 @@ main {
 .trade-remove {
   background: none;
   border: 1px solid var(--border-bright);
+  border-radius: var(--radius-sm);
   color: var(--danger);
   width: 22px;
   height: 22px;
@@ -740,6 +757,7 @@ main {
 .week-controls select {
   background: var(--panel-2);
   border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   color: var(--text);
   padding: 8px 12px;
   font-family: var(--mono);
@@ -782,6 +800,7 @@ main {
   text-transform: uppercase;
   padding: 1px 6px;
   border: 1px solid var(--border-bright);
+  border-radius: var(--radius-sm);
 }
 
 .sos-easy {
@@ -870,6 +889,7 @@ main {
 .your-pick-btn {
   background: var(--panel-2);
   border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
   color: var(--text-dim);
   font-family: var(--mono);
   font-size: 0.76rem;
@@ -969,6 +989,7 @@ main {
   margin-top: 8px;
   padding: 8px 10px;
   border: 1px dashed var(--border-bright);
+  border-radius: var(--radius-sm);
   color: var(--accent-2);
   font-size: 0.76rem;
   letter-spacing: 0.03em;
@@ -990,6 +1011,7 @@ main {
 .ocr-review {
   margin-top: 10px;
   border: 1px solid var(--border-bright);
+  border-radius: var(--radius-sm);
   background: var(--panel-2);
   padding: 10px 12px;
 }
@@ -1034,6 +1056,11 @@ main {
   text-transform: uppercase;
   padding: 7px 12px;
   cursor: pointer;
+}
+
+.ocr-add-btn,
+.ocr-cancel-btn {
+  border-radius: var(--radius-sm);
 }
 
 .ocr-add-btn {

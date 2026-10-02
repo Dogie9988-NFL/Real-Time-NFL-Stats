@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T07:12:27.050Z",
+  "generatedAt": "2026-10-02T07:32:48.139Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -268,14 +268,14 @@
           "id": "sacks-dt",
           "label": "Sacks (DT)",
           "section": "position",
-          "count": 39,
+          "count": 37,
           "available": true
         },
         {
           "id": "sacks-edge",
           "label": "Sacks (Edge)",
           "section": "position",
-          "count": 43,
+          "count": 42,
           "available": true
         },
         {
@@ -296,7 +296,7 @@
           "id": "interceptions-db",
           "label": "Interceptions (DB)",
           "section": "position",
-          "count": 44,
+          "count": 41,
           "available": true
         },
         {
@@ -366,7 +366,7 @@
           "id": "forced-fumbles-dt",
           "label": "Forced Fumbles (DT)",
           "section": "position",
-          "count": 11,
+          "count": 10,
           "available": true
         },
         {
@@ -380,7 +380,7 @@
           "id": "forced-fumbles-lb",
           "label": "Forced Fumbles (LB)",
           "section": "position",
-          "count": 26,
+          "count": 25,
           "available": true
         },
         {
@@ -408,7 +408,7 @@
           "id": "fumbles-recovered-lb",
           "label": "Fumbles Recovered (LB)",
           "section": "position",
-          "count": 18,
+          "count": 17,
           "available": true
         },
         {

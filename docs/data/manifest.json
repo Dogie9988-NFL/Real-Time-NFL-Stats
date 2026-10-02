@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-02T06:08:21.674Z",
+  "generatedAt": "2026-10-02T06:33:11.297Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -205,7 +205,7 @@
           "id": "rushing-td-rb",
           "label": "Rushing TD (RB)",
           "section": "position",
-          "count": 33,
+          "count": 35,
           "available": true
         },
         {
@@ -254,7 +254,7 @@
           "id": "receiving-td-te",
           "label": "Receiving TD (TE)",
           "section": "position",
-          "count": 34,
+          "count": 35,
           "available": true
         },
         {

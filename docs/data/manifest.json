@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-03T03:35:57.731Z",
+  "generatedAt": "2026-10-03T03:40:36.776Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -596,7 +596,7 @@
           "id": "rushing-yards-te",
           "label": "Rushing Yards (TE)",
           "section": "position",
-          "count": 13,
+          "count": 14,
           "available": true
         },
         {
@@ -729,7 +729,7 @@
           "id": "interceptions-lb",
           "label": "Interceptions (LB)",
           "section": "position",
-          "count": 41,
+          "count": 43,
           "available": true
         },
         {
@@ -841,7 +841,7 @@
           "id": "fumbles-recovered-db",
           "label": "Fumbles Recovered (DB)",
           "section": "position",
-          "count": 43,
+          "count": 44,
           "available": true
         },
         {

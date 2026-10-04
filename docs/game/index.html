@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+</head>
+<body>
+<title>Fourth and Long</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@600;800;900&family=Barlow+Semi+Condensed:wght@400;500;600;700&family=Barlow:wght@400;500;600&display=swap">
+<style>
+/* Layout: scoreboard strip over a live field; play-call wristband cards below; scouting + log rail on the right (stacks on phones). */
+:root {
+  --bg: #e9ece4;
+  --panel: #f8f9f4;
+  --line: #cfd5c8;
+  --fg: #18211c;
+  --muted: #5b6760;
+  --turf: #2f7d46;
+  --turf-2: #2b7140;
+  --chalk: #f4f7f1;
+  --flag: #f2c230;
+  --flag-ink: #3a2c00;
+  --you: #2457b0;
+  --cpu: #b23a2e;
+  --good: #23824a;
+  --bad: #b8382c;
+  --board: #1d2a24;
+  --board-fg: #ffd36a;
+  --shadow: 0 1px 0 rgba(20,40,30,.06), 0 6px 18px -10px rgba(20,40,30,.35);
+  --display: "Big Shoulders Display", "Arial Narrow", Impact, sans-serif;
+  --ui: "Barlow Semi Condensed", "Arial Narrow", system-ui, sans-serif;
+  --body: "Barlow", system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #111814; --panel: #19221d; --line: #2c3a32; --fg: #e3e9e3; --muted: #93a39a;
+    --turf: #276b3c; --turf-2: #235f36; --chalk: #eaf0e8; --flag: #f0c53c; --flag-ink: #2d2200;
+    --you: #6f9bff; --cpu: #ff7d6e; --good: #4cc27a; --bad: #ff7d6e; --board: #0b110e; --board-fg: #ffd36a;
+    --shadow: 0 1px 0 rgba(0,0,0,.3), 0 8px 20px -12px rgba(0,0,0,.8);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --bg: #111814; --panel: #19221d; --line: #2c3a32; --fg: #e3e9e3; --muted: #93a39a;
+  --turf: #276b3c; --turf-2: #235f36; --chalk: #eaf0e8; --flag: #f0c53c; --flag-ink: #2d2200;
+  --you: #6f9bff; --cpu: #ff7d6e; --good: #4cc27a; --bad: #ff7d6e; --board: #0b110e; --board-fg: #ffd36a;
+  --shadow: 0 1px 0 rgba(0,0,0,.3), 0 8px 20px -12px rgba(0,0,0,.8);
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.45; }
+.wrap { max-width: 1180px; margin: 0 auto; padding-inline: 16px; padding-block: 18px 40px; display: grid; gap: 14px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; letter-spacing: .01em; }
+button { font: inherit; color: inherit; cursor: pointer; }
+button:focus-visible, [tabindex]:focus-visible { outline: 3px solid var(--flag); outline-offset: 2px; }
+.label { font-family: var(--ui); font-size: 12px; font-weight: 700; text-transform: uppercase; letter-spacing: .09em; color: var(--muted); }
+
+/* Scoreboard */
+.board { background: var(--board); color: #e9efe9; border-radius: 10px; padding: 10px 14px; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 10px; box-shadow: var(--shadow); }
+.team { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.team.right { justify-content: flex-end; text-align: right; }
+.team .nm { font-family: var(--ui); font-weight: 700; font-size: 14px; text-transform: uppercase; letter-spacing: .06em; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.team .sc { font-family: var(--display); font-weight: 900; font-size: 46px; line-height: 1; color: var(--board-fg); font-variant-numeric: tabular-nums; min-width: 1.3em; text-align: center; }
+.chip-you, .chip-cpu { width: 10px; height: 10px; border-radius: 50%; flex: none; }
+.chip-you { background: var(--you); } .chip-cpu { background: var(--cpu); }
+.poss { font-size: 11px; color: var(--board-fg); visibility: hidden; }
+.poss.on { visibility: visible; }
+.mid { text-align: center; font-family: var(--ui); }
+.mid .clock { font-family: var(--display); font-weight: 800; font-size: 30px; color: var(--board-fg); font-variant-numeric: tabular-nums; line-height: 1; }
+.mid .qtr { font-size: 12px; letter-spacing: .12em; text-transform: uppercase; opacity: .8; }
+.dd { display: flex; flex-wrap: wrap; gap: 8px 18px; align-items: baseline; font-family: var(--ui); }
+.dd .big { font-family: var(--display); font-weight: 800; font-size: 28px; }
+.dd .spot { color: var(--muted); font-weight: 600; }
+
+/* Field */
+.fieldbox { background: var(--turf); border-radius: 10px; overflow: hidden; box-shadow: var(--shadow); position: relative; }
+canvas#field { display: block; width: 100%; height: 190px; }
+.banner { position: absolute; left: 50%; top: 12px; transform: translateX(-50%); background: var(--flag); color: var(--flag-ink); font-family: var(--display); font-weight: 900; font-size: 26px; padding: 2px 16px; border-radius: 4px; letter-spacing: .04em; text-transform: uppercase; pointer-events: none; transition: opacity .3s; white-space: nowrap; }
+
+/* Main grid */
+.main { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 14px; align-items: start; }
+@media (max-width: 900px) { .main { grid-template-columns: minmax(0, 1fr); } }
+.panel { background: var(--panel); border: 1px solid var(--line); border-radius: 10px; padding: 14px; min-width: 0; }
+.panel + .panel { margin-top: 14px; }
+
+.result { display: grid; gap: 6px; padding: 12px 14px; border-left: 5px solid var(--line); background: var(--panel); border-radius: 8px; border: 1px solid var(--line); border-left-width: 5px; }
+.result.good { border-left-color: var(--good); }
+.result.bad { border-left-color: var(--bad); }
+.result .calls { font-family: var(--ui); font-size: 13px; color: var(--muted); display: flex; flex-wrap: wrap; gap: 4px 14px; }
+.result .calls b { color: var(--fg); }
+.result .out { font-family: var(--display); font-weight: 800; font-size: 24px; line-height: 1.1; }
+.result .why { font-size: 14px; color: var(--muted); }
+
+.callhead { display: flex; justify-content: space-between; align-items: center; gap: 10px; flex-wrap: wrap; margin-bottom: 10px; }
+.callhead h2 { font-size: 26px; }
+.seg { display: inline-flex; border: 1px solid var(--line); border-radius: 6px; overflow: hidden; }
+.seg button { background: transparent; border: 0; padding: 6px 10px; font-family: var(--ui); font-weight: 600; font-size: 13px; color: var(--muted); }
+.seg button + button { border-left: 1px solid var(--line); }
+.seg button[aria-pressed="true"] { background: var(--fg); color: var(--panel); }
+
+.cards { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 10px; }
+.cards.d4 { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+@media (max-width: 620px) { .cards { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 380px) { .cards, .cards.d4 { grid-template-columns: minmax(0,1fr); } }
+.card { text-align: left; background: var(--bg); border: 1px solid var(--line); border-radius: 8px; padding: 10px 11px 11px; display: grid; gap: 5px; align-content: start; transition: transform .12s, border-color .12s, box-shadow .12s; position: relative; }
+.card:hover:not(:disabled) { transform: translateY(-2px); border-color: var(--fg); box-shadow: var(--shadow); }
+.card:disabled { opacity: .45; cursor: not-allowed; }
+.card .key { position: absolute; top: 8px; right: 10px; font-family: var(--ui); font-size: 11px; color: var(--muted); border: 1px solid var(--line); border-radius: 3px; padding: 0 5px; }
+.card .nm { font-family: var(--display); font-weight: 800; font-size: 21px; line-height: 1.05; padding-right: 22px; }
+.card .ds { font-size: 13px; color: var(--muted); line-height: 1.3; }
+.card .vs { font-family: var(--ui); font-size: 12px; line-height: 1.35; }
+.card .vs .g { color: var(--good); font-weight: 700; }
+.card .vs .b { color: var(--bad); font-weight: 700; }
+.special { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+.btn { background: var(--fg); color: var(--panel); border: 0; border-radius: 6px; padding: 9px 14px; font-family: var(--ui); font-weight: 700; font-size: 14px; letter-spacing: .03em; }
+.btn.ghost { background: transparent; color: var(--fg); border: 1px solid var(--line); }
+.btn.flag { background: var(--flag); color: var(--flag-ink); }
+.btn:disabled { opacity: .4; cursor: not-allowed; }
+.hint { font-size: 13px; color: var(--muted); margin-top: 10px; }
+
+/* Scout bars */
+.scout h3 { font-size: 20px; margin-bottom: 2px; }
+.scout .sub { font-size: 13px; color: var(--muted); margin-bottom: 10px; }
+.bar { display: grid; grid-template-columns: 92px minmax(0,1fr) 38px; gap: 8px; align-items: center; font-family: var(--ui); font-size: 13px; margin: 5px 0; }
+.bar .track { display: block; height: 10px; background: var(--bg); border-radius: 5px; overflow: hidden; border: 1px solid var(--line); }
+.bar .fill { display: block; height: 100%; background: var(--muted); border-radius: 5px; transition: width .4s; }
+.bar.hot .fill { background: var(--flag); }
+.bar .pct { text-align: right; font-variant-numeric: tabular-nums; color: var(--muted); }
+.log { list-style: none; margin: 0; padding: 0; max-height: 300px; overflow-y: auto; font-size: 13px; display: grid; gap: 6px; }
+.log li { display: grid; grid-template-columns: 52px minmax(0,1fr); gap: 6px; }
+.log .t { font-family: var(--ui); color: var(--muted); font-variant-numeric: tabular-nums; }
+.log .you { border-left: 3px solid var(--you); padding-left: 6px; }
+.log .cpu { border-left: 3px solid var(--cpu); padding-left: 6px; }
+.log .score { font-weight: 700; }
+
+/* Menu + game over overlay */
+.screen { display: grid; gap: 18px; max-width: 860px; margin: 0 auto; padding-block: 10px; }
+.hero h1 { font-size: clamp(48px, 9vw, 92px); font-weight: 900; line-height: .9; text-transform: uppercase; }
+.hero h1 span { color: var(--turf); }
+.hero p { max-width: 62ch; font-size: 16px; margin: 10px 0 0; }
+.pick { display: grid; grid-template-columns: repeat(2, minmax(0,1fr)); gap: 10px; }
+@media (max-width: 560px) { .pick { grid-template-columns: minmax(0,1fr); } }
+.opt { text-align: left; background: var(--panel); border: 2px solid var(--line); border-radius: 8px; padding: 12px; display: grid; gap: 3px; }
+.opt[aria-pressed="true"] { border-color: var(--fg); box-shadow: var(--shadow); }
+.opt .nm { font-family: var(--display); font-weight: 800; font-size: 22px; display: flex; gap: 8px; align-items: center; }
+.opt .ds { font-size: 13px; color: var(--muted); }
+.swatch { width: 14px; height: 14px; border-radius: 3px; flex: none; }
+.diffrow { display: flex; flex-wrap: wrap; gap: 8px; }
+.how { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 12px; }
+@media (max-width: 700px) { .how { grid-template-columns: minmax(0,1fr); } }
+.how div { border-top: 3px solid var(--fg); padding-top: 8px; font-size: 14px; }
+.how b { font-family: var(--display); font-size: 19px; display: block; }
+.final { text-align: center; }
+.final .fs { font-family: var(--display); font-weight: 900; font-size: clamp(56px, 12vw, 110px); line-height: 1; font-variant-numeric: tabular-nums; }
+.stats { display: grid; grid-template-columns: repeat(3, minmax(0,1fr)); gap: 10px; }
+@media (max-width: 560px) { .stats { grid-template-columns: minmax(0,1fr); } }
+.stat { background: var(--panel); border: 1px solid var(--line); border-radius: 8px; padding: 12px; }
+.stat .v { font-family: var(--display); font-weight: 800; font-size: 32px; font-variant-numeric: tabular-nums; }
+.grade { display: inline-block; font-family: var(--display); font-weight: 900; font-size: 40px; background: var(--flag); color: var(--flag-ink); border-radius: 6px; padding: 0 14px; }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+
+<div class="wrap" id="app"></div>
+
+<script>
+(() => {
+"use strict";
+
+// ---------- Playbook ----------
+const OFF = {
+  dive:   { name: "Dive",        key: "1", ds: "Run up the middle. Safe, steady yards.", pass: false, mean: 3.8, sd: 2.5, fum: .012 },
+  sweep:  { name: "Sweep",       key: "2", ds: "Run to the outside. Boom or bust.",       pass: false, mean: 4.2, sd: 5.5, fum: .016 },
+  slant:  { name: "Quick Slant", key: "3", ds: "Fast, short throw. Reliable.",            pass: true, comp: .68, mean: 7,  sd: 3,  int: .025, sackBlitz: .07 },
+  go:     { name: "Go Route",    key: "4", ds: "Deep bomb down the sideline.",            pass: true, comp: .36, mean: 28, sd: 10, int: .05,  sackBlitz: .17 },
+  pa:     { name: "Play Action", key: "5", ds: "Fake the run, throw over the top.",       pass: true, comp: .55, mean: 16, sd: 6,  int: .035, sackBlitz: .20 },
+  screen: { name: "Screen",      key: "6", ds: "Dump it short behind the rushers.",       pass: true, comp: .82, mean: 4,  sd: 5,  int: .01,  sackBlitz: .02 },
+};
+const DEF = {
+  stack:   { name: "Stack the Box", key: "1", ds: "Eight men near the line to stop the run." },
+  zone:    { name: "Cover 2 Zone",  key: "2", ds: "Defenders guard areas. Smothers short passes." },
+  blitz:   { name: "Blitz",         key: "3", ds: "Send extra rushers at the quarterback." },
+  prevent: { name: "Prevent",       key: "4", ds: "Drop deep. Gives up short stuff, never the bomb." },
+};
+const OK = Object.keys(OFF), DK = Object.keys(DEF);
+// Matchup edge for the OFFENSE: +2 great call, -2 the defense read it perfectly.
+const EDGE = {
+  dive:   { stack: -2, zone:  1, blitz: -1, prevent:  2 },
+  sweep:  { stack: -1, zone:  1, blitz:  2, prevent:  1 },
+  slant:  { stack:  1, zone: -2, blitz:  1, prevent:  1 },
+  go:     { stack:  2, zone: -1, blitz: -1, prevent: -2 },
+  pa:     { stack:  2, zone:  0, blitz: -2, prevent: -1 },
+  screen: { stack: -1, zone:  0, blitz:  2, prevent:  1 },
+};
+const WHY = {
+  "dive|stack": "Eight in the box swallowed the run.", "dive|zone": "Light box, easy push up the middle.", "dive|blitz": "Rushers shot the gaps and met the back early.", "dive|prevent": "Nobody near the line. Free yards.",
+  "sweep|stack": "Box defenders flowed to the edge in time.", "sweep|zone": "Zone defenders were slow to come up.", "sweep|blitz": "Blitzers vacated the edge. Wide open lane.", "sweep|prevent": "Soft defense, plenty of grass outside.",
+  "slant|stack": "Linebackers crept up, leaving the middle open.", "slant|zone": "Zone defenders sat right in the throwing lane.", "slant|blitz": "Ball came out before the rush got home.", "slant|prevent": "Deep defenders gave up the underneath throw.",
+  "go|stack": "One safety deep against a burner. Mismatch.", "go|zone": "Two deep safeties took away the top.", "go|blitz": "Pressure came before the route developed.", "go|prevent": "Everyone was deep. Nowhere to throw it.",
+  "pa|stack": "The fake froze the linebackers.", "pa|zone": "Zone stayed disciplined against the fake.", "pa|blitz": "Turning your back on a blitz is risky.", "pa|prevent": "Deep defenders never bit on the fake.",
+  "screen|stack": "Box defenders were right there to tackle.", "screen|zone": "Zone defenders closed on the dump-off.", "screen|blitz": "Rushers ran right past the screen.", "screen|prevent": "Lots of room underneath.",
+};
+const TEAMS = [
+  { id: "krakens", name: "Harbor City Krakens", short: "Krakens", style: "Air Raid", color: "#0f7c8c", ds: "Throws deep constantly. Loves the Go Route.",
+    w: { dive: .5, sweep: .6, slant: 1.3, go: 1.6, pa: 1.1, screen: .8 } },
+  { id: "outlaws", name: "Dust Bowl Outlaws", short: "Outlaws", style: "Ground and Pound", color: "#a0602a", ds: "Runs the ball and dares you to stop it.",
+    w: { dive: 1.7, sweep: 1.3, slant: .7, go: .4, pa: 1.1, screen: .6 } },
+  { id: "yetis", name: "Glacier Bay Yetis", short: "Yetis", style: "West Coast", color: "#5a6fb0", ds: "Short passes and screens. Patient and tricky.",
+    w: { dive: .8, sweep: .7, slant: 1.6, go: .5, pa: .9, screen: 1.5 } },
+  { id: "comets", name: "Prairie Comets", short: "Comets", style: "Balanced", color: "#8a4fa0", ds: "Mixes everything. Hardest to scout.",
+    w: { dive: 1, sweep: 1, slant: 1, go: 1, pa: 1, screen: 1 } },
+];
+const DIFFS = {
+  rookie: { name: "Rookie", ds: "Slow to learn your habits.", temp: 1.6, adapt: .15, memory: .5 },
+  pro:    { name: "Pro",    ds: "Notices patterns quickly.",  temp: .7,  adapt: .55, memory: 1 },
+  legend: { name: "Legend", ds: "Punishes any predictability.", temp: .32, adapt: 1, memory: 1.4 },
+};
+const QLEN = 300;
+
+// ---------- State ----------
+let S;
+let menuSel = { team: "krakens", diff: "pro" };
+const anim = { x: 25, fromX: 25, toX: 25, t0: 0, dur: 0, arc: 0, banner: "", bannerUntil: 0 };
+
+function fresh() {
+  const team = TEAMS.find(t => t.id === menuSel.team);
+  const recv = Math.random() < .5 ? "you" : "cpu";
+  return {
+    phase: "play", team: team.id, diff: menuSel.diff,
+    score: { you: 0, cpu: 0 }, q: 1, clock: QLEN, ot: false,
+    poss: recv, firstRecv: recv, pos: 25, down: 1, toGo: 10,
+    tempo: "normal",
+    youHist: { short: {}, medium: {}, long: {} },   // your offensive calls, CPU studies these
+    youDefHist: { short: {}, medium: {}, long: {} }, // your defensive calls
+    cpuHist: { short: {}, medium: {}, long: {} },   // CPU offensive calls, you can study these
+    stats: { yards: 0, plays: 0, read: 0, cpuYards: 0, to: 0, cpuTo: 0, bigs: 0 },
+    last: null, log: [{ t: "Q1 5:00", c: "", s: `Kickoff. ${recv === "you" ? "You receive" : team.short + " receive"} at the 25.` }],
+  };
+}
+const team = () => TEAMS.find(t => t.id === S.team);
+const D = () => DIFFS[S.diff];
+
+// ---------- Helpers ----------
+const rnd = Math.random;
+const clamp = (v, a, b) => Math.max(a, Math.min(b, v));
+function gauss(m, sd) { let u = 0, v = 0; while (!u) u = rnd(); while (!v) v = rnd(); return m + sd * Math.sqrt(-2 * Math.log(u)) * Math.cos(2 * Math.PI * v); }
+function pickW(weights) { const ks = Object.keys(weights); let tot = ks.reduce((a, k) => a + weights[k], 0), r = rnd() * tot; for (const k of ks) { r -= weights[k]; if (r <= 0) return k; } return ks[ks.length - 1]; }
+const bucket = (toGo) => toGo <= 3 ? "short" : toGo <= 7 ? "medium" : "long";
+const BUCKET_NAME = { short: "short yardage (3 or less)", medium: "medium yardage (4 to 7)", long: "long yardage (8+)" };
+const fmtClock = s => `${Math.floor(s / 60)}:${String(Math.max(0, s) % 60).padStart(2, "0")}`;
+const qName = () => S.ot ? "OT" : "Q" + S.q;
+function spotText(pos) { if (pos === 50) return "midfield"; return pos < 50 ? `own ${pos}` : `opp ${100 - pos}`; }
+function ord(n) { return ["", "1st", "2nd", "3rd", "4th"][n]; }
+const absX = (pos, who = S.poss) => who === "you" ? pos : 100 - pos;
+function fgChance(pos) {
+  const d = 100 - pos + 17;
+  if (d <= 25) return .98; if (d <= 40) return .98 - (d - 25) * .01; if (d <= 50) return .83 - (d - 40) * .02; if (d <= 60) return .63 - (d - 50) * .04; return 0;
+}
+function softmax(obj, T) { const ks = Object.keys(obj), mx = Math.max(...ks.map(k => obj[k])); const e = {}; let s = 0; ks.forEach(k => { e[k] = Math.exp((obj[k] - mx) / T); s += e[k]; }); ks.forEach(k => e[k] /= s); return e; }
+
+// Situational priors: what a typical team does on each kind of down.
+const OFF_PRIOR = {
+  short:  { dive: 2.2, sweep: 1.2, slant: 1, go: .4, pa: 1, screen: .5 },
+  medium: { dive: 1, sweep: 1, slant: 1.4, go: .7, pa: 1, screen: 1 },
+  long:   { dive: .5, sweep: .7, slant: 1.3, go: 1.3, pa: 1, screen: 1.1 },
+};
+const DEF_PRIOR = { stack: 1, zone: 1, blitz: 1, prevent: .6 };
+function norm(o) { const s = Object.values(o).reduce((a, b) => a + b, 0); const r = {}; for (const k in o) r[k] = o[k] / s; return r; }
+
+// What the CPU defense thinks you'll call, from your history this game.
+function cpuReadOfYou(b) {
+  const prior = norm(OFF_PRIOR[b]), h = S.youHist[b], m = D().memory, k = 3;
+  let tot = 0; OK.forEach(p => tot += (h[p] || 0));
+  const all = {}; let allTot = 0; // overall habits leak across situations a bit
+  OK.forEach(p => { all[p] = ["short", "medium", "long"].reduce((a, bb) => a + (S.youHist[bb][p] || 0), 0); allTot += all[p]; });
+  const out = {};
+  OK.forEach(p => {
+    const c = m * (h[p] || 0) + .35 * m * (all[p] || 0);
+    out[p] = c + prior[p] * k;
+  });
+  return norm(out);
+}
+// What you have seen the CPU offense do in this situation (shown to you).
+function yourReadOfCpu(b) {
+  const prior = norm(OFF_PRIOR[b]), h = S.cpuHist[b], k = 3, out = {};
+  OK.forEach(p => out[p] = (h[p] || 0) + prior[p] * k);
+  return norm(out);
+}
+function cpuPickDefense() {
+  const read = cpuReadOfYou(bucket(S.toGo)), ev = {};
+  DK.forEach(d => { ev[d] = -OK.reduce((a, p) => a + read[p] * EDGE[p][d], 0); });
+  // situational sanity
+  if (S.toGo >= 15) ev.prevent += .6;
+  if (S.toGo <= 2) ev.stack += .4;
+  let T = D().temp; if (S.tempo === "hurry") T *= 3.5;
+  return pickW(softmax(ev, T));
+}
+function cpuPickOffense() {
+  const b = bucket(S.toGo), t = team(), w = {};
+  // what CPU believes your defense will do
+  const h = S.youDefHist[b]; const dp = {}; DK.forEach(d => dp[d] = (h[d] || 0) + DEF_PRIOR[d] * 2); const dpn = norm(dp);
+  const late = (S.q >= 4 || S.ot) && S.clock < 150, diff = S.score.cpu - S.score.you;
+  OK.forEach(p => {
+    let x = t.w[p] * OFF_PRIOR[b][p];
+    if (late && diff < 0) { if (OFF[p].pass) x *= 1.8; if (p === "go") x *= 1.5; }
+    if (late && diff > 0 && !OFF[p].pass) x *= 2.2;
+    const exp = DK.reduce((a, d) => a + dpn[d] * EDGE[p][d], 0);
+    w[p] = x * Math.exp(exp * D().adapt * 1.4);
+  });
+  return pickW(w);
+}
+function cpuTempo() {
+  const late = (S.q === 4 || S.q === 2 || S.ot) && S.clock < 150, diff = S.score.cpu - S.score.you;
+  if (late && (diff < 0 || S.q === 2)) return "hurry";
+  if (S.q === 4 && S.clock < 300 && diff > 0) return "milk";
+  return "normal";
+}
+// CPU 4th-down / end-of-half decision: "play", "punt", or "fg"
+function cpuSpecial() {
+  const fg = fgChance(S.pos), diff = S.score.cpu - S.score.you, endHalf = (S.q === 2 || S.q === 4 || S.ot) && S.clock <= 20;
+  if (endHalf && fg >= .4 && (S.q !== 4 || (diff <= 0 && diff >= -3))) return "fg";
+  if (S.down !== 4) return "play";
+  const desperate = (S.q === 4 || S.ot) && S.clock < 180 && diff < 0;
+  if (desperate && !(diff >= -3 && fg > .55)) return "play";
+  if (S.toGo <= 1 && S.pos >= 45) return "play";
+  if (S.diff === "legend" && S.toGo <= 2 && S.pos >= 55 && S.pos < 70) return "play";
+  if (fg >= .55) return "fg";
+  if (S.pos >= 62 && S.toGo <= 3) return "play";
+  return "punt";
+}
+
+// ---------- Game engine ----------
+function resolvePlay(o, d, tempo) {
+  const p = OFF[o];
+  const edge = EDGE[o][d] + (tempo === "hurry" ? -.5 : 0);
+  const r = { o, d, edge, yards: 0, kind: "", time: 0, turnover: false };
+  const runTime = tempo === "hurry" ? 16 : tempo === "milk" ? 42 : 34;
+  if (p.pass) {
+    const sackP = d === "blitz" ? p.sackBlitz : .035;
+    if (rnd() < sackP) { r.kind = "sack"; r.yards = -Math.round(4 + rnd() * 5); r.time = runTime; return r; }
+    const intP = clamp(p.int * (1 - .35 * edge), .003, .2);
+    if (rnd() < intP) { r.kind = "int"; r.turnover = true; r.yards = Math.round(clamp(gauss(p.mean * .7, 4), 2, 35)); r.time = 8; return r; }
+    const comp = clamp(p.comp + .09 * edge, .08, .95);
+    if (rnd() < comp) {
+      let y = gauss(p.mean * (1 + .3 * edge), p.sd);
+      if (rnd() < .04 + .03 * Math.max(0, edge)) y += 12 + rnd() * 30;
+      r.yards = Math.round(Math.max(o === "screen" ? -3 : 1, y)); r.kind = "comp"; r.time = runTime;
+    } else { r.kind = "inc"; r.time = 6; }
+  } else {
+    const fumP = clamp(p.fum * (1 - .3 * edge), .004, .06);
+    let y = gauss(p.mean * (1 + .35 * edge), p.sd);
+    if (rnd() < .035 + .025 * Math.max(0, edge)) y += 15 + rnd() * 30;
+    r.yards = Math.round(Math.max(-5, y)); r.kind = "run"; r.time = runTime;
+    if (rnd() < fumP) { r.kind = "fum"; r.turnover = true; r.yards = Math.round(clamp(r.yards, -3, 6)); r.time = 8; }
+  }
+  return r;
+}
+
+function describe(r, offName) {
+  const y = r.yards, yd = Math.abs(y) === 1 ? "yard" : "yards";
+  switch (r.kind) {
+    case "sack": return `SACKED for a loss of ${-y}`;
+    case "int": return `INTERCEPTED!`;
+    case "fum": return `FUMBLE! Defense recovers`;
+    case "inc": return `Incomplete pass`;
+    case "comp": return y >= 0 ? `Complete for ${y} ${yd}` : `Caught for a loss of ${-y}`;
+    case "run": return y > 0 ? `Run for ${y} ${yd}` : y === 0 ? `Stuffed for no gain` : `Tackled for a loss of ${-y}`;
+  }
+}
+function edgeVerdict(e) {
+  if (e >= 2) return "Perfect call."; if (e >= 1) return "Good matchup."; if (e > -1) return "Even matchup."; if (e > -2) return "They had it covered."; return "They read it perfectly.";
+}
+
+function addLog(text, who, cls = "") { S.log.unshift({ t: `${qName()} ${fmtClock(S.clock)}`, c: who + (cls ? " " + cls : ""), s: text }); if (S.log.length > 60) S.log.pop(); }
+
+function moveBall(newAbs, arc = 0) {
+  anim.fromX = anim.x; anim.toX = newAbs; anim.t0 = performance.now(); anim.arc = arc;
+  anim.dur = matchMedia("(prefers-reduced-motion: reduce)").matches ? 1 : 650;
+}
+function flash(text) { anim.banner = text; anim.bannerUntil = performance.now() + 1600; }
+
+function changePoss(newPos, who) {
+  S.poss = who; S.pos = clamp(newPos, 1, 99); S.down = 1; S.toGo = Math.min(10, 100 - S.pos);
+}
+function kickoffTo(who) { changePoss(25, who); moveBall(absX(25, who)); }
+
+function score(who, pts, what) {
+  S.score[who] += pts; flash(what);
+  addLog(`${what}! ${who === "you" ? "You" : team().short} +${pts}. Score ${S.score.you}–${S.score.cpu}.`, who, "score");
+  if (S.ot) { endGame(); return true; }
+  return false;
+}
+
+function runClock(sec) {
+  S.clock -= sec;
+  if (S.clock > 0) return;
+  S.clock = 0;
+}
+function afterPlay() {
+  if (S.phase !== "play") return;
+  if (S.clock > 0) return;
+  if (S.ot) { endGame(); return; }
+  if (S.q === 2) {
+    addLog("Halftime.", "");
+    S.q = 3; S.clock = QLEN; flash("Halftime");
+    kickoffTo(S.firstRecv === "you" ? "cpu" : "you");
+  } else if (S.q === 4) {
+    if (S.score.you === S.score.cpu) {
+      S.ot = true; S.q = 5; S.clock = QLEN; flash("Overtime");
+      const who = rnd() < .5 ? "you" : "cpu";
+      addLog(`Overtime! Next score wins. ${who === "you" ? "You" : team().short} receive.`, "");
+      kickoffTo(who);
+    } else endGame();
+  } else {
+    addLog(`End of quarter ${S.q}.`, ""); S.q++; S.clock = QLEN;
+  }
+}
+
+function applyResult(r, offWho) {
+  const defWho = offWho === "you" ? "cpu" : "you";
+  const name = offWho === "you" ? "You" : team().short;
+  const offName = OFF[r.o].name, defName = DEF[r.d].name;
+  const txt = describe(r, offName);
+  S.stats.plays += offWho === "you" ? 1 : 0;
+  if (offWho === "you" && r.edge <= -1) S.stats.read++;
+  runClock(r.time);
+  const startPos = S.pos;
+  let headline = txt, scored = false;
+
+  if (r.turnover) {
+    const spot = clamp(startPos + r.yards, 1, 99);
+    let newPos = 100 - spot;
+    if (r.kind === "int") newPos = clamp(100 - (startPos + r.yards) + Math.round(rnd() * 12), 1, 99);
+    if (offWho === "you") S.stats.to++; else S.stats.cpuTo++;
+    addLog(`${offName} vs ${defName}: ${txt}`, offWho);
+    flash(r.kind === "int" ? "Interception" : "Fumble");
+    changePoss(newPos, defWho); moveBall(absX(S.pos), r.kind === "int" ? 6 : 0);
+  } else {
+    let newPos = startPos + r.yards;
+    if (offWho === "you") S.stats.yards += r.yards; else S.stats.cpuYards += r.yards;
+    if (r.yards >= 20 && offWho === "you") S.stats.bigs++;
+    if (newPos >= 100) {
+      addLog(`${offName} vs ${defName}: ${describe({ ...r, yards: 100 - startPos })}`, offWho);
+      moveBall(absX(100, offWho), OFF[r.o].pass ? 10 : 0);
+      headline = `TOUCHDOWN! ${describe({ ...r, yards: 100 - startPos })}`;
+      scored = true;
+      if (!score(offWho, 7, "Touchdown")) kickoffTo(defWho);
+    } else if (newPos <= 0) {
+      addLog(`${offName} vs ${defName}: ${txt} in the end zone`, offWho);
+      moveBall(absX(0, offWho)); headline = "SAFETY! " + txt; scored = true;
+      if (!score(defWho, 2, "Safety")) { changePoss(35, defWho); moveBall(absX(35, defWho)); }
+    } else {
+      S.pos = newPos; moveBall(absX(newPos), OFF[r.o].pass && r.kind === "comp" ? Math.min(12, r.yards / 2) : 0);
+      addLog(`${offName} vs ${defName}: ${txt}`, offWho);
+      if (r.yards >= S.toGo) { S.down = 1; S.toGo = Math.min(10, 100 - S.pos); if (r.yards >= 20) flash("Big play"); else if (offWho === "you") flash("First down"); }
+      else if (S.down === 4) {
+        addLog(`Turnover on downs.`, offWho); flash("Turnover on downs");
+        headline += ". Turnover on downs";
+        changePoss(100 - S.pos, defWho);
+      } else { S.down++; S.toGo -= r.yards; }
+    }
+  }
+  const goodForYou = offWho === "you" ? r.edge > 0 : r.edge < 0;
+  const badForYou = offWho === "you" ? r.edge < 0 : r.edge > 0;
+  S.last = {
+    offWho, o: r.o, d: r.d, headline, verdict: edgeVerdict(r.edge),
+    why: WHY[`${r.o}|${r.d}`], tone: r.turnover ? (offWho === "you" ? "bad" : "good")
+      : scored ? ((offWho === "you") === headline.startsWith("TOUCHDOWN") ? "good" : "bad")
+      : goodForYou ? "good" : badForYou ? "bad" : "",
+  };
+  afterPlay();
+}
+
+function userCallOffense(o) {
+  if (S.phase !== "play" || S.poss !== "you") return;
+  const b = bucket(S.toGo);
+  const d = cpuPickDefense();           // defense decides BEFORE seeing your call
+  S.youHist[b][o] = (S.youHist[b][o] || 0) + 1;
+  const r = resolvePlay(o, d, S.tempo);
+  applyResult(r, "you");
+  render();
+}
+function userCallDefense(d) {
+  if (S.phase !== "play" || S.poss !== "cpu") return;
+  const b = bucket(S.toGo);
+  const o = cpuPickOffense();           // offense decides BEFORE seeing your call
+  S.youDefHist[b][d] = (S.youDefHist[b][d] || 0) + 1;
+  S.cpuHist[b][o] = (S.cpuHist[b][o] || 0) + 1;
+  const r = resolvePlay(o, d, cpuTempo());
+  applyResult(r, "cpu");
+  render();
+}
+function doPunt(who) {
+  const other = who === "you" ? "cpu" : "you";
+  let net = Math.round(gauss(41, 6));
+  const land = S.pos + net;
+  runClock(8);
+  let newPos;
+  if (land >= 100) { newPos = 20; addLog(`Punt into the end zone. Touchback.`, who); }
+  else { newPos = 100 - land; addLog(`Punt, ${net} yards net. ${other === "you" ? "You take over" : team().short + " take over"} at the ${spotText(newPos).replace("own", "their own").replace("opp", "the")}.`, who); }
+  S.last = { offWho: who, special: true, headline: land >= 100 ? "Punt. Touchback." : `Punt, ${net} yards`, tone: "", why: "" };
+  changePoss(newPos, other); moveBall(absX(newPos), 14);
+  afterPlay(); render();
+}
+function doFG(who) {
+  const other = who === "you" ? "cpu" : "you";
+  const dist = 100 - S.pos + 17, p = fgChance(S.pos);
+  runClock(5);
+  const good = rnd() < p;
+  if (good) {
+    moveBall(absX(100, who), 16);
+    S.last = { offWho: who, special: true, headline: `${dist}-yard field goal is GOOD`, tone: who === "you" ? "good" : "bad", why: `It had a ${Math.round(p * 100)}% chance.` };
+    if (!score(who, 3, "Field goal")) kickoffTo(other);
+  } else {
+    addLog(`${dist}-yard field goal is no good.`, who);
+    S.last = { offWho: who, special: true, headline: `${dist}-yard field goal MISSED`, tone: who === "you" ? "bad" : "good", why: `It had a ${Math.round(p * 100)}% chance.` };
+    flash("No good");
+    changePoss(Math.max(20, 100 - (S.pos - 7)), other); moveBall(absX(S.pos));
+  }
+  afterPlay(); render();
+}
+function cpuSpecialGo() {
+  const s = cpuSpecial();
+  if (s === "punt") doPunt("cpu"); else if (s === "fg") doFG("cpu");
+}
+function endGame() {
+  S.phase = "over"; render();
+}
+
+// ---------- Rendering ----------
+const app = document.getElementById("app");
+let canvas, ctx;
+
+function render() {
+  if (!S || S.phase === "menu") return renderMenu();
+  if (S.phase === "over") return renderOver();
+  renderGame();
+}
+
+function renderMenu() {
+  app.innerHTML = `
+  <div class="screen">
+    <div class="hero">
+      <div class="label">A football play-calling strategy game</div>
+      <h1>Fourth <span>&amp;</span> Long</h1>
+      <p>You are the head coach. Call every play on offense and defense. The other sideline studies your habits all game long, so if you keep calling the same thing, they will be waiting for it.</p>
+    </div>
+    <div class="how">
+      <div><b>1. Read the situation</b>Down, distance and the clock change what makes sense. 3rd and 1 is not 3rd and 15.</div>
+      <div><b>2. Out-guess them</b>Every play beats some defenses and loses to others. Check the scouting report to see what they expect.</div>
+      <div><b>3. Break your patterns</b>Being unpredictable is a weapon. The defense counters what you call most.</div>
+    </div>
+    <div>
+      <div class="label" style="margin-bottom:8px">Choose your opponent</div>
+      <div class="pick">${TEAMS.map(t => `
+        <button class="opt" data-team="${t.id}" aria-pressed="${menuSel.team === t.id}">
+          <span class="nm"><span class="swatch" style="background:${t.color}"></span>${t.name}</span>
+          <span class="label">${t.style}</span>
+          <span class="ds">${t.ds}</span>
+        </button>`).join("")}
+      </div>
+    </div>
+    <div>
+      <div class="label" style="margin-bottom:8px">Difficulty</div>
+      <div class="pick" style="grid-template-columns:repeat(auto-fit,minmax(150px,1fr))">${Object.entries(DIFFS).map(([k, d]) => `
+        <button class="opt" data-diff="${k}" aria-pressed="${menuSel.diff === k}"><span class="nm">${d.name}</span><span class="ds">${d.ds}</span></button>`).join("")}
+      </div>
+    </div>
+    <div><button class="btn flag" id="start" style="font-size:18px;padding:12px 26px">Kick off</button></div>
+  </div>`;
+}
+
+function barRows(probs, hotKey) {
+  const top = OK.reduce((a, k) => probs[k] > probs[a] ? k : a, OK[0]);
+  return OK.map(k => `<div class="bar ${k === top ? "hot" : ""}"><span>${OFF[k].name}</span><span class="track"><span class="fill" style="width:${Math.round(probs[k] * 100)}%"></span></span><span class="pct">${Math.round(probs[k] * 100)}%</span></div>`).join("");
+}
+
+function cardVs(list, cls) { return list.length ? `<span class="${cls}">${list.join(", ")}</span>` : "<span>nothing</span>"; }
+
+function renderGame() {
+  const t = team(), you = S.poss === "you";
+  const b = bucket(S.toGo);
+  const firstDownX = S.toGo >= 100 - S.pos ? "Goal" : S.toGo;
+  const special = !you ? cpuSpecial() : "play";
+  const fgP = fgChance(S.pos), fgDist = 100 - S.pos + 17;
+
+  let callArea;
+  if (you) {
+    callArea = `
+      <div class="callhead"><h2>Call your offense</h2>
+        <div class="seg" role="group" aria-label="Tempo">
+          ${[["normal", "Normal"], ["hurry", "Hurry-up"], ["milk", "Milk clock"]].map(([k, n]) => `<button data-tempo="${k}" aria-pressed="${S.tempo === k}">${n}</button>`).join("")}
+        </div>
+      </div>
+      <div class="cards">${OK.map(k => {
+        const p = OFF[k];
+        const beats = DK.filter(d => EDGE[k][d] >= 1).map(d => DEF[d].name);
+        const weak = DK.filter(d => EDGE[k][d] <= -1).map(d => DEF[d].name);
+        return `<button class="card" data-off="${k}"><span class="key">${p.key}</span><span class="nm">${p.name}</span><span class="ds">${p.ds}</span>
+          <span class="vs">Beats: ${cardVs(beats, "g")}</span><span class="vs">Loses to: ${cardVs(weak, "b")}</span></button>`;
+      }).join("")}</div>
+      <div class="special">
+        <button class="btn ghost" data-punt="1">Punt</button>
+        <button class="btn ghost" data-fg="1" ${fgP <= 0 ? "disabled" : ""}>Field goal${fgP > 0 ? ` · ${fgDist} yd · ${Math.round(fgP * 100)}%` : " · out of range"}</button>
+      </div>
+      <p class="hint">${S.tempo === "hurry" ? "Hurry-up: plays use about 16 seconds and the defense has no time to adjust its read, but your execution gets a little sloppy." : S.tempo === "milk" ? "Milk clock: plays use about 42 seconds. Great for protecting a lead." : "Tip: press keys 1 to 6 to call plays."}</p>`;
+  } else if (special !== "play") {
+    callArea = `
+      <div class="callhead"><h2>${t.short} ${special === "punt" ? "line up to punt" : "line up for a field goal"}</h2></div>
+      <p>${special === "punt" ? `${ord(S.down)} and ${S.toGo}. They are giving the ball back.` : `A ${fgDist}-yard attempt (${Math.round(fgP * 100)}% chance).`}</p>
+      <button class="btn flag" data-cpuspecial="1">Continue</button>`;
+  } else {
+    callArea = `
+      <div class="callhead"><h2>Call your defense</h2><span class="label">${t.short} tempo: ${cpuTempo()}</span></div>
+      <div class="cards d4">${DK.map(k => {
+        const d = DEF[k];
+        const stops = OK.filter(o => EDGE[o][k] <= -1).map(o => OFF[o].name);
+        const hurts = OK.filter(o => EDGE[o][k] >= 1).map(o => OFF[o].name);
+        return `<button class="card" data-def="${k}"><span class="key">${d.key}</span><span class="nm">${d.name}</span><span class="ds">${d.ds}</span>
+          <span class="vs">Stops: ${cardVs(stops, "g")}</span><span class="vs">Beaten by: ${cardVs(hurts, "b")}</span></button>`;
+      }).join("")}</div>
+      <p class="hint">${S.down === 4 ? "They are going for it on 4th down. Get a stop and you get the ball back." : "Tip: press keys 1 to 4 to call a defense."}</p>`;
+  }
+
+  const L = S.last;
+  const resultHTML = L ? `
+    <div class="result ${L.tone}">
+      ${L.special ? "" : `<div class="calls"><span>${L.offWho === "you" ? "You called" : t.short + " called"} <b>${OFF[L.o].name}</b></span><span>${L.offWho === "you" ? t.short + " defense" : "Your defense"}: <b>${DEF[L.d].name}</b></span></div>`}
+      <div class="out">${L.headline}</div>
+      <div class="why">${L.special ? L.why : `${L.verdict} ${L.why}`}</div>
+    </div>` : `<div class="result"><div class="out">Welcome to the stadium.</div><div class="why">${S.poss === "you" ? "You have the ball first. Pick a play below." : t.short + " have the ball first. Pick a defense below."}</div></div>`;
+
+  const scoutHTML = you ? `
+    <h3>What their defense expects</h3>
+    <div class="sub">On ${BUCKET_NAME[b]}, based on what you have called so far. They will set up to stop the top pick.</div>
+    ${barRows(cpuReadOfYou(b))}` : `
+    <h3>Their offense on ${b} yardage</h3>
+    <div class="sub">${t.style} team. ${t.ds} Bars mix what they usually do with what you have seen today.</div>
+    ${barRows(yourReadOfCpu(b))}`;
+
+  app.innerHTML = `
+    <div class="board" role="status" aria-live="polite">
+      <div class="team"><span class="chip-you"></span><span class="nm">You</span><span class="poss ${you ? "on" : ""}" aria-label="has the ball">◆</span><span class="sc">${S.score.you}</span></div>
+      <div class="mid"><div class="qtr">${S.ot ? "Overtime" : "Quarter " + S.q}</div><div class="clock">${fmtClock(S.clock)}</div></div>
+      <div class="team right"><span class="sc">${S.score.cpu}</span><span class="poss ${!you ? "on" : ""}" aria-label="has the ball">◆</span><span class="nm">${t.short}</span><span class="chip-cpu" style="background:${t.color}"></span></div>
+    </div>
+    <div class="dd">
+      <span class="big">${ord(S.down)} &amp; ${firstDownX}</span>
+      <span class="spot">Ball on the ${spotText(S.pos)} · ${you ? "Your ball" : t.short + " ball"}</span>
+    </div>
+    <div class="fieldbox"><canvas id="field" aria-label="Football field showing the ball position"></canvas><div class="banner" id="banner" style="opacity:0"></div></div>
+    <div class="main">
+      <div style="display:grid;gap:14px;min-width:0">
+        ${resultHTML}
+        <div class="panel">${callArea}</div>
+      </div>
+      <div>
+        <div class="panel scout">${scoutHTML}</div>
+        <div class="panel"><div class="label" style="margin-bottom:8px">Play by play</div>
+          <ul class="log">${S.log.map(l => `<li><span class="t">${l.t}</span><span class="${l.c}">${l.s}</span></li>`).join("")}</ul>
+        </div>
+        <div style="margin-top:14px;display:flex;gap:8px;flex-wrap:wrap"><button class="btn ghost" data-quit="1">Quit to menu</button></div>
+      </div>
+    </div>`;
+  canvas = document.getElementById("field"); ctx = canvas.getContext("2d");
+  sizeCanvas();
+}
+
+function renderOver() {
+  const t = team(), s = S.stats, won = S.score.you > S.score.cpu, tie = S.score.you === S.score.cpu;
+  const predict = s.plays ? Math.round(s.read / s.plays * 100) : 0;
+  let pts = (S.score.you - S.score.cpu) / 7 + (35 - predict) / 15 + (s.cpuTo - s.to) * .5;
+  const grade = pts > 2.5 ? "A+" : pts > 1.5 ? "A" : pts > .5 ? "B" : pts > -.5 ? "C" : pts > -1.5 ? "D" : "F";
+  app.innerHTML = `
+  <div class="screen final">
+    <div class="label">Final${S.ot ? " · Overtime" : ""}</div>
+    <h1 style="font-size:clamp(40px,8vw,72px);text-transform:uppercase">${tie ? "Tie game" : won ? "You win!" : t.short + " win"}</h1>
+    <div class="fs"><span style="color:var(--you)">${S.score.you}</span> – <span style="color:${t.color}">${S.score.cpu}</span></div>
+    <div><span class="label">Coaching grade</span><br><span class="grade">${grade}</span></div>
+    <div class="stats" style="text-align:left">
+      <div class="stat"><div class="label">Your yards</div><div class="v">${s.yards}</div><div class="ds">${t.short}: ${s.cpuYards}</div></div>
+      <div class="stat"><div class="label">Times they read you</div><div class="v">${predict}%</div><div class="ds">Lower means you were harder to predict.</div></div>
+      <div class="stat"><div class="label">Turnovers</div><div class="v">${s.to}</div><div class="ds">You forced ${s.cpuTo}.</div></div>
+    </div>
+    <div style="display:flex;gap:10px;justify-content:center;flex-wrap:wrap">
+      <button class="btn flag" id="again" style="font-size:17px;padding:11px 22px">Rematch</button>
+      <button class="btn ghost" data-quit="1">Change opponent</button>
+    </div>
+  </div>`;
+}
+
+// ---------- Field drawing ----------
+function sizeCanvas() {
+  if (!canvas) return;
+  const dpr = window.devicePixelRatio || 1, w = canvas.clientWidth, h = canvas.clientHeight;
+  canvas.width = Math.round(w * dpr); canvas.height = Math.round(h * dpr);
+  ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+}
+function cssVar(n) { return getComputedStyle(document.documentElement).getPropertyValue(n).trim(); }
+function draw(now) {
+  requestAnimationFrame(draw);
+  if (!canvas || !document.body.contains(canvas) || S.phase !== "play") return;
+  const w = canvas.clientWidth, h = canvas.clientHeight;
+  if (!w) return;
+  if (Math.abs(canvas.width - w * (window.devicePixelRatio || 1)) > 2) sizeCanvas();
+  const t = clamp((now - anim.t0) / anim.dur, 0, 1), e = 1 - Math.pow(1 - t, 3);
+  anim.x = anim.fromX + (anim.toX - anim.fromX) * e;
+  const lift = Math.sin(Math.PI * t) * anim.arc * 2.2;
+  const turf = cssVar("--turf"), turf2 = cssVar("--turf-2"), chalk = cssVar("--chalk"), flag = cssVar("--flag");
+  const yx = y => (y + 10) / 120 * w; // yard (−10..110) to px
+  // stripes
+  for (let i = 0; i < 12; i++) { ctx.fillStyle = i % 2 ? turf : turf2; ctx.fillRect(yx(i * 10 - 10), 0, w / 12 + 1, h); }
+  // end zones
+  ctx.fillStyle = cssVar("--you"); ctx.globalAlpha = .85; ctx.fillRect(0, 0, yx(0), h);
+  ctx.fillStyle = team().color; ctx.fillRect(yx(100), 0, w - yx(100), h); ctx.globalAlpha = 1;
+  ctx.save(); ctx.fillStyle = "rgba(255,255,255,.92)"; ctx.font = `800 ${Math.max(12, Math.min(26, w / 34))}px "Big Shoulders Display", Impact, sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.translate(yx(-5), h / 2); ctx.rotate(-Math.PI / 2); ctx.fillText("YOU", 0, 0); ctx.restore();
+  ctx.save(); ctx.fillStyle = "rgba(255,255,255,.92)"; ctx.font = `800 ${Math.max(12, Math.min(26, w / 34))}px "Big Shoulders Display", Impact, sans-serif`; ctx.textAlign = "center"; ctx.textBaseline = "middle";
+  ctx.translate(yx(105), h / 2); ctx.rotate(Math.PI / 2); ctx.fillText(team().short.toUpperCase(), 0, 0); ctx.restore();
+  // yard lines + numbers
+  ctx.strokeStyle = chalk; ctx.globalAlpha = .75;
+  for (let y = 0; y <= 100; y += 5) { ctx.lineWidth = y % 10 ? 1 : 2; ctx.beginPath(); ctx.moveTo(yx(y), 0); ctx.lineTo(yx(y), h); ctx.stroke(); }
+  ctx.lineWidth = 1;
+  for (let y = 1; y < 100; y++) { if (y % 5) { ctx.beginPath(); ctx.moveTo(yx(y), h * .33); ctx.lineTo(yx(y), h * .33 + 5); ctx.moveTo(yx(y), h * .67 - 5); ctx.lineTo(yx(y), h * .67); ctx.stroke(); } }
+  ctx.globalAlpha = .8; ctx.fillStyle = chalk; ctx.font = `700 ${Math.max(10, Math.min(18, w / 55))}px "Barlow Semi Condensed", sans-serif`; ctx.textAlign = "center";
+  for (let y = 10; y < 100; y += 10) { const n = y <= 50 ? y : 100 - y; ctx.fillText(String(n), yx(y), h - 10); ctx.save(); ctx.translate(yx(y), 18); ctx.rotate(Math.PI); ctx.fillText(String(n), 0, -6); ctx.restore(); }
+  ctx.globalAlpha = 1;
+  // line of scrimmage + first-down line (settled position only)
+  if (t >= 1) {
+    const los = absX(S.pos), fd = absX(Math.min(100, S.pos + S.toGo));
+    ctx.lineWidth = 3; ctx.strokeStyle = "#5fb0ff"; ctx.beginPath(); ctx.moveTo(yx(los), 0); ctx.lineTo(yx(los), h); ctx.stroke();
+    if (S.pos + S.toGo < 100) { ctx.strokeStyle = flag; ctx.beginPath(); ctx.moveTo(yx(fd), 0); ctx.lineTo(yx(fd), h); ctx.stroke(); }
+  }
+  // ball
+  const bx = yx(anim.x), by = h / 2 - lift, sz = Math.max(7, Math.min(12, w / 80));
+  ctx.fillStyle = "rgba(0,0,0,.25)"; ctx.beginPath(); ctx.ellipse(bx, h / 2 + sz * .9, sz * 1.1, sz * .35, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.fillStyle = "#7a3f1d"; ctx.strokeStyle = "#3d1e0c"; ctx.lineWidth = 1.5;
+  ctx.beginPath(); ctx.ellipse(bx, by, sz * 1.5, sz, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
+  ctx.strokeStyle = "#fff"; ctx.lineWidth = 1.5; ctx.beginPath(); ctx.moveTo(bx - sz * .5, by); ctx.lineTo(bx + sz * .5, by); ctx.stroke();
+  for (let i = -2; i <= 2; i++) { ctx.beginPath(); ctx.moveTo(bx + i * sz * .22, by - sz * .25); ctx.lineTo(bx + i * sz * .22, by + sz * .25); ctx.stroke(); }
+  // banner
+  const bn = document.getElementById("banner");
+  if (bn) { const on = now < anim.bannerUntil; if (bn.textContent !== anim.banner) bn.textContent = anim.banner; bn.style.opacity = on ? 1 : 0; }
+}
+
+// ---------- Input ----------
+app.addEventListener("click", ev => {
+  const el = ev.target.closest("button"); if (!el) return;
+  if (el.dataset.team) { menuSel.team = el.dataset.team; renderMenu(); return; }
+  if (el.dataset.diff) { menuSel.diff = el.dataset.diff; renderMenu(); return; }
+  if (el.id === "start" || el.id === "again") { S = fresh(); anim.x = anim.toX = anim.fromX = absX(25); anim.t0 = 0; anim.dur = 1; flash("Kickoff"); render(); return; }
+  if (el.dataset.quit) { S = { phase: "menu" }; render(); return; }
+  if (el.dataset.tempo) { S.tempo = el.dataset.tempo; render(); return; }
+  if (el.dataset.off) return userCallOffense(el.dataset.off);
+  if (el.dataset.def) return userCallDefense(el.dataset.def);
+  if (el.dataset.punt) return doPunt("you");
+  if (el.dataset.fg) return doFG("you");
+  if (el.dataset.cpuspecial) return cpuSpecialGo();
+});
+document.addEventListener("keydown", ev => {
+  if (!S || S.phase !== "play" || ev.metaKey || ev.ctrlKey || ev.altKey) return;
+  const n = parseInt(ev.key, 10); if (!n) return;
+  if (S.poss === "you" && n <= 6) userCallOffense(OK[n - 1]);
+  else if (S.poss === "cpu" && cpuSpecial() === "play" && n <= 4) userCallDefense(DK[n - 1]);
+});
+window.addEventListener("resize", sizeCanvas);
+
+// ---------- Boot (keeps a game in progress across page updates) ----------
+function start(data) {
+  if (data && data.S && data.S.phase) { S = data.S; if (data.menuSel) menuSel = data.menuSel; if (S.phase === "play") { anim.x = anim.toX = anim.fromX = absX(S.pos); anim.dur = 1; } }
+  else S = { phase: "menu" };
+  render(); requestAnimationFrame(draw);
+}
+window.claude?.hot?.snapshot?.(() => ({ S, menuSel }));
+window.claude?.hot?.ready ? window.claude.hot.ready(start) : start(window.claude?.hot?.data ?? {});
+})();
+</script>
+</body>
+</html>

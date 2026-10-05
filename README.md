@@ -94,3 +94,11 @@ The last two both need a `CFBD_API_KEY` repository secret (Settings →
 Secrets and variables → Actions). Push either more often only if you
 upgrade past CFBD's free tier, and keep the combined total under 1,000/month
 if you do.
+
+## Bonus: Undrafted (story game)
+
+`docs/game/index.html` is a self-contained football story game. You play an
+undrafted rookie trying to survive camp, win a starting job, and chase a
+championship, with quick skill mini-games on game day. It has no
+dependencies and no build step. Open the file in any browser to play, or
+visit `/game/` on the hosted site. Progress saves in the browser.

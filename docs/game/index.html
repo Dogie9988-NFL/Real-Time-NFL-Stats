@@ -1,0 +1,3171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+<title>Undrafted</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@500;600;700&amp;family=Barlow:ital,wght@0,400;0,500;0,600;0,700;1,400&amp;family=Graduate&amp;display=swap" rel="stylesheet" />
+<style>
+/* Layout: the story is written on a coach's graph-paper play sheet; a dark trading-card player card rides beside it; an amber LED scoreboard appears at game time; mini-games happen on a strip of turf. */
+:root {
+  --field: #E3EAE0;
+  --field-line: rgba(21, 33, 58, .055);
+  --sheet: #FCFDFB;
+  --grid: rgba(38, 84, 160, .065);
+  --ink: #14203A;
+  --muted: #58647A;
+  --line: #C9D3C8;
+  --pylon: #D2500A;
+  --pylon-ink: #FFFFFF;
+  --pylon-soft: rgba(223, 85, 10, .12);
+  --good: #23763F;
+  --warn: #946C00;
+  --bad: #BE3229;
+  --board: #121A16;
+  --board-2: #1C2822;
+  --board-ink: #E9EEE7;
+  --board-muted: #93A096;
+  --led: #FFB21E;
+  --turf-a: #2E6E3E;
+  --turf-b: #245A32;
+  --chalk: #FFFFFF;
+  --chalk-dim: rgba(255, 255, 255, .72);
+  --m-skill: #FF7A2E;
+  --m-conf: #FFB21E;
+  --m-energy: #5BD68A;
+  --m-fame: #E9EEE7;
+  --m-chem: #69C3E6;
+  --m-neg: #FF6E61;
+  --shadow: 0 1px 0 rgba(20, 32, 58, .05), 0 14px 32px -18px rgba(20, 32, 58, .35);
+  --f-display: 'Graduate', 'Rockwell', 'Roboto Slab', Georgia, serif;
+  --f-body: 'Barlow', 'Segoe UI', Roboto, system-ui, sans-serif;
+  --f-label: 'Barlow Condensed', 'Arial Narrow', 'Roboto Condensed', sans-serif;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --field: #0B120E;
+    --field-line: rgba(233, 239, 231, .035);
+    --sheet: #121C17;
+    --grid: rgba(150, 205, 170, .045);
+    --ink: #E6ECE4;
+    --muted: #98A59B;
+    --line: #26352C;
+    --pylon: #FF7A2E;
+    --pylon-ink: #160800;
+    --pylon-soft: rgba(255, 122, 46, .15);
+    --good: #4FC27A;
+    --warn: #E6BB3A;
+    --bad: #FF6E61;
+    --board: #070C09;
+    --board-2: #111A15;
+    --turf-a: #1C4B2A;
+    --turf-b: #153D21;
+    --shadow: 0 1px 0 rgba(0, 0, 0, .4), 0 14px 32px -18px rgba(0, 0, 0, .8);
+    color-scheme: dark;
+  }
+}
+:root[data-theme="dark"] {
+  --field: #0B120E;
+  --field-line: rgba(233, 239, 231, .035);
+  --sheet: #121C17;
+  --grid: rgba(150, 205, 170, .045);
+  --ink: #E6ECE4;
+  --muted: #98A59B;
+  --line: #26352C;
+  --pylon: #FF7A2E;
+  --pylon-ink: #160800;
+  --pylon-soft: rgba(255, 122, 46, .15);
+  --good: #4FC27A;
+  --warn: #E6BB3A;
+  --bad: #FF6E61;
+  --board: #070C09;
+  --board-2: #111A15;
+  --turf-a: #1C4B2A;
+  --turf-b: #153D21;
+  --shadow: 0 1px 0 rgba(0, 0, 0, .4), 0 14px 32px -18px rgba(0, 0, 0, .8);
+  color-scheme: dark;
+}
+
+*, *::before, *::after { box-sizing: border-box; }
+html, body { min-height: 100%; }
+body {
+  margin: 0;
+  background: var(--field);
+  color: var(--ink);
+  font-family: var(--f-body);
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+body::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(10% - 1px), var(--field-line) calc(10% - 1px) 10%);
+  z-index: 0;
+}
+button { font: inherit; color: inherit; }
+:focus-visible { outline: 3px solid var(--pylon); outline-offset: 2px; }
+kbd {
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: .82em;
+  padding: 1px 6px;
+  border-radius: 4px;
+  border: 1px solid currentColor;
+  opacity: .9;
+}
+
+#app { position: relative; z-index: 1; min-height: 100vh; display: flex; flex-direction: column; }
+
+/* ---------- Top bar ---------- */
+.topbar {
+  position: sticky;
+  top: env(safe-area-inset-top, 0px);
+  z-index: 20;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding-block: 10px;
+  padding-inline: 16px;
+  background: var(--field);
+  border-bottom: 1px solid var(--line);
+}
+.brand {
+  font-family: var(--f-display);
+  font-size: 19px;
+  letter-spacing: .04em;
+  background: none;
+  border: 0;
+  padding: 4px 0;
+  cursor: pointer;
+  color: var(--ink);
+}
+.brand span { color: var(--pylon); }
+.status {
+  flex: 1;
+  min-width: 0;
+  font-family: var(--f-label);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--muted);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.top-actions { display: flex; gap: 8px; }
+.tbtn {
+  font-family: var(--f-label);
+  font-weight: 600;
+  font-size: 14px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  background: transparent;
+  border: 1px solid var(--line);
+  color: var(--ink);
+  padding: 6px 12px;
+  border-radius: 6px;
+  cursor: pointer;
+}
+.tbtn:hover { border-color: var(--pylon); }
+
+.wrap { width: 100%; max-width: 1100px; margin: 0 auto; padding-inline: 16px; padding-block: 22px 56px; }
+.wrap.narrow { max-width: 760px; }
+
+/* ---------- Title screen ---------- */
+.hero {
+  position: relative;
+  overflow: hidden;
+  border-radius: 14px;
+  background: linear-gradient(180deg, var(--turf-a), var(--turf-b));
+  color: var(--chalk);
+  box-shadow: var(--shadow);
+}
+.hero-field {
+  position: absolute;
+  inset: 0;
+  background:
+    repeating-linear-gradient(90deg, transparent 0 calc(10% - 2px), rgba(255, 255, 255, .28) calc(10% - 2px) 10%),
+    repeating-linear-gradient(180deg, rgba(255, 255, 255, .025) 0 40px, transparent 40px 80px);
+}
+.yardnums {
+  position: absolute;
+  left: 0; right: 0; bottom: 14px;
+  display: flex;
+  justify-content: space-around;
+  font-family: var(--f-display);
+  font-size: clamp(16px, 3vw, 30px);
+  color: rgba(255, 255, 255, .32);
+  padding-inline: 4%;
+  pointer-events: none;
+}
+.hero-inner { position: relative; padding: clamp(28px, 6vw, 64px) clamp(20px, 5vw, 56px) clamp(64px, 9vw, 96px); max-width: 760px; }
+.eyebrow {
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: .2em;
+  text-transform: uppercase;
+  color: var(--led);
+}
+.logo {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(48px, 11vw, 116px);
+  line-height: .92;
+  letter-spacing: .01em;
+  margin: 10px 0 18px;
+  text-shadow: 0 4px 0 var(--pylon), 0 10px 30px rgba(0, 0, 0, .35);
+  text-transform: uppercase;
+}
+.tagline { font-size: clamp(17px, 2.1vw, 20px); max-width: 52ch; margin: 0 0 26px; color: var(--chalk); }
+.hero-actions { display: flex; flex-wrap: wrap; gap: 12px; }
+.pylon-mark {
+  position: absolute;
+  right: clamp(16px, 5vw, 56px);
+  top: clamp(20px, 5vw, 48px);
+  width: 22px;
+  height: 64px;
+  background: var(--pylon);
+  border-radius: 3px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .3);
+}
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: 18px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 12px 22px;
+  border-radius: 8px;
+  border: 2px solid transparent;
+  cursor: pointer;
+  transition: transform .12s ease, background-color .12s ease;
+}
+.btn:active { transform: translateY(1px); }
+.btn-primary { background: var(--pylon); color: var(--pylon-ink); }
+.btn-primary:hover { filter: brightness(1.08); }
+.btn-ghost { background: rgba(0, 0, 0, .18); color: var(--chalk); border-color: rgba(255, 255, 255, .55); }
+.btn-ghost:hover { background: rgba(0, 0, 0, .3); }
+.btn-plain { background: transparent; color: var(--ink); border-color: var(--line); }
+.btn-plain:hover { border-color: var(--pylon); }
+.btn small { font-family: var(--f-body); font-weight: 500; font-size: 13px; letter-spacing: 0; text-transform: none; opacity: .85; }
+
+.how {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 16px;
+  margin-top: 22px;
+}
+.how > div {
+  background: var(--sheet);
+  border: 1px solid var(--line);
+  border-radius: 10px;
+  padding: 18px 20px;
+  min-width: 0;
+}
+.how h3 { font-family: var(--f-display); font-weight: 400; font-size: 20px; margin: 0 0 6px; }
+.how p { margin: 0; color: var(--muted); font-size: 16px; }
+.how-games { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 10px; }
+.chip {
+  display: inline-block;
+  font-family: var(--f-label);
+  font-weight: 600;
+  font-size: 13px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 4px;
+  background: var(--pylon-soft);
+  color: var(--ink);
+}
+.foot-note { margin-top: 18px; color: var(--muted); font-size: 14px; text-align: center; }
+
+/* ---------- Setup ---------- */
+.sheet {
+  background-color: var(--sheet);
+  background-image: linear-gradient(var(--grid) 1px, transparent 1px), linear-gradient(90deg, var(--grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  padding: clamp(20px, 4vw, 36px) clamp(18px, 4vw, 40px);
+  box-shadow: var(--shadow);
+  min-width: 0;
+}
+.kicker {
+  font-family: var(--f-label);
+  text-transform: uppercase;
+  letter-spacing: .14em;
+  font-size: 14px;
+  color: var(--pylon);
+  font-weight: 700;
+}
+.title {
+  font-family: var(--f-display);
+  font-weight: 400;
+  font-size: clamp(26px, 4.4vw, 40px);
+  line-height: 1.08;
+  margin: 6px 0 18px;
+  text-wrap: balance;
+}
+.form-grid { display: grid; gap: 22px; }
+.name-row { display: grid; grid-template-columns: 1fr 1fr auto; gap: 12px; align-items: end; }
+.lbl {
+  display: block;
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-bottom: 6px;
+}
+.txt {
+  width: 100%;
+  font: inherit;
+  font-size: 18px;
+  font-weight: 600;
+  padding: 10px 12px;
+  border: 1.5px solid var(--line);
+  border-radius: 8px;
+  background: var(--sheet);
+  color: var(--ink);
+}
+.txt:focus { border-color: var(--pylon); outline: none; box-shadow: 0 0 0 3px var(--pylon-soft); }
+fieldset { border: 0; padding: 0; margin: 0; min-width: 0; }
+legend { padding: 0; }
+.opt-grid { display: grid; gap: 10px; grid-template-columns: repeat(4, minmax(0, 1fr)); }
+.opt-grid.three { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.opt { position: relative; display: block; cursor: pointer; min-width: 0; }
+.opt input { position: absolute; opacity: 0; pointer-events: none; }
+.opt-body {
+  display: block;
+  height: 100%;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  padding: 12px 14px;
+  background: var(--sheet);
+  transition: border-color .12s ease, box-shadow .12s ease;
+}
+.opt:hover .opt-body { border-color: var(--muted); }
+.opt input:checked + .opt-body { border-color: var(--pylon); box-shadow: 0 0 0 3px var(--pylon-soft); }
+.opt input:focus-visible + .opt-body { outline: 3px solid var(--pylon); outline-offset: 2px; }
+.opt-big { font-family: var(--f-display); font-size: 28px; line-height: 1; display: block; }
+.opt-name { font-weight: 700; display: block; margin-top: 4px; }
+.opt-desc { font-size: 14.5px; color: var(--muted); display: block; margin-top: 4px; line-height: 1.4; }
+.opt-tag { display: block; margin-top: 8px; font-family: var(--f-label); font-weight: 600; font-size: 13px; letter-spacing: .05em; text-transform: uppercase; color: var(--pylon); }
+.num-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.num-row .opt-body { font-family: var(--f-display); font-size: 22px; padding: 8px 14px; min-width: 64px; text-align: center; }
+
+/* ---------- Play layout ---------- */
+.play { display: grid; grid-template-columns: minmax(0, 1fr) 300px; gap: 24px; align-items: start; }
+.story p { margin: 0 0 .95em; max-width: 64ch; }
+.story p.say { margin-top: 1.1em; }
+.story .who {
+  display: block;
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: 13.5px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+  color: var(--pylon);
+  margin-bottom: 1px;
+}
+.story .note {
+  font-family: var(--f-label);
+  font-weight: 600;
+  font-size: 16px;
+  letter-spacing: .02em;
+  color: var(--muted);
+}
+.story .warn { color: var(--warn); font-weight: 600; }
+.story em { font-style: italic; }
+.reveal > * { animation: rise .45s ease both; }
+.reveal > *:nth-child(2) { animation-delay: .07s; }
+.reveal > *:nth-child(3) { animation-delay: .14s; }
+.reveal > *:nth-child(4) { animation-delay: .21s; }
+.reveal > *:nth-child(5) { animation-delay: .28s; }
+.reveal > *:nth-child(n+6) { animation-delay: .35s; }
+@keyframes rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+
+.choices { display: grid; gap: 10px; margin-top: 22px; }
+.choice {
+  display: flex;
+  gap: 12px;
+  align-items: flex-start;
+  width: 100%;
+  text-align: left;
+  padding: 13px 16px;
+  border: 1.5px solid var(--line);
+  background: var(--sheet);
+  color: var(--ink);
+  border-radius: 8px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: border-color .12s ease;
+}
+.choice:hover:not([disabled]) { border-color: var(--pylon); }
+.choice .k { transition: transform .12s ease; }
+.choice:hover:not([disabled]) .k { transform: translateX(3px); }
+.choice[disabled] { opacity: .5; cursor: not-allowed; }
+.choice .k {
+  flex: none;
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: 14px;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  border-radius: 5px;
+  background: var(--ink);
+  color: var(--sheet);
+  margin-top: 1px;
+}
+.choice .t { min-width: 0; }
+.choice small { display: block; color: var(--muted); font-size: 14px; margin-top: 2px; }
+.choice.primary { background: var(--pylon); border-color: var(--pylon); color: var(--pylon-ink); font-family: var(--f-label); font-weight: 700; font-size: 19px; letter-spacing: .06em; text-transform: uppercase; align-items: center; }
+.choice.primary .k { background: var(--pylon-ink); color: var(--pylon); }
+.choice.primary small { color: inherit; opacity: .88; font-family: var(--f-body); font-weight: 500; font-size: 14.5px; letter-spacing: 0; text-transform: none; }
+.choice.primary:hover { filter: brightness(1.06); }
+
+/* ---------- Scoreboard ---------- */
+.board {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: center;
+  gap: 10px;
+  background: var(--board);
+  color: var(--board-ink);
+  border-radius: 8px;
+  padding: 10px 14px;
+  margin: 0 0 18px;
+  border: 1px solid var(--line);
+}
+.bteam { display: flex; align-items: center; gap: 12px; min-width: 0; }
+.bteam.right { justify-content: flex-end; }
+.bname { font-family: var(--f-display); font-size: clamp(13px, 2.2vw, 17px); text-transform: uppercase; letter-spacing: .03em; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.bscore {
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: clamp(30px, 5vw, 40px);
+  line-height: 1;
+  color: var(--led);
+  text-shadow: 0 0 12px rgba(255, 178, 30, .45);
+  font-variant-numeric: tabular-nums;
+  min-width: 2ch;
+  text-align: center;
+}
+.bmid { font-family: var(--f-label); font-weight: 700; letter-spacing: .1em; color: var(--board-muted); font-size: 14px; text-align: center; text-transform: uppercase; }
+
+.matchup {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  gap: 12px;
+  align-items: center;
+  background: var(--board);
+  color: var(--board-ink);
+  border-radius: 8px;
+  padding: 14px 16px;
+  margin-bottom: 18px;
+  border: 1px solid var(--line);
+}
+.mu-side { min-width: 0; }
+.mu-side.right { text-align: right; }
+.mu-team { font-family: var(--f-display); font-size: clamp(15px, 2.6vw, 20px); text-transform: uppercase; line-height: 1.1; }
+.mu-sub { font-family: var(--f-label); font-weight: 600; letter-spacing: .08em; text-transform: uppercase; color: var(--board-muted); font-size: 13px; margin-top: 4px; }
+.mu-vs { font-family: var(--f-display); color: var(--led); font-size: 18px; }
+.threat { display: inline-flex; gap: 3px; vertical-align: middle; margin-left: 4px; }
+.threat i { width: 8px; height: 10px; border-radius: 2px; background: rgba(255, 255, 255, .15); }
+.threat i.on { background: var(--led); }
+
+.grade {
+  display: inline-grid;
+  place-items: center;
+  font-family: var(--f-display);
+  font-size: 26px;
+  width: 54px;
+  height: 54px;
+  border-radius: 8px;
+  background: var(--ink);
+  color: var(--sheet);
+  vertical-align: middle;
+  margin-right: 12px;
+}
+.grade-row { display: flex; align-items: center; margin: 4px 0 16px; }
+.grade-row div { min-width: 0; }
+
+/* ---------- Week hub ---------- */
+.acts { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 12px; margin-top: 8px; }
+.act {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  text-align: left;
+  padding: 14px 16px;
+  border: 1.5px solid var(--line);
+  border-radius: 10px;
+  background: var(--sheet);
+  color: var(--ink);
+  cursor: pointer;
+  min-width: 0;
+  transition: border-color .12s ease, box-shadow .12s ease;
+}
+.act:hover:not([disabled]) { border-color: var(--pylon); box-shadow: 0 0 0 3px var(--pylon-soft); }
+.act[disabled] { opacity: .45; cursor: not-allowed; }
+.act.picked { border-color: var(--good); opacity: 1; box-shadow: 0 0 0 3px rgba(35, 118, 63, .15); }
+.act-top { display: flex; align-items: center; gap: 8px; }
+.act-name { font-family: var(--f-display); font-size: 18px; line-height: 1.1; flex: 1; min-width: 0; }
+.act-desc { font-size: 15px; color: var(--muted); line-height: 1.4; }
+.act-fx { display: flex; flex-wrap: wrap; gap: 5px; margin-top: auto; padding-top: 4px; }
+.fxc { font-family: var(--f-label); font-weight: 700; font-size: 13px; letter-spacing: .04em; text-transform: uppercase; padding: 1px 7px; border-radius: 4px; }
+.fxc.up { background: rgba(35, 118, 63, .14); color: var(--good); }
+.fxc.down { background: rgba(190, 50, 41, .12); color: var(--bad); }
+.fxc.lock { background: var(--pylon-soft); color: var(--ink); }
+.picks-left { font-family: var(--f-label); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--pylon); }
+.hub-log { margin-top: 16px; display: grid; gap: 8px; }
+.hub-log p { margin: 0; padding: 10px 14px; border-radius: 8px; background: var(--pylon-soft); font-size: 16px; }
+.hub-log b { font-family: var(--f-label); letter-spacing: .06em; text-transform: uppercase; }
+
+/* ---------- Player card ---------- */
+.card {
+  position: sticky;
+  top: calc(env(safe-area-inset-top, 0px) + 72px);
+  background: var(--board);
+  color: var(--board-ink);
+  border-radius: 12px;
+  border: 1px solid var(--line);
+  box-shadow: var(--shadow);
+  overflow: hidden;
+}
+.pc-head { display: flex; gap: 14px; align-items: center; padding: 16px 18px 12px; background: linear-gradient(135deg, var(--board-2), var(--board)); border-bottom: 1px solid rgba(255, 255, 255, .08); }
+.pc-num { font-family: var(--f-display); font-size: 44px; line-height: 1; color: var(--m-skill); min-width: 2ch; text-align: center; }
+.pc-name { font-family: var(--f-display); font-size: 19px; line-height: 1.1; text-transform: uppercase; overflow-wrap: anywhere; }
+.pc-role { font-family: var(--f-label); font-weight: 600; font-size: 13.5px; letter-spacing: .08em; text-transform: uppercase; color: var(--board-muted); margin-top: 3px; }
+.pc-body { padding: 14px 18px 18px; display: grid; gap: 14px; }
+.pc-sec { display: grid; gap: 8px; }
+.pc-h { font-family: var(--f-label); font-weight: 700; font-size: 12.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--board-muted); }
+.meter-row { display: grid; grid-template-columns: 102px 1fr 30px; gap: 8px; align-items: center; font-size: 14px; }
+.meter-row .ml { font-family: var(--f-label); font-weight: 600; letter-spacing: .03em; text-transform: uppercase; font-size: 13.5px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.meter-row .mv { font-family: var(--f-label); font-weight: 700; text-align: right; font-variant-numeric: tabular-nums; }
+.bar { height: 8px; border-radius: 4px; background: rgba(255, 255, 255, .1); overflow: hidden; position: relative; }
+.bar > i { display: block; height: 100%; border-radius: 4px; transition: width .5s ease; }
+.bar.center::before { content: ''; position: absolute; left: 50%; top: -2px; bottom: -2px; width: 1px; background: rgba(255, 255, 255, .35); }
+.bar.center > i { position: absolute; top: 0; }
+.pc-money { display: flex; justify-content: space-between; align-items: baseline; font-family: var(--f-label); font-weight: 700; font-size: 15px; letter-spacing: .04em; text-transform: uppercase; }
+.pc-money b { font-size: 20px; color: var(--led); font-variant-numeric: tabular-nums; }
+.pc-items { display: flex; flex-wrap: wrap; gap: 6px; }
+.pc-item { font-family: var(--f-label); font-weight: 600; font-size: 13px; letter-spacing: .04em; padding: 3px 8px; border-radius: 4px; background: rgba(255, 255, 255, .08); border: 1px solid rgba(255, 255, 255, .12); }
+.pc-stats { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; text-align: center; }
+.pc-stats div { background: rgba(255, 255, 255, .05); border-radius: 6px; padding: 6px 4px; }
+.pc-stats b { display: block; font-family: var(--f-label); font-size: 22px; line-height: 1.1; color: var(--led); font-variant-numeric: tabular-nums; }
+.pc-stats span { font-family: var(--f-label); font-weight: 600; font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--board-muted); }
+.pc-toggle { display: none; }
+
+/* ---------- Mini-games ---------- */
+.mg {
+  position: relative;
+  margin-top: 18px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: linear-gradient(180deg, var(--turf-a), var(--turf-b));
+  color: var(--chalk);
+  padding: 18px;
+  user-select: none;
+  -webkit-user-select: none;
+  touch-action: manipulation;
+}
+.mg::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: repeating-linear-gradient(90deg, transparent 0 calc(20% - 2px), rgba(255, 255, 255, .16) calc(20% - 2px) 20%);
+  pointer-events: none;
+}
+.mg > * { position: relative; }
+.mg-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 12px; margin-bottom: 14px; }
+.mg-tag { font-family: var(--f-label); font-weight: 700; font-size: 13px; letter-spacing: .16em; text-transform: uppercase; background: var(--led); color: #1A1200; padding: 2px 8px; border-radius: 4px; }
+.mg-prompt { font-weight: 600; font-size: 17px; min-width: 0; }
+.mg-row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin-top: 14px; }
+.mg-help { font-size: 14px; color: var(--chalk-dim); }
+.mg-btn {
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: 20px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  padding: 12px 26px;
+  border-radius: 8px;
+  border: 0;
+  background: var(--pylon);
+  color: #FFFFFF;
+  cursor: pointer;
+  min-width: 150px;
+  box-shadow: 0 4px 0 rgba(0, 0, 0, .25);
+}
+.mg-btn:active { transform: translateY(2px); box-shadow: 0 2px 0 rgba(0, 0, 0, .25); }
+.meter {
+  position: relative;
+  height: 50px;
+  border-radius: 6px;
+  background: rgba(0, 0, 0, .3);
+  border: 2px solid rgba(255, 255, 255, .7);
+  overflow: hidden;
+  cursor: pointer;
+}
+.zone { position: absolute; top: 0; bottom: 0; }
+.zone.good { background: rgba(255, 255, 255, .3); }
+.zone.perfect { background: var(--pylon); }
+.needle { position: absolute; top: -2px; bottom: -2px; width: 5px; margin-left: -2.5px; background: #FFFFFF; box-shadow: 0 0 0 2px rgba(0, 0, 0, .45); border-radius: 2px; }
+.react-pad {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 160px;
+  border-radius: 8px;
+  border: 2px dashed rgba(255, 255, 255, .6);
+  background: rgba(0, 0, 0, .25);
+  color: var(--chalk);
+  cursor: pointer;
+  font-family: var(--f-display);
+  font-size: clamp(28px, 6vw, 46px);
+  text-transform: uppercase;
+}
+.react-pad.wait { border-style: solid; }
+.react-pad.fake { background: rgba(255, 255, 255, .18); }
+.react-pad.go { background: var(--pylon); border-color: var(--pylon); color: #FFFFFF; }
+.combo-seq { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; }
+.arrow-box {
+  width: 54px;
+  height: 54px;
+  display: grid;
+  place-items: center;
+  border: 2px solid rgba(255, 255, 255, .55);
+  border-radius: 8px;
+  font-size: 28px;
+  font-weight: 700;
+  background: rgba(0, 0, 0, .2);
+}
+.arrow-box.cur { border-color: var(--led); box-shadow: 0 0 0 3px rgba(255, 178, 30, .4); }
+.arrow-box.done { background: var(--chalk); color: var(--turf-b); border-color: var(--chalk); }
+.combo-seq.shake { animation: shake .3s; }
+@keyframes shake { 25% { transform: translateX(-6px); } 75% { transform: translateX(6px); } }
+.combo-pad { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px; margin-top: 14px; }
+.pad-btn {
+  height: 58px;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, .6);
+  background: rgba(0, 0, 0, .25);
+  color: var(--chalk);
+  font-size: 26px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.pad-btn:active { background: rgba(255, 255, 255, .25); }
+.timer { height: 8px; margin-top: 14px; border-radius: 4px; background: rgba(255, 255, 255, .2); overflow: hidden; }
+.timer > i { display: block; height: 100%; width: 100%; background: var(--led); transform-origin: left center; }
+.read-opts { display: grid; gap: 8px; margin-top: 12px; }
+.read-opt {
+  display: flex;
+  gap: 10px;
+  align-items: flex-start;
+  text-align: left;
+  padding: 11px 14px;
+  border-radius: 8px;
+  border: 2px solid rgba(255, 255, 255, .55);
+  background: rgba(0, 0, 0, .22);
+  color: var(--chalk);
+  font-weight: 600;
+  cursor: pointer;
+}
+.read-opt:hover { background: rgba(0, 0, 0, .35); border-color: var(--chalk); }
+.read-opt .k { flex: none; font-family: var(--f-label); width: 24px; height: 24px; display: grid; place-items: center; border-radius: 5px; background: var(--chalk); color: var(--turf-b); font-weight: 700; }
+.film-note { background: rgba(255, 178, 30, .16); border: 1px solid rgba(255, 178, 30, .55); border-radius: 8px; padding: 10px 12px; font-size: 15.5px; }
+.film-note b { font-family: var(--f-label); letter-spacing: .1em; text-transform: uppercase; color: var(--led); margin-right: 6px; }
+.flash {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  background: rgba(0, 0, 0, .55);
+  text-align: center;
+  animation: pop .35s ease both;
+  z-index: 3;
+}
+.flash b { font-family: var(--f-display); font-weight: 400; font-size: clamp(36px, 8vw, 64px); line-height: 1; text-transform: uppercase; }
+.flash span { font-family: var(--f-label); font-weight: 600; letter-spacing: .12em; text-transform: uppercase; color: var(--chalk-dim); }
+.flash.great b { color: var(--led); }
+.flash.bad b { color: var(--m-neg); }
+@keyframes pop { from { opacity: 0; transform: scale(1.08); } to { opacity: 1; transform: none; } }
+
+/* ---------- Toasts ---------- */
+#toasts {
+  position: fixed;
+  left: 50%;
+  top: calc(64px + env(safe-area-inset-top, 0px));
+  transform: translateX(-50%);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 6px;
+  z-index: 50;
+  pointer-events: none;
+  width: max-content;
+  max-width: calc(100vw - 32px);
+}
+.toast {
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: 15px;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  padding: 6px 14px;
+  border-radius: 999px;
+  background: var(--board);
+  color: var(--board-ink);
+  border: 1px solid rgba(255, 255, 255, .14);
+  box-shadow: 0 6px 18px rgba(0, 0, 0, .25);
+  animation: toastIn .25s ease both;
+}
+.toast { display: flex; flex-wrap: wrap; justify-content: center; gap: 2px 14px; }
+.toast.cash, .tp.cash { color: var(--led); }
+.tp.up { color: var(--m-energy); }
+.tp.down { color: var(--m-neg); }
+.toast.trophy { background: var(--led); color: #1A1200; font-size: 16px; padding: 10px 18px; border-radius: 10px; }
+.toast.out { opacity: 0; transform: translateY(-6px); transition: all .3s ease; }
+@keyframes toastIn { from { opacity: 0; transform: translateY(-8px); } to { opacity: 1; transform: none; } }
+
+/* ---------- Menu & trophies ---------- */
+.overlay { position: fixed; inset: 0; z-index: 40; background: rgba(5, 10, 8, .55); display: grid; place-items: center; padding: 16px; }
+.menu { width: 100%; max-width: 380px; display: grid; gap: 10px; }
+.menu .title { margin-bottom: 8px; }
+.menu .btn { justify-content: center; }
+.confirm-text { margin: 0; color: var(--bad); font-weight: 600; }
+.trophies { display: grid; grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); gap: 12px; }
+.trophy { display: flex; gap: 12px; align-items: flex-start; padding: 14px; border-radius: 10px; border: 1.5px solid var(--line); background: var(--sheet); min-width: 0; }
+.trophy .ti { flex: none; width: 40px; height: 40px; border-radius: 8px; display: grid; place-items: center; font-family: var(--f-display); font-size: 18px; background: var(--line); color: var(--muted); }
+.trophy.on { border-color: var(--led); }
+.trophy.on .ti { background: var(--led); color: #1A1200; }
+.trophy b { display: block; font-family: var(--f-display); font-weight: 400; font-size: 16.5px; line-height: 1.15; }
+.trophy span { display: block; font-size: 14.5px; color: var(--muted); margin-top: 3px; line-height: 1.35; }
+.trophy:not(.on) b { color: var(--muted); }
+.sumgrid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; margin: 6px 0 18px; }
+.sumgrid div { background: var(--board); color: var(--board-ink); border-radius: 8px; padding: 10px 12px; }
+.sumgrid b { display: block; font-family: var(--f-label); font-size: clamp(19px, 5vw, 24px); overflow-wrap: anywhere; line-height: 1.1; color: var(--led); font-variant-numeric: tabular-nums; }
+.sumgrid span { font-family: var(--f-label); font-weight: 600; font-size: 12.5px; letter-spacing: .1em; text-transform: uppercase; color: var(--board-muted); }
+.results { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 18px; }
+.res { font-family: var(--f-label); font-weight: 700; font-size: 14px; letter-spacing: .04em; padding: 4px 8px; border-radius: 5px; border: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.res.w { border-color: var(--good); color: var(--good); }
+.res.l { border-color: var(--bad); color: var(--bad); }
+.ending-mark { font-family: var(--f-label); font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--muted); font-size: 13.5px; margin: 6px 0 8px; }
+
+/* ---------- Narrow screens ---------- */
+@media (max-width: 880px) {
+  .play { grid-template-columns: minmax(0, 1fr); gap: 14px; }
+  .card { position: static; order: -1; }
+  .pc-toggle {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    padding: 10px 16px;
+    background: transparent;
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, .08);
+    color: var(--board-ink);
+    cursor: pointer;
+    font-family: var(--f-label);
+    font-weight: 600;
+    font-size: 14px;
+    letter-spacing: .06em;
+    text-transform: uppercase;
+  }
+  .pc-mini { display: flex; flex-wrap: wrap; gap: 4px 12px; min-width: 0; }
+  .pc-mini b { color: var(--led); font-variant-numeric: tabular-nums; }
+  .card:not(.open) .pc-body { display: none; }
+  .pc-head { padding: 12px 16px 10px; }
+  .pc-num { font-size: 34px; }
+  .how { grid-template-columns: minmax(0, 1fr); }
+  .opt-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .opt-grid.three { grid-template-columns: minmax(0, 1fr); }
+}
+@media (max-width: 520px) {
+  body { font-size: 16.5px; }
+  .name-row { grid-template-columns: 1fr 1fr; }
+  .name-row .btn { grid-column: 1 / -1; justify-content: center; }
+  .status { font-size: 12.5px; }
+  body.in-play .brand { display: none; }
+  .tbtn { padding: 6px 9px; }
+  .mg { padding: 14px; }
+  .mg-btn { width: 100%; }
+  .arrow-box { width: 44px; height: 44px; font-size: 22px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .001ms !important; animation-delay: 0ms !important; transition-duration: .001ms !important; }
+}
+</style>
+</head>
+<body>
+<div id="app">
+  <header class="topbar">
+    <button class="brand" id="brandBtn" type="button" aria-label="Undrafted title screen">UNDRAFTED<span>.</span></button>
+    <div class="status" id="status"></div>
+    <div class="top-actions">
+      <button class="tbtn" id="soundBtn" type="button" aria-pressed="true">Sound on</button>
+      <button class="tbtn" id="menuBtn" type="button" hidden>Menu</button>
+    </div>
+  </header>
+  <main id="screen"></main>
+  <div id="toasts" aria-live="polite"></div>
+</div>
+<script>
+(() => {
+'use strict';
+
+/* =========================================================
+   UNDRAFTED — a football story game.
+   Everything (story, mini-games, saving) lives in this file.
+   ========================================================= */
+
+// ---------- Small helpers ----------
+const $ = (s, r = document) => r.querySelector(s);
+const $$ = (s, r = document) => Array.from(r.querySelectorAll(s));
+const rand = (a, b) => a + Math.random() * (b - a);
+const ri = (a, b) => Math.floor(rand(a, b + 1));
+const chance = p => Math.random() < p;
+const pick = a => a[Math.floor(Math.random() * a.length)];
+const clamp = (v, lo, hi) => Math.max(lo, Math.min(hi, v));
+const shuffle = a => { const b = a.slice(); for (let i = b.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [b[i], b[j]] = [b[j], b[i]]; } return b; };
+const esc = s => String(s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+const money = n => '$' + Math.round(n).toLocaleString('en-US');
+const reduceMotion = !!(window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches);
+
+// Browser storage can be missing or blocked, so every call is wrapped.
+const store = {
+  get(k, d) { try { const v = localStorage.getItem(k); return v == null ? d : JSON.parse(v); } catch (e) { return d; } },
+  set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { /* ignore */ } },
+  del(k) { try { localStorage.removeItem(k); } catch (e) { /* ignore */ } },
+};
+const SAVE_KEY = 'undrafted.save.v1';
+const TROPHY_KEY = 'undrafted.trophies.v1';
+const PREF_KEY = 'undrafted.prefs.v1';
+
+// ---------- Sound (tiny synth, no files needed) ----------
+const Sound = (() => {
+  let ctx = null;
+  let on = store.get(PREF_KEY, {}).sound !== false;
+  function ac() {
+    if (!ctx) {
+      const C = window.AudioContext || window.webkitAudioContext;
+      if (!C) return null;
+      try { ctx = new C(); } catch (e) { return null; }
+    }
+    if (ctx.state === 'suspended') ctx.resume().catch(() => {});
+    return ctx;
+  }
+  function tone(f, d, type, vol, t0, slide) {
+    const c = ac(); if (!c) return;
+    const t = c.currentTime + (t0 || 0);
+    const o = c.createOscillator(), g = c.createGain();
+    o.type = type || 'sine';
+    o.frequency.setValueAtTime(f, t);
+    if (slide) o.frequency.exponentialRampToValueAtTime(Math.max(40, f + slide), t + d);
+    g.gain.setValueAtTime(0.0001, t);
+    g.gain.exponentialRampToValueAtTime(vol || 0.06, t + 0.01);
+    g.gain.exponentialRampToValueAtTime(0.0001, t + d);
+    o.connect(g); g.connect(c.destination);
+    o.start(t); o.stop(t + d + 0.03);
+  }
+  function noise(d, vol, t0, freq) {
+    const c = ac(); if (!c) return;
+    const len = Math.floor(c.sampleRate * d);
+    const buf = c.createBuffer(1, len, c.sampleRate), data = buf.getChannelData(0);
+    for (let i = 0; i < len; i++) data[i] = (Math.random() * 2 - 1) * Math.sin(Math.PI * i / len);
+    const src = c.createBufferSource(); src.buffer = buf;
+    const f = c.createBiquadFilter(); f.type = 'bandpass'; f.frequency.value = freq || 900; f.Q.value = 0.6;
+    const g = c.createGain(); g.gain.value = vol || 0.05;
+    src.connect(f); f.connect(g); g.connect(c.destination);
+    src.start(c.currentTime + (t0 || 0));
+  }
+  const fx = {
+    click: () => tone(520, 0.05, 'triangle', 0.035),
+    tick: () => tone(900, 0.04, 'square', 0.025),
+    good: () => { tone(523, 0.12, 'triangle', 0.06); tone(784, 0.2, 'triangle', 0.06, 0.08); },
+    great: () => { [523, 659, 784, 1047].forEach((f, i) => tone(f, 0.24, 'triangle', 0.06, i * 0.07)); noise(1.2, 0.07, 0.05, 800); },
+    bad: () => tone(190, 0.32, 'sawtooth', 0.045, 0, -80),
+    whistle: () => { tone(2200, 0.32, 'sine', 0.04, 0, 120); tone(2350, 0.18, 'sine', 0.025, 0.06, -80); },
+    trophy: () => [784, 988, 1175, 1568].forEach((f, i) => tone(f, 0.28, 'sine', 0.05, i * 0.09)),
+    cash: () => { tone(1320, 0.07, 'square', 0.025); tone(1760, 0.12, 'square', 0.025, 0.06); },
+  };
+  return {
+    play(n) { if (on && fx[n]) { try { fx[n](); } catch (e) { /* ignore */ } } },
+    get on() { return on; },
+    toggle() { on = !on; const p = store.get(PREF_KEY, {}); p.sound = on; store.set(PREF_KEY, p); if (on) ac(); return on; },
+  };
+})();
+
+// ---------- Who you can be ----------
+const POS = {
+  QB: { name: 'Quarterback', nums: [3, 7, 12, 16], games: ['Reads', 'Throws', 'Scrambles'],
+        blurb: 'Read the defense, fire into tight windows, escape the rush.', verb: 'throw',
+        stats: [['passYds', 'Pass yds'], ['td', 'TD'], ['int', 'INT']],
+        train: 'You throw two hundred extra balls at a trash can forty yards away. By the end you hit it eleven times in a row.' },
+  RB: { name: 'Running Back', nums: [22, 26, 28, 33], games: ['Cuts', 'Jukes', 'Blitz pickup'],
+        blurb: 'Find the hole, juke the linebacker, dive for the pylon.', verb: 'run',
+        stats: [['rushYds', 'Rush yds'], ['td', 'TD'], ['long', 'Long']],
+        train: 'You push the blocking sled until your legs shake. Then you push it again, because Okafor is watching.' },
+  WR: { name: 'Wide Receiver', nums: [11, 14, 17, 84], games: ['Releases', 'Catches', 'Option routes'],
+        blurb: 'Beat press coverage, toe-tap the sideline, high-point the fade.', verb: 'catch',
+        stats: [['rec', 'Catches'], ['recYds', 'Rec yds'], ['td', 'TD']],
+        train: 'The JUGS machine fires three hundred balls at you. You drop four. You think about those four all night.' },
+  LB: { name: 'Linebacker', nums: [44, 52, 54, 58], games: ['Snap timing', 'Run reads', 'Tackles'],
+        blurb: 'Diagnose the play, shed blockers, punch the ball loose.', verb: 'tackle',
+        stats: [['tkl', 'Tackles'], ['sacks', 'Sacks'], ['take', 'Takeaways']],
+        train: 'You hit the tackling sled until the pad on it splits down the middle. The equipment guy sighs.' },
+};
+const POSCOACH = { QB: 'quarterbacks coach', RB: 'running backs coach', WR: 'wide receivers coach', LB: 'linebackers coach' };
+const VANE_NUM = { QB: 9, RB: 32, WR: 81, LB: 55 };
+const INJ = { QB: 'steps up in the pocket to throw', RB: 'cuts back on a sweep', WR: 'goes up for a contested catch', LB: 'fills a gap on a run play' };
+
+const ORIGINS = {
+  town: { name: 'Small town', where: "Cutter's Ford, Kansas", fam: 'Grandma Bea', fp: 'she', fpos: 'her', fobj: 'her',
+          blurb: 'Raised by Grandma Bea above the Bluebird Diner. Population 2,140, and every one of them watches your games.',
+          bonus: { conf: 5, chem: 6 }, tag: '+Confidence, +Chemistry' },
+  city: { name: 'Harbor City kid', where: 'the east side of Harbor City', fam: 'Mom', fp: 'she', fpos: 'her', fobj: 'her',
+          blurb: 'You grew up eleven miles from the Hammerheads stadium. Your mom works nights as an ER nurse.',
+          bonus: { fame: 10, conf: 4 }, tag: '+Fame, +Confidence' },
+  base: { name: 'Military family', where: 'six Army bases in twelve years', fam: 'Dad', fp: 'he', fpos: 'his', fobj: 'him',
+          blurb: 'Your dad, a retired Army sergeant, taught you to be early, be ready, and make your bed.',
+          bonus: { skill: 5, energy: 10 }, tag: '+Skill, +Energy' },
+};
+
+const FIRST_NAMES = ['Jordan', 'Malik', 'Tyler', 'Andre', 'Cody', 'Dev', 'Mateo', 'Isaiah', 'Sam', 'Kai', 'Darius', 'Luke', 'Theo', 'Jalen', 'Eli', 'Marco', 'Nate', 'Rashad', 'Cole', 'Diego'];
+const LAST_NAMES = ['Reyes', 'Brooks', 'Okoye', 'Hart', 'Delgado', 'Whitfield', 'Mercer', 'Banks', 'Kowalski', 'Tran', 'Ellison', 'Price', 'Navarro', 'Shaw', 'Bishop', 'Castillo', 'Abernathy', 'Greene', 'Holt', 'Sato'];
+
+// ---------- The season ----------
+const SCHEDULE = [
+  { team: 'Lakeshore Gulls', r: 46, blurb: 'A rebuilding team with a rookie head coach and a lot of teal. A good place to start.' },
+  { team: 'Desert Vipers', r: 52, blurb: 'Fast and mean. Their stadium has no roof, and the forecast says 101 degrees.' },
+  { team: 'Northfork Lumberjacks', r: 55, blurb: 'Physical. They run the ball forty times a game and dare you to stop it.' },
+  { team: 'Steel Valley Smelters', r: 50, blurb: 'Their fans wave yellow towels. Their secondary waves at receivers going by.' },
+  { team: 'Capital Monarchs', r: 70, rival: true, blurb: 'The defending champions. Their star, Dante Kingsley, has a crown tattoo and a podcast.' },
+  { team: 'Gulf Coast Hurricanes', r: 58, blurb: 'A high-flying passing attack. Expect points, and a lot of them.' },
+  { team: 'Frontier Mustangs', r: 56, blurb: 'A mile above sea level. Bring your lungs.' },
+  { team: 'Prairie Bison', r: 49, blurb: 'The Thanksgiving game. Half the country will be watching with a plate in their lap.' },
+  { team: 'Neon City Jackpots', r: 61, blurb: 'Flashy and dangerous. They lead the league in trick plays and gold cleats.' },
+  { team: 'Capital Monarchs', r: 72, rival: true, blurb: 'The rematch, on your field. A playoff spot could ride on it.' },
+];
+const PLAYOFFS = [
+  { team: 'Redwood Grizzlies', r: 62, round: 'Wild Card', blurb: 'Big, slow, and very hard to move. Win and you advance. Lose and you clean out your locker.' },
+  { team: 'Capital Monarchs', r: 73, rival: true, round: 'Conference Championship', blurb: 'Third time this season. Whoever wins goes to the Championship.' },
+  { team: 'Empire Sentinels', r: 77, round: 'The Championship', blurb: 'The best team in the other conference. They have not lost since October.' },
+];
+const oppOf = n => (n < 10 ? SCHEDULE[n] : PLAYOFFS[n - 10]);
+const shortName = t => t.split(' ').pop();
+
+// ---------- Game-day moments, per position ----------
+// type: timing | reaction | combo | read
+// read.opts: [label, quality, what happens]
+const MOMENTS = {
+  QB: [
+    { type: 'read', title: 'Two-High Shell',
+      setup: 'First and ten at your own 32. Both safeties sit deep, twenty yards off the ball. The cornerbacks are playing soft, giving your receivers an eight-yard cushion.',
+      read: { q: 'Where do you go with the ball?', tell: 'Two deep safeties take away the deep ball. Soft corners leave the quick game wide open.',
+        opts: [
+          ['Quick out to the sideline, in front of the soft corner', 'great', 'Three-step drop, and the ball is out before the corner can close. Your receiver turns upfield and doesn\'t stop running until somebody makes him.'],
+          ['Hand it off and let the run game work', 'good', 'Steady. Six yards, and the chains are close to moving.'],
+          ['Launch it deep down the middle', 'bad', 'The deep safety was sitting right there. He undercuts the route, and the crowd groans as he takes it back the other way.'],
+        ] } },
+    { type: 'read', title: 'Blitz Look',
+      setup: 'Third and six. The middle linebacker creeps up into the A-gap and the safety rotates down. They\'re showing blitz. Six rushers, maybe seven.',
+      read: { q: 'They\'re coming. What\'s the call?', tell: 'When a linebacker leaves his spot to blitz, the space behind him is empty. Throw hot.',
+        opts: [
+          ['Check to a hot slant into the space the linebacker left', 'great', 'You see it, you check it, you throw it. The slant hits your receiver in stride right where the linebacker used to be.'],
+          ['Keep the running back in to block and take a deep shot', 'good', 'The extra blocker buys you half a second. You hit an out route for the first down.'],
+          ['Snap it as called and hope', 'bad', 'Seven guys come. Six guys block. You do the math lying on your back.'],
+        ] } },
+    { type: 'timing', title: 'Collapsing Pocket', btn: 'Throw',
+      setup: 'The pocket is caving in. Your receiver is breaking open on a dig route across the middle, and you have about one second before a defensive end ends your afternoon.',
+      prompt: 'Release the throw inside the window.',
+      great: 'You step up into the chaos and deliver a strike between two defenders. It\'s the kind of throw they put in a highlight package.',
+      good: 'It isn\'t pretty, but it\'s caught. The chains move.',
+      bad: 'You hold it a beat too long. The defensive end gets there first. Sack.' },
+    { type: 'timing', title: 'Play-Action Shot', btn: 'Throw',
+      setup: 'You fake the handoff and the linebackers bite on it, hard. Your receiver has a step on the cornerback down the sideline.',
+      prompt: 'Drop it in the bucket. Release in the window.',
+      great: 'The ball drops out of the sky and over your receiver\'s shoulder. Nobody touches him.',
+      good: 'A little underthrown, but your receiver adjusts and gets dragged down at the 20.',
+      bad: 'Overthrown by two yards. The ball skips out of bounds and the cornerback wags his finger at you.' },
+    { type: 'combo', title: 'Nobody Open',
+      setup: 'Perfect coverage. Every receiver is blanketed. Your left tackle just got beat, and a defensive end is coming at you like a falling refrigerator.',
+      prompt: 'Scramble! Hit the moves in order.',
+      great: 'You spin out of one tackle, duck under another, and pick up eighteen yards with your legs. The sideline loses its mind.',
+      good: 'You escape the rush and throw it away. Sometimes the best play is the boring one.',
+      bad: 'You spin right into a linebacker\'s arms. Sack, and you feel it in your teeth.' },
+    { type: 'reaction', title: 'High Snap', fakes: 1,
+      setup: 'Shotgun. Your center has been snapping high all day, and you can feel another one coming.',
+      prompt: 'Snatch the snap the instant it comes. Move on the orange GO.',
+      great: 'You pluck the high snap out of the air one-handed and fire a quick screen before the defense resets. Huge gain.',
+      good: 'You corral the snap and get the play off. Tidy.',
+      bad: 'The ball sails off your fingertips. You fall on it, eleven yards behind where you started.' },
+    { type: 'read', title: 'Red Zone Mismatch',
+      setup: 'First and goal at the 8. Man-to-man coverage across the board, no safety help in the middle. Your 6\'6" tight end is lined up across from a 5\'10" cornerback.',
+      read: { q: 'Who gets the ball?', tell: 'Man coverage with no safety help means the mismatch is your best friend. Find the tall guy.',
+        opts: [
+          ['Throw it high to the tight end', 'great', 'You put it where only the tight end can get it. He plucks it over the cornerback like he\'s reaching for the top shelf.'],
+          ['Quarterback sneak behind the center', 'good', 'You lean forward behind Tiny and pick up three tough yards.'],
+          ['Force it to your favorite receiver, even though he\'s double-covered', 'bad', 'Two defenders, one ball. It gets batted straight up and very nearly caught by the wrong team.'],
+        ] } },
+    { type: 'timing', title: 'Back-Shoulder Fade', btn: 'Throw',
+      setup: 'Your receiver is running a fade, and the cornerback has his back turned, running stride for stride with him.',
+      prompt: 'Release in the window so only your guy can catch it.',
+      great: 'You throw it to the back shoulder. Your receiver turns, catches it, and the cornerback never even sees the ball.',
+      good: 'Caught at the sideline with a foot in bounds. Good enough.',
+      bad: 'The cornerback turns at exactly the right moment and nearly picks it off.' },
+  ],
+  RB: [
+    { type: 'read', title: 'Inside Zone',
+      setup: 'Inside zone. At the snap, the defensive tackle slants hard to his left, and the linebacker crashes into the A-gap. The backside looks wide open.',
+      read: { q: 'Where do you run?', tell: 'When the defense slants one way, the cutback lane opens the other way. Be patient.',
+        opts: [
+          ['Cut back to the backside', 'great', 'You plant, cut back against the flow, and there\'s nothing in front of you but green grass and a referee running backward.'],
+          ['Bounce it outside to the sideline', 'good', 'You bounce it wide and pick up six before the cornerback shoves you out of bounds.'],
+          ['Plow straight ahead into the A-gap', 'bad', 'You run straight into the linebacker who was already standing there. No gain.'],
+        ] } },
+    { type: 'combo', title: 'One Man to Beat',
+      setup: 'You\'re through the line. One linebacker stands between you and daylight. He\'s breaking down, waiting for you to commit.',
+      prompt: 'Juke him! Hit the moves in order.',
+      great: 'You plant left, go right, and the linebacker grabs a handful of air. The crowd rises with you.',
+      good: 'He gets a hand on you, but you fall forward for eight tough yards.',
+      bad: 'He reads it perfectly. You go down right where you stood.' },
+    { type: 'reaction', title: 'Toss Sweep', fakes: 1,
+      setup: 'Toss sweep to the left. Your quarterback will pitch it the instant the ball is snapped. Be ready.',
+      prompt: 'Catch the pitch the moment it comes. Move on the orange GO.',
+      great: 'You catch it in stride and turn the corner before the defense can blink.',
+      good: 'Clean exchange, solid gain.',
+      bad: 'You\'re a step slow. The pitch bounces off your hip, and you fall on it for a loss.' },
+    { type: 'timing', title: 'Stiff-Arm', btn: 'Stiff-arm',
+      setup: 'A safety is coming downhill at you along the sideline, building speed.',
+      prompt: 'Time the stiff-arm. Hit it in the window.',
+      great: 'You plant your hand on his facemask and he folds up like a lawn chair. You keep running.',
+      good: 'You shove him off balance and grab five more yards before stepping out.',
+      bad: 'You time it wrong. He lowers his shoulder, and you go flying.' },
+    { type: 'timing', title: 'The Pylon', btn: 'Dive',
+      setup: 'Third and goal from the 4. You take the handoff and bounce it outside. The orange pylon is right there.',
+      prompt: 'Leave your feet at the right moment.',
+      great: 'You launch yourself, ball stretched out in one hand. It clips the pylon on the way down.',
+      good: 'You dive and land at the 1. So close you can smell it.',
+      bad: 'You leave your feet too early and land a yard short, out of bounds.' },
+    { type: 'read', title: 'Blitz Pickup',
+      setup: 'Pass play. A linebacker comes free off the edge, and your quarterback is looking the other way.',
+      read: { q: 'What\'s your job right now?', tell: 'Protection first. A running back\'s first job on a blitz is to find the free rusher.',
+        opts: [
+          ['Square up and stone the blitzer', 'great', 'You meet him head-on. Your quarterback never knows he was in danger, and he throws a 30-yard strike.'],
+          ['Chip him and leak out for a checkdown', 'good', 'You bump him just enough, catch the checkdown, and pick up four.'],
+          ['Ignore him and run your pass route', 'bad', 'You run your route. The linebacker runs straight into your quarterback. Coach Bramble\'s face turns purple.'],
+        ] } },
+    { type: 'combo', title: 'Broken Tackles',
+      setup: 'Three defenders converge on you at the line of scrimmage. Keep your legs churning.',
+      prompt: 'Fight through! Hit the moves in order.',
+      great: 'You bounce off one, spin off the second, and leave the third sitting on the grass. It takes six guys to bring you down twenty yards later.',
+      good: 'They swarm you, but you drag the whole pile forward for four.',
+      bad: 'Gang-tackled behind the line.' },
+    { type: 'read', title: 'Screen Game',
+      setup: 'The defense is pinning its ears back on the pass rush. Coach dials up a screen pass to you.',
+      read: { q: 'How do you run the screen?', tell: 'A good screen is a lie. Sell the pass block, let the rush go by, then slip out.',
+        opts: [
+          ['Sell the block for a count, then slip out', 'great', 'The rushers fly right past you. The ball floats over their heads and you have three blockers out in front. Gone.'],
+          ['Release to the flat right away', 'good', 'A defender reads it early, but you shake him for a short gain.'],
+          ['Block for real and forget the screen', 'bad', 'The ball goes to where you were supposed to be. Incomplete. Okafor slaps her clipboard against her leg.'],
+        ] } },
+  ],
+  WR: [
+    { type: 'combo', title: 'Press Coverage',
+      setup: 'The cornerback lines up right in your face, hands up. Press coverage. You have to win at the line.',
+      prompt: 'Beat the jam! Hit the moves in order.',
+      great: 'Swipe, swim, gone. He\'s still facing the wrong way when you catch it twenty yards downfield.',
+      good: 'You get off the jam a step late, but you still haul it in for a first down.',
+      bad: 'He re-routes you into the sideline. The ball goes somewhere else.' },
+    { type: 'timing', title: 'Catch in Traffic', btn: 'Catch',
+      setup: 'Crossing route over the middle. The ball is coming, and so is a linebacker who wants to take your head off.',
+      prompt: 'Secure the catch. Click in the window.',
+      great: 'You snatch it, absorb the hit, and keep running. The crowd roars.',
+      good: 'Caught. You get flattened, but you hold on.',
+      bad: 'You hear footsteps and take your eyes off the ball. Dropped.' },
+    { type: 'read', title: 'Option Route',
+      setup: 'You\'re running an option route out of the slot. The defender is playing outside leverage and sinking deep.',
+      read: { q: 'Which way do you break?', tell: 'If the defender is outside and deep, the space is inside and short. Break away from his leverage.',
+        opts: [
+          ['Break inside on the slant', 'great', 'He sinks, you break inside, and your quarterback puts it right on your numbers. Big gain.'],
+          ['Sit down in the soft spot of the zone', 'good', 'You find the hole, turn around, and catch an easy eight yards.'],
+          ['Run the go route deep', 'bad', 'He was waiting for exactly that. Your quarterback has to throw it away.'],
+        ] } },
+    { type: 'reaction', title: 'Hard Count', fakes: 2,
+      setup: 'Your quarterback is using a hard count to draw the defense offside. Don\'t you be the one who jumps.',
+      prompt: 'Explode off the line on the orange GO. Ignore the fakes.',
+      great: 'You\'re off the ball before the cornerback can blink, and you catch a quick slant for 22 yards.',
+      good: 'Clean release. You catch a short out.',
+      bad: 'You flinch. Yellow flag. False start, number {num}.' },
+    { type: 'timing', title: 'Toe Tap', btn: 'Catch',
+      setup: 'The pass is drifting toward the sideline. You\'ll have to catch it and drag both feet in bounds.',
+      prompt: 'Catch it and tap your toes. Click in the window.',
+      great: 'Two toes, perfectly in. The referee signals catch. The replay will be on every highlight show tonight.',
+      good: 'One foot in, then the other, just barely. Catch confirmed.',
+      bad: 'Your foot lands on the chalk. Incomplete.' },
+    { type: 'combo', title: 'Yards After Catch',
+      setup: 'You catch a quick slant in stride. One safety between you and the end zone.',
+      prompt: 'Make him miss! Hit the moves in order.',
+      great: 'You stutter, cut, and the safety falls over his own feet. Nobody else is close.',
+      good: 'You beat the safety but get caught from behind at the 15.',
+      bad: 'The safety wraps you up immediately.' },
+    { type: 'read', title: 'Scramble Drill',
+      setup: 'The play breaks down. Your quarterback is scrambling to his right, buying time.',
+      read: { q: 'Where do you go?', tell: 'When the QB scrambles, work back toward him and toward the sideline he\'s running to.',
+        opts: [
+          ['Work back toward him along the sideline', 'great', 'You come back to the ball, the defender loses you, and you catch it on the run. Huge play.'],
+          ['Keep running deep', 'good', 'Your quarterback heaves it. You catch it at the sideline for a modest gain.'],
+          ['Stop in the middle of the field and wave your arms', 'bad', 'Waving your arms doesn\'t make you open. It makes you a target. The pass is nearly picked off.'],
+        ] } },
+    { type: 'timing', title: 'Jump Ball', btn: 'Jump',
+      setup: 'Fade to the back corner of the end zone. You and the cornerback go up together.',
+      prompt: 'High-point it. Click in the window.',
+      great: 'You snatch it at the top of your jump and come down with both feet in.',
+      good: 'You tip it to yourself and land at the 2.',
+      bad: 'The cornerback times his jump better. Incomplete.' },
+  ],
+  LB: [
+    { type: 'reaction', title: 'Hard Count', tag: 'tkl', fakes: 2,
+      setup: 'The quarterback is barking a hard count, trying to pull you offside. Your eyes belong on the football.',
+      prompt: 'Fire on the orange GO, the snap. Ignore the hard count.',
+      great: 'You time the snap perfectly and shoot through the gap. Tackle for a loss before the running back even has the ball.',
+      good: 'You stay onside and fill your gap. Short gain.',
+      bad: 'You jump. Flag. Five free yards for them.' },
+    { type: 'read', title: 'Run or Pass?', tag: 'tkl',
+      setup: 'They come out heavy: two tight ends and a fullback. Their guards are leaning forward with their weight on their hands.',
+      read: { q: 'What\'s coming?', tell: 'Linemen leaning on their hands are about to fire forward. That means run.',
+        opts: [
+          ['Attack the line. It\'s a run.', 'great', 'You fill the gap at full speed and meet the running back in the backfield. Loss of three.'],
+          ['Stay home and read it', 'good', 'You read it, then react. Tackle after a four-yard gain.'],
+          ['Drop back into pass coverage', 'bad', 'It\'s a run. You\'re fifteen yards away. They pick up twelve.'],
+        ] } },
+    { type: 'timing', title: 'Form Tackle', tag: 'tkl', btn: 'Tackle',
+      setup: 'The running back bursts through the hole, and it\'s just you and him in the open field.',
+      prompt: 'Square up. Wrap him up in the window.',
+      great: 'Square, wrap, drive. You plant him on his back. The sideline erupts.',
+      good: 'You get him down. Not pretty, but down.',
+      bad: 'He jukes you out of your cleats and keeps going.' },
+    { type: 'combo', title: 'Shed the Block', tag: 'tkl',
+      setup: 'A 320-pound guard is climbing to the second level to block you.',
+      prompt: 'Rip and swim! Hit the moves in order.',
+      great: 'Rip, swim, and you\'re free. You make the tackle at the line.',
+      good: 'You fight off the block and help finish the tackle.',
+      bad: 'He swallows you whole. The running back strolls past.' },
+    { type: 'timing', title: 'Jump the Route', tag: 'take', btn: 'Break',
+      setup: 'Third and seven. The quarterback is staring down his receiver on a slant.',
+      prompt: 'Break on the ball. Click in the window.',
+      great: 'You break on it and the ball hits you right in the hands. Interception!',
+      good: 'You get a hand on it. Pass broken up.',
+      bad: 'You guess wrong. Completed behind you for a first down.' },
+    { type: 'timing', title: 'Punch It Out', tag: 'take', btn: 'Punch',
+      setup: 'The ball carrier is fighting for extra yards with the ball held loose, away from his body.',
+      prompt: 'Punch the ball out. Click in the window.',
+      great: 'You punch it out. Fumble! And the Hammerheads fall on it!',
+      good: 'You don\'t get the ball, but you stop him cold.',
+      bad: 'You go for the ball instead of the tackle. He spins free.' },
+    { type: 'combo', title: 'A-Gap Blitz', tag: 'sack',
+      setup: 'Coach Bramble dials up a blitz. You\'re going through the A-gap, straight at the quarterback.',
+      prompt: 'Get home! Hit the moves in order.',
+      great: 'You slip past the center untouched and bury the quarterback. Sack!',
+      good: 'You flush him out of the pocket, and he throws it away.',
+      bad: 'The running back picks you up. The quarterback has all day.' },
+    { type: 'read', title: 'Third and Long', tag: 'take',
+      setup: 'Third and twelve. Five receivers spread wide. You\'re in zone coverage over the middle.',
+      read: { q: 'Where do you drop?', tell: 'On third and long, they need yards. Sit underneath the deep routes and make the QB throw over you.',
+        opts: [
+          ['Sink under the deep middle route', 'great', 'The quarterback throws it right where you were hiding. Interception!'],
+          ['Carry the crossing route', 'good', 'You stay with the crosser, and the pass falls incomplete. Punt.'],
+          ['Rush the quarterback instead', 'bad', 'You leave your zone. The quarterback throws right where you were supposed to be.'],
+        ] } },
+  ],
+};
+
+// Final-minutes moments. "chase" = tied or behind, "hold" = protecting a lead.
+const CLUTCH = {
+  QB: {
+    chase: { type: 'timing', title: 'Two-Minute Drill', btn: 'Throw',
+      setup: 'No huddle. You march them down the field one completion at a time. Now it comes down to one throw.',
+      prompt: 'One throw. Release in the window.',
+      great: 'You fire it between two defenders. Your receiver catches it with both hands and the stadium detonates.',
+      good: 'It wobbles. It\'s caught anyway.',
+      bad: 'The pass sails high. The defender gets a hand on it.' },
+    hold: { type: 'read', title: 'Ice It',
+      setup: 'Third and four. One more first down and you can kneel on it.',
+      read: { q: 'One first down ends the game. The call?', tell: 'With the lead, the clock is your friend. Keep the ball on the ground or throw short and safe.',
+        opts: [
+          ['Hand it off behind Tiny on a power run', 'great', 'Tiny and the left guard move the pile like furniture. First down.'],
+          ['Quick slant to your most reliable receiver', 'good', 'Short, safe, caught. First down.'],
+          ['Deep shot to end it in style', 'bad', 'Incomplete. The clock stops, and you just handed them the ball with time to work.'],
+        ] } },
+  },
+  RB: {
+    chase: { type: 'combo', title: 'Final Drive',
+      setup: 'Bramble puts the game in your hands. The ball goes to you on every snap of the final drive, and it comes down to one carry.',
+      prompt: 'Everything you have. Hit the moves in order.',
+      great: 'You bounce off a safety, spin past a linebacker, and keep your legs moving long after you should be down.',
+      good: 'Nothing pretty about it. Just enough.',
+      bad: 'They stuff you at the line.' },
+    hold: { type: 'combo', title: 'Ball Security',
+      setup: 'Four-minute offense. Every carry burns forty seconds. Two hands on the ball. Do not fumble.',
+      prompt: 'Protect the ball. Hit the moves in order.',
+      great: 'Six carries, thirty-one yards, and you never give them a sniff of the ball.',
+      good: 'You grind out the first down you need.',
+      bad: 'Somebody rips at the ball and it pops loose.' },
+  },
+  WR: {
+    chase: { type: 'timing', title: 'Last Throw', btn: 'Catch',
+      setup: 'It comes down to one throw, and your quarterback is looking at you.',
+      prompt: 'Make the catch. Click in the window.',
+      great: 'You go up over two defenders and come down with it.',
+      good: 'You bobble it, juggle it, and secure it against your chest.',
+      bad: 'It goes off your fingertips.' },
+    hold: { type: 'combo', title: 'Move the Chains',
+      setup: 'Third and five. Get open, catch it, and the game is over.',
+      prompt: 'Get open! Hit the moves in order.',
+      great: 'You break the cornerback\'s ankles and catch it with room to spare.',
+      good: 'Just enough separation. First down.',
+      bad: 'Blanketed. The pass falls incomplete, and they get the ball back.' },
+  },
+  LB: {
+    chase: { type: 'combo', title: 'Take It Away', tag: 'take',
+      setup: 'They\'re trying to run out the clock. The offense needs the ball back, and somebody on defense has to make a play.',
+      prompt: 'Go get the ball! Hit the moves in order.',
+      great: 'You rip the ball out of the running back\'s arms and fall on it yourself.',
+      good: 'You blow up a run for a loss and force a punt with time left.',
+      bad: 'They pick up the first down. The clock keeps running.' },
+    hold: { type: 'timing', title: 'The Last Stand', tag: 'tkl', btn: 'Tackle',
+      setup: 'They\'re on your 30 with time for one more play. One more stop and the game is over.',
+      prompt: 'Make the stop. Click in the window.',
+      great: 'You read it, close, and drop the ball carrier a yard short.',
+      good: 'You get a hand on the pass. Incomplete.',
+      bad: 'He slips your tackle and keeps going.' },
+  },
+};
+
+// ---------- Trophies (saved across careers) ----------
+const TROPHIES = [
+  ['camp', 'Welcome to the League', 'Survive training camp.'],
+  ['bigplay', 'Highlight Reel', 'Make a big play in a real game.'],
+  ['six', 'Six Points', 'Score a touchdown. A pick-six counts.'],
+  ['clutch', 'Ice in the Veins', 'Win a game with a clutch play in the final minutes.'],
+  ['perfect', 'Perfect Game', 'Earn an A+ game grade.'],
+  ['playoffs', 'Playoff Bound', 'Make the playoffs.'],
+  ['champ', 'Champion', 'Win the Championship.'],
+  ['mvp', 'Legend', 'Reach the Legend ending.'],
+  ['undefeated', 'Perfect Season', 'Go 10-0 in the regular season.'],
+  ['fame', 'Household Name', 'Reach 80 Fame.'],
+  ['chem', 'Brotherhood', 'Reach 85 Chemistry.'],
+  ['torch', 'Torch Passed', 'Earn Marcus Vane\'s respect (Vane 60 or higher).'],
+  ['family', 'Hometown Hero', 'Reach 95 Family.'],
+  ['blitz', 'Good Boy', 'Adopt the practice-field dog.'],
+  ['leo', 'A Promise Kept', 'Keep your promise to Leo.'],
+  ['empty', 'Running on Fumes', 'Play a game with Energy under 15.'],
+  ['rich', 'Set for Life', 'Finish a season with $750,000 or more in the bank.'],
+  ['squad', 'From the Bottom', 'Win a playoff game after starting on the practice squad.'],
+  ['all4', 'Utility Player', 'Make it through camp at all four positions.'],
+];
+
+const ITEMS = {
+  luck: ['Rabbit\'s foot', 'Turns one bad play into a good one, then it\'s gone.'],
+  notes: ['Vane\'s notes', 'Film notes on every read, every week.'],
+  blitz: ['Blitz the dog', '+2 Confidence every week. Recovery days restore more energy.'],
+  band: ['Vane\'s wristband', 'Bigger window on clutch plays.'],
+};
+
+// ---------- Weekly activities ----------
+const ACTS = [
+  { id: 'train', name: 'Extra reps', desc: () => POS[S.pos].train, chips: [['+Skill', 'up'], ['−Energy', 'down']],
+    run: () => { fx({ skill: ri(4, 6), energy: -16 }); return pick([`Okafor walks by, stops, and watches three reps without saying anything. Then she nods once.`, `Your body is sore in places you didn't know had muscles. That's how you know it worked.`, `By the end you can do it with your eyes closed. You know because Tiny made you try.`]); } },
+  { id: 'film', name: 'Film room', desc: () => `Break down this week's opponent with Coach Okafor. Unlocks film notes on your reads this week.`, chips: [['+Skill', 'up'], ['+Coaches', 'up'], ['Film notes', 'up']],
+    run: () => { S.wk.film = true; fx({ skill: 2, coach: 4, energy: -5 }); return pick([`You notice their safety taps his helmet every time they're about to blitz. Okafor writes it on the whiteboard and underlines it twice.`, `Okafor pauses the tape forty-one times. You take notes on all forty-one.`, `You find a tendency: on third down, they bring pressure seven times out of ten.`]); } },
+  { id: 'rest', name: 'Recovery day', desc: () => `Cold tub, massage, and nine hours of sleep.${S.items.blitz ? ' Blitz insists on a long walk.' : ''}`, chips: [['+Energy', 'up'], ['+Confidence', 'up']],
+    run: () => { fx({ energy: 26 + (S.items.blitz ? 8 : 0), conf: 2 }); return pick([`You sleep eleven hours and wake up feeling brand new.`, `The massage therapist finds a knot in your back that has its own zip code.`, `Ice bath, sauna, ice bath. You can't tell if it works. You feel great.`]); } },
+  { id: 'team', name: 'Hang with the guys', desc: () => `Team chemistry is built off the field. Usually somewhere with food.`, chips: [['+Chemistry', 'up'], ['+Confidence', 'up']],
+    run: () => { fx({ chem: 7, conf: 2, energy: -5 }); return pick([`Bowling night with the offensive line. Tiny bowls a 61 and celebrates every pin like a touchdown.`, `Tiny fires up a grill in the parking lot. Forty guys show up. Somebody brings a speaker the size of a refrigerator.`, `A video game tournament gets out of hand. Coach Bramble walks in, watches for ten seconds, and leaves without a word.`, `Escape room with the rookies. You don't escape. You do bond.`]); } },
+  { id: 'media', name: 'Make some content', desc: () => `Post a video. Go on a podcast. Feed the algorithm.`, chips: [['+Fame', 'up'], ['Risky', 'lock']],
+    run: () => { if (chance(0.25)) { fx({ fame: 6, chem: -4 }); return `The video does great numbers. A few veterans start calling you "Hollywood," and they don't mean it nicely.`; } fx({ fame: 7 }); return pick([`Your "day in the life" video gets 400,000 views. Most of the comments are about how your apartment has no furniture.`, `You go on a podcast and tell the story of draft night. The host tears up. So does the sound guy.`, `Your trick-shot video, a football into a trash can from the upper deck, goes viral.`]); } },
+  { id: 'home', name: 'Call {fam}', desc: () => `An hour on the phone with {fam}. You always come back lighter.`, chips: [['+Confidence', 'up'], ['+Family', 'up']],
+    run: () => { fx({ conf: 6, family: 6, energy: 4 }); return { town: `Grandma Bea puts you on speaker so the whole diner can say hi. Somebody yells that the pie is half off in your honor.`, city: `Mom calls on her break between patients. She has nine minutes. She spends all nine asking whether you're eating vegetables.`, base: `Dad asks about your footwork, your sleep schedule, and whether you've been making your bed. You have not been making your bed.` }[S.origin]; } },
+  { id: 'gig', name: 'Paid appearance', desc: () => `Sign autographs at a car dealership and smile for photos.`, chips: [['+Money', 'up'], ['+Fame', 'up'], ['−Energy', 'down']],
+    req: () => S.st.fame >= 25 || !!S.flags.agent, lock: 'Needs 25 Fame or an agent',
+    run: () => { const m = S.flags.agent === 'sly' ? 2 : S.flags.agent === 'steady' ? 1.3 : 1; const pay = Math.round(ri(9, 16) * 1000 * m / 100) * 100; fx({ money: pay, fame: 2, energy: -10 }); return pick([`A man brings forty footballs for you to sign. You sign all forty. He thanks you and leaves with a hand truck.`, `You film a commercial for a mattress store. Your line is "I sleep like a champion." It takes nineteen takes.`, `You cut a ribbon at a new car wash. They give you a lifetime pass and a giant pair of scissors.`]); } },
+  { id: 'mentor', name: 'Study with Vane', desc: () => `Sit with Marcus Vane and a tablet full of film.`, chips: [['+Skill', 'up'], ['+Vane', 'up']],
+    req: () => S.rel.vane >= 40, lock: 'Needs Vane 40+',
+    run: () => { fx({ skill: 5, vane: 4, energy: -7 }); return pick([`Vane shows you how to read a defense from the way the safety stands. You will never unsee it.`, `Vane rewinds one play nine times. "See it yet?" On the ninth time, you do.`, `Vane tells you about his rookie year. He got cut twice. You had no idea.`]); } },
+];
+
+// ---------- Random events (each can happen once per career) ----------
+const EVENTS = {
+  viral: { title: 'Two Million Views', body: [
+      `Somebody films you doing a victory dance in the locker room. It's a dance {fam} taught you when you were seven. By morning it has two million views.`,
+      `Your phone will not stop buzzing.`],
+    choices: [
+      { label: 'Lean in. Post a tutorial.', do() { fx({ fame: 10, conf: 3, chem: -2 }); return [`The tutorial gets more views than the original. A few veterans do the dance ironically at practice. Then they do it un-ironically.`]; } },
+      { label: 'Teach the whole offensive line the dance.', do() { fx({ chem: 8, fame: 6 }); return [`Tiny cannot dance. It doesn't matter. The video of Tiny doing the shuffle gets more views than yours did.`]; } },
+      { label: 'Say nothing and keep your head down.', do() { fx({ coach: 4 }); return [`Bramble passes you in the hallway. "Saw the dance." That's it. That's all he says. You think it might have been a compliment.`]; } },
+    ] },
+  fender: { title: 'Crunch', body: [
+      `Backing out of the players' lot, you hear a crunch. You've dented a lifted pickup truck.`,
+      `It's Tiny's pickup truck. The one with TINY airbrushed across the tailgate in flames.`],
+    choices: [
+      { label: 'Find Tiny and confess.', do() { fx({ chem: 5, money: -3000 }); return [{ s: 'Tiny', t: `Bro, that truck's been hit by worse. My cousin backed into it with a boat. Buy me lunch and we're good.` }, `Lunch costs you $87. Tiny orders four entrees.`]; } },
+      { label: 'Leave a note with your number.', do() { fx({ chem: 2, money: -3000 }); return [`Tiny texts you a photo of the note with eleven crying-laughing faces. Then he sends you the body shop bill.`]; } },
+      { label: 'Drive away. Fast.', do() { if (chance(0.6)) { fx({ chem: -10, conf: -3 }); return [`The players' lot has nine security cameras. By lunch, the footage is on the locker room TV with dramatic music added. Tiny doesn't talk to you for two days.`]; } fx({ conf: -4 }); return [`Nobody finds out. You feel terrible about it every time Tiny smiles at you.`]; } },
+    ] },
+  dinner: { title: 'The Rookie Dinner', body: [
+      `It's a league tradition. The veterans take the rookies to the most expensive steakhouse in Harbor City, order everything on the menu, and hand the rookies the check.`,
+      `Your share of the check is $28,450. One veteran ordered a single steak that cost $400. He ate half of it.`],
+    choices: [
+      { label: 'Pay it with a smile.', do() { fx({ money: -28450, chem: 10, vane: 5 }); return [`The veterans give you a standing ovation. Vane raises his glass in your direction, which is the first time he's acknowledged your existence in public.`]; } },
+      { label: 'Split it with the other rookies.', do() { fx({ money: -9000, chem: 4 }); return [`Five rookies, one calculator, and a lot of math on a napkin. Fair is fair.`]; } },
+      { label: 'Refuse to pay.', do() { fx({ chem: -12, conf: 3 }); return [`The next morning you find your car on the practice field, at the fifty-yard line, wrapped in four hundred feet of athletic tape.`]; } },
+    ] },
+  club: { title: 'Club Velvet', body: [
+      `The group chat lights up two nights before the game. Big night at Club Velvet, and the DJ is somebody famous.`],
+    choices: [
+      { label: 'Go, but leave at eleven.', do() { fx({ chem: 4, energy: -5 }); return [`You dance, you laugh, you leave at 10:58. Responsible and fun. Okafor would be proud, if you ever told her.`]; } },
+      { label: 'Go and stay out all night.', do() { if (chance(0.4)) { fx({ chem: 6, energy: -24, coach: -10 }); return [`Somebody posts a photo of you on top of a booth at 3 a.m. Bramble has it printed and taped to your locker by 7.`]; } fx({ chem: 6, energy: -24 }); return [`Legendary night. You feel it in your bones the entire next day.`]; } },
+      { label: 'Stay home. Cold tub. Bed.', do() { fx({ energy: 14, coach: 2 }); return [`You're asleep by 9:30. The group chat has 214 messages when you wake up. You read none of them.`]; } },
+    ] },
+  pep: { title: 'The Old Gym', body: [
+      `Your old high school calls. They want you to speak at Friday's pep rally. It's your day off, but it's a long trip back to {where}.`],
+    choices: [
+      { label: 'Fly home and do it in person.', do() { fx({ energy: -12, fame: 5, family: 8, conf: 5 }); return [`The gym is packed. Your old coach introduces you and gets choked up halfway through. {fam} sits in the front row and films the whole thing sideways.`]; } },
+      { label: 'Record a video message.', do() { fx({ fame: 3, family: 3 }); return [`You film it in the locker room. Tiny photobombs it. The kids love Tiny more than you, honestly.`]; } },
+      { label: 'Politely decline.', do() { fx({ energy: 5 }); return [`You send a signed jersey instead. It hangs in the trophy case by Monday.`]; } },
+    ] },
+  rabbit: { title: 'The Superfan', body: [
+      `At an autograph line, a woman in a foam shark hat presses something into your hand. It's a rabbit's foot on a key ring.`,
+      { s: 'Superfan', t: `My dad carried this to every Hammerheads game for thirty years. He'd want a player to have it. Keep it in your sock.` }],
+    choices: [
+      { label: 'Keep it. You need all the luck you can get.', do() { S.items.luck = true; fx({ conf: 2 }); return [`You tuck it into your sock. It's a little gross. It also feels like it might work.`, { note: 'New item: Rabbit\'s foot. It will turn one bad play into a good one, then it\'s gone.' }]; } },
+      { label: 'Thank her, but give it back.', do() { fx({ conf: 2, fame: 2 }); return [`She tears up. "You're a good kid." She posts about it online, and it's the nicest thing anyone says about you all week.`]; } },
+    ] },
+  zapp: { if: () => S.st.fame >= 15, title: 'ZAPP!', body: [
+      `ZAPP! Hydration wants you in a commercial. They're offering $40,000.`,
+      `You taste the product. It tastes like a battery dipped in blue raspberry.`],
+    choices: [
+      { label: 'Do it and smile big.', do() { fx({ money: 40000, fame: 6 }); return [`"ZAPP! Hydration. Taste the win." You say it forty times. You never actually swallow.`]; } },
+      { label: 'Do it, but improvise an honest line.', do() { if (chance(0.5)) { fx({ money: 40000, fame: 12 }); return [`"It tastes like a battery, but I've never cramped once." They keep it. It becomes the most-shared ad of the season.`]; } fx({ money: 20000, fame: 2 }); return [`They do not keep it. They pay you half and use a stunt double for the drinking shot.`]; } },
+      { label: 'Turn it down.', do() { fx({ conf: 2 }); return [`You stick to water. Tiny takes the commercial instead and uses the money to buy a second grill.`]; } },
+    ] },
+  fiveam: { title: 'Five A.M.', body: [
+      { s: 'Coach Okafor', t: `Five a.m. tomorrow. Me, you, and the walkthrough field. It's optional.` },
+      `She says "optional" the way a dentist says "this won't hurt."`],
+    choices: [
+      { label: 'Be there at 4:45.', do() { fx({ skill: 5, coach: 8, energy: -10 }); return [`She's already there at 4:30. Of course she is. But she notices you came early, and she notices that you noticed.`]; } },
+      { label: 'Be there at 5:00 sharp.', do() { fx({ skill: 3, coach: 3, energy: -8 }); return [`On time is on time. You get forty minutes of footwork before the sun comes up.`]; } },
+      { label: 'Sleep in. It said optional.', do() { fx({ energy: 10, coach: -5 }); return [`Okafor doesn't mention it. That's somehow worse.`]; } },
+    ] },
+  troll: { title: '@HammerheadsHater69', body: [
+      `An account called @HammerheadsHater69 posts your worst play of the season in slow motion with clown music. It has a million views.`],
+    choices: [
+      { label: 'Reply with a joke at your own expense.', do() { fx({ fame: 6, conf: 2 }); return [`"The clown music is actually what plays in my head on every snap." It gets more likes than the original. The account deletes itself.`]; } },
+      { label: 'Clap back hard.', do() { fx({ fame: 4, coach: -4, conf: 1 }); return [`It turns into a three-day news story. Bramble makes you run stadium stairs while holding your phone.`]; } },
+      { label: 'Log off.', do() { fx({ conf: 3, energy: 5 }); return [`You delete the app for the weekend. You read a whole book. It's about sharks, which feels appropriate.`]; } },
+    ] },
+  hammy: { title: 'A Twinge', body: [
+      `Thursday practice. You plant to cut and feel a twinge in the back of your leg. Probably nothing. Probably.`],
+    choices: [
+      { label: 'Tell the trainers right away.', do() { fx({ energy: 10, coach: 3 }); return [`They tape it, ice it, and tell you it's minor. Bramble says, "Smart." It's the first time he's ever said that word to you.`]; } },
+      { label: 'Play through it.', do() { if (chance(0.35)) { fx({ energy: -28, conf: -5 }); return [`By Friday you're limping. By Saturday you're a mess. You will be playing on one and a half legs Sunday.`]; } fx({ conf: 3 }); return [`It really was nothing. You feel tough about it, even though you were mostly lucky.`]; } },
+      { label: 'Try Tiny\'s auntie\'s secret ointment.', do() { fx({ energy: 6, chem: 4 }); return [`It smells like a campfire and cinnamon. It works shockingly well. You do not ask what's in it.`]; } },
+    ] },
+  song: { title: 'Rookie Song', body: [
+      `Team dinner tradition: every rookie stands on a chair and sings. Tonight is your night. Ninety men put down their forks.`],
+    choices: [
+      { label: 'Go all in on a power ballad.', do() { if (S.st.conf >= 50) { fx({ chem: 9, fame: 2 }); return [`You hit the high note. You actually hit it. Tiny cries. Bramble does not cry, but he does stop eating.`]; } fx({ chem: 6 }); return [`Your voice cracks on the big note. Somehow that makes it better. They make you do it again.`]; } },
+      { label: 'Mumble through the fight song.', do() { fx({ chem: -2 }); return [`Ninety men boo you, lovingly. They throw dinner rolls. You catch one.`]; } },
+      { label: 'Pull Tiny up for a duet.', do() { fx({ chem: 7, conf: 3 }); return [`Tiny knows all the words to every song ever written. The two of you get a standing ovation and a noise complaint from the hotel.`]; } },
+    ] },
+  cards: { title: 'Bourré on the Plane', body: [
+      `On the team plane, the veterans play Bourré, a Cajun card game that has been played on football flights for decades. There's an empty seat at the table.`],
+    choices: [
+      { label: 'Buy in for $5,000.', do() { if (chance(0.5)) { fx({ money: 15000, chem: 3 }); return [`Beginner's luck. You win $15,000 and the veterans demand a rematch on every flight for the rest of the season.`]; } fx({ money: -5000, chem: 3 }); return [`You lose all of it in four hands. The veterans thank you for your contribution.`]; } },
+      { label: 'Watch and learn.', do() { fx({ chem: 2 }); return [`You learn the rules, the trash talk, and that you should never play cards with Tiny.`]; } },
+      { label: 'Noise-canceling headphones. Sleep.', do() { fx({ energy: 10 }); return [`You wake up with drool on your shoulder and a mustache drawn on your face. Worth it.`]; } },
+    ] },
+  reporter: { if: () => S.flags.vaneHurt, title: 'The Question', body: [
+      `Jules Park from the Harbor City Ledger catches you at your locker with a microphone.`,
+      { s: 'Jules Park', t: `The fans are asking. With the way you've been playing, is this your team now?` }],
+    choices: [
+      { label: '"It\'s Marcus\'s team. I\'m keeping his seat warm."', do() { fx({ vane: 10, coach: 2 }); return [`Vane watches the clip in the training room. He doesn't say anything, but he forwards it to his wife.`]; } },
+      { label: '"I\'m here to win the job."', do() { fx({ conf: 4, fame: 4, vane: -8 }); return [`It's the headline on the Ledger's website within an hour. Vane walks past your locker without looking at you.`]; } },
+      { label: '"Ask me after Sunday."', do() { fx({ fame: 2, coach: 2 }); return [`Jules smiles. "I will." They will.`]; } },
+    ] },
+  dog: { title: 'Trespasser', body: [
+      `During practice, a scruffy brown mutt squeezes under the fence, steals a football, and runs the length of the field with it. Nobody can catch him.`,
+      `When he finally stops, he drops the ball at your feet and sits down like he's waiting for a play call.`],
+    choices: [
+      { label: 'Adopt him. His name is Blitz.', do() { S.items.blitz = true; award('blitz'); fx({ conf: 5, fame: 3 }); return [`The vet says he's about two years old and "very fast for his size." The equipment guy makes him a tiny jersey with your number on it.`, { note: 'New item: Blitz. +2 Confidence every week, and recovery days restore more energy.' }]; } },
+      { label: 'Find his owner.', do() { fx({ conf: 2, fame: 3 }); return [`His name is Biscuit. His owner is an eighty-year-old season-ticket holder who cries when you bring him home. She sends cookies every week for the rest of the season.`]; } },
+    ] },
+  helmets: { title: 'New Helmets', body: [
+      `Your old high school coach calls. The program can't afford new helmets this year. Some of the kids are wearing ones older than they are.`],
+    choices: [
+      { label: 'Write a check for $25,000.', do() { fx({ money: -25000, family: 8, fame: 5, conf: 3 }); return [`The kids send a team photo. Every one of them is wearing a new helmet and pointing at the camera.`]; } },
+      { label: 'Organize a fundraiser with teammates.', do() { fx({ energy: -10, fame: 6, chem: 4 }); return [`Tiny runs the grill. The fundraiser raises $31,000. Tiny eats about $400 of it.`]; } },
+      { label: 'Not right now.', do() { fx({ conf: -2 }); return [`You tell yourself you'll do it next year. It nags at you anyway.`]; } },
+    ] },
+  car: { if: () => S.st.money >= 120000, title: 'The Showroom', body: [
+      `A dealership is showing off a matte-orange sports car. It costs $150,000. The salesman says it "matches the pylons."`],
+    choices: [
+      { label: 'Buy it.', do() { fx({ money: -150000, fame: 5, conf: 5 }); return [`It's incredible. It goes zero to sixty in three seconds. Tiny does not fit in it. You drive him to lunch anyway, with his head out the sunroof.`]; } },
+      { label: 'Buy {fam} a sensible car instead.', do() { fx({ money: -40000, family: 15, conf: 3 }); return [`{fam} cries in the parking lot, then asks about the gas mileage.`]; } },
+      { label: 'Walk away.', do() { fx({ coach: 2 }); return [`Okafor drives a 2009 minivan with 240,000 miles on it. She approves of your choice when you mention it.`]; } },
+    ] },
+  snow: { title: 'Snow Week', body: [
+      `A blizzard buries Harbor City. Bramble refuses to practice indoors.`,
+      { s: 'Coach Bramble', t: `It might snow on Sunday. It might snow in January. We practice in it.` }],
+    choices: [
+      { label: 'Embrace it. Snow angels on the fifty.', do() { fx({ chem: 5, energy: -4 }); return [`Half the team joins in. Bramble watches from the sideline with his arms crossed. Is he smiling? Nobody can tell under the scarf.`]; } },
+      { label: 'Focus on ball security in the cold.', do() { fx({ skill: 3, coach: 3 }); return [`Wet ball, frozen hands. By the end of the week, cold doesn't bother you anymore.`]; } },
+      { label: 'Complain about the cold.', do() { fx({ coach: -4, energy: 4 }); return [`Bramble hears you. You do up-downs in the snow until you stop complaining, then a few more after that.`]; } },
+    ] },
+  legend: { title: 'Hands Greer', body: [
+      `Hollis "Hands" Greer, a retired Hammerheads legend with a bronze statue outside the stadium, runs a free clinic for kids on Tuesdays. He invites you.`],
+    choices: [
+      { label: 'Go.', do() { fx({ fame: 4, skill: 2, conf: 4, energy: -8 }); return [`Forty kids, one legend, and you. Greer shows you a trick he's never told anyone. "Don't tell the defense," he says, and winks.`]; } },
+      { label: 'Rest instead.', do() { fx({ energy: 6 }); return [`You watch clips of the clinic online. The kids look like they had a blast.`]; } },
+    ] },
+};
+const RANDOM_SLATES = [1, 2, 5, 8, 9];
+
+// ---------- Story pages ----------
+const P = {};
+
+P.draft = () => ({
+  kicker: 'Draft night · Round 7, pick 257',
+  title: 'Mr. Irrelevant Is Somebody Else',
+  body: [
+    `The last pick of the draft scrolls across the bottom of the TV. It's a kicker from a school you've never heard of. The commissioner mispronounces his name, and the crowd cheers anyway. They call the last pick "Mr. Irrelevant." Even he got a phone call tonight.`,
+    `Two hundred and fifty-seven names got called this weekend. Yours wasn't one of them.`,
+    `Your phone is face-down on the couch cushion. It hasn't buzzed in four hours. {fam} is in the kitchen, washing a pan that was clean an hour ago.`,
+  ],
+  choices: [
+    { label: 'Turn off the TV and go run sprints in the dark.', do() { fx({ skill: 3, energy: -5 }); return [`You run forty-yard sprints under the streetlights until your lungs burn. Every time you cross the line, you say the name of somebody who got picked ahead of you. You run out of breath before you run out of names.`]; }, then: 'call' },
+    { label: 'Go sit with {fam} in the kitchen.', do() { fx({ family: 8, conf: 3 }); return [{ s: '{fam}', t: `They'll be sorry. Every one of them. Now eat something.` }, `You eat cold mac and cheese out of the pan. It's the best thing you've ever tasted.`]; }, then: 'call' },
+    { label: 'Screenshot every analyst who called you a "camp body."', do() { fx({ conf: 5 }); return [`You make a folder on your phone called RECEIPTS. It has nineteen screenshots in it. You set the meanest one as your lock screen.`]; }, then: 'call' },
+  ],
+});
+
+P.call = () => ({
+  kicker: 'Draft night · 11:52 PM',
+  title: 'Unknown Number',
+  body: [
+    `At 11:52, the phone buzzes. Unknown number, Harbor City area code.`,
+    { s: 'Coach Okafor', t: `{first} {last}? This is Nina Okafor, {poscoach} for the Harbor City Hammerheads. We watched your tape. We want you at camp. It's a tryout contract with no guarantees. Your flight leaves at six a.m.` },
+    `Behind you, {fam} has gone completely still. Dishwater drips onto the floor.`,
+  ],
+  choices: [
+    { label: '"Yes, ma\'am. I\'ll be there before you are."', do() { fx({ conf: 5, coach: 2 }); return [{ s: 'Coach Okafor', t: `I get there at four-thirty. Good luck.` }, `She hangs up. {fam} screams loud enough to set off a car alarm outside.`]; }, then: 'camp1' },
+    { label: '"Thank you. I won\'t let you down."', do() { fx({ coach: 6 }); return [{ s: 'Coach Okafor', t: `Don't thank me. Show me.` }, `She hangs up. You stare at the phone for a full minute before you remember to breathe.`]; }, then: 'camp1' },
+    { label: '"What\'s the signing bonus?"', do() { fx({ money: 2500, coach: -4 }); return [`There's a long pause on the line.`, { s: 'Coach Okafor', t: `Twenty-five hundred dollars. That's more than most of the guys we called tonight got.` }, `You take it. It's the most money you've ever had at one time.`]; }, then: 'camp1' },
+  ],
+});
+
+P.camp1 = () => ({
+  kicker: 'Training camp · Day 1',
+  title: 'The Locker Between Two Giants',
+  body: [
+    `The Hammerheads facility smells like cut grass, rubber mats, and money. Ninety players are in camp. Fifty-three will make the team.`,
+    `Your locker is a plywood stall with a strip of tape that says {LAST} in marker. On your left sits a man roughly the size of a vending machine, eating cereal out of a mixing bowl.`,
+    { s: 'Tiny', t: `Tavita Fonoti. Everybody calls me Tiny. Don't ask why. You want some cereal? I got a whole box in my truck.` },
+    `On your right is a locker with a brass nameplate: VANE, #{vnum}. Eleven seasons, two Pro Bowls, and a poster that hung above your bed when you were nine years old.`,
+    `Marcus Vane walks in, looks at the tape on your locker, and says nothing at all.`,
+  ],
+  choices: [
+    { label: 'Tell Vane you had his poster on your wall as a kid.', do() { fx({ vane: 6, conf: -1 }); return [{ s: 'Marcus Vane', t: `Great. Now I feel old. Was it the one with the frosted tips?` }, `You nod. He shakes his head, but you catch the corner of his mouth moving.`]; }, then: 'camp_drill' },
+    { label: 'Introduce yourself with a firm handshake.', do() { fx({ vane: 2, conf: 3 }); return [`He shakes your hand without standing up.`, { s: 'Marcus Vane', t: `Firm grip. Plenty of guys with firm grips get cut, rookie.` }]; }, then: 'camp_drill' },
+    { label: 'Ask Vane for one piece of advice.', do() { fx({ vane: -3, skill: 3 }); return [{ s: 'Marcus Vane', t: `Advice? Don't take my job.` }, `Then, quieter, without looking up:`, { s: 'Marcus Vane', t: `And stop looking at your feet when you {verb}.` }, `You've never noticed that you do that. You do that.`]; }, then: 'camp_drill' },
+    { label: 'Sit down next to Tiny and eat cereal.', do() { fx({ chem: 6 }); return [`Best decision you've made all year. Tiny tells you which coaches yell, which ones whisper, and which one you should be scared of. (The one who whispers.)`]; }, then: 'camp_drill' },
+  ],
+});
+
+P.camp_drill = () => ({
+  kicker: 'Training camp · Day 1 · Afternoon',
+  title: 'The Forty',
+  body: [
+    `Head coach Ray Bramble has a whistle, a clipboard, and a face like a closed fist. He has been coaching since before you were born, and he has never once said "good job" to anyone.`,
+    { s: 'Coach Bramble', t: `Rookies. Forty-yard dash. Electronic timing. Anybody who false-starts runs it again with the whole team watching.` },
+    `You settle into your stance. Somewhere in the stands, a scout clicks a stopwatch.`,
+  ],
+  mini: { type: 'reaction', diff: 1.2, fakes: 1, label: 'Get off', prompt: 'Explode on the orange GO. Not before.', btnText: 'Get set',
+    onDone(r) {
+      S.camp += { great: 3, good: 2, bad: 0 }[r];
+      fx(r === 'great' ? { conf: 4 } : r === 'bad' ? { conf: -3 } : { conf: 1 });
+      const body = { great: [`4.41 seconds. Bramble looks at the stopwatch, then at you, then writes something down. It's the first thing he's written all day.`], good: [`4.55. Solid. Nobody gasps, but nobody laughs either.`], bad: [`You flinch early. The whistle shrieks. You run it again with ninety guys watching, and Bramble writes nothing down.`] }[r];
+      go('_result', { body, next: 'camp_night', kicker: 'Training camp · Day 1' });
+    } },
+});
+
+P.camp_night = () => ({
+  kicker: 'Training camp · Day 2 · Night',
+  title: 'Karaoke at the Rusty Anchor',
+  body: [
+    `Day two is a blur of install meetings. The playbook is three hundred pages long and written like a tax form.`,
+    `At 8 p.m., Tiny kicks open your dorm door.`,
+    { s: 'Tiny', t: `Rookies are doing karaoke at the Rusty Anchor. Curfew's at eleven. Come on. I'm doing a power ballad and I need a backup singer.` },
+  ],
+  choices: [
+    { label: 'Go, and sing backup like your life depends on it.', do() { fx({ chem: 8, energy: -8 }); if (chance(0.3)) { fx({ coach: -6, money: -1000 }); return [`You and Tiny bring the house down. You also get back at 11:04. Bramble's assistant is standing in the hallway with a clipboard and a $1,000 fine.`]; } return [`You and Tiny bring the house down. You're back at 10:58, still humming.`]; }, then: 'camp_scrim' },
+    { label: 'Go for one song, then go study.', do() { fx({ chem: 4, skill: 2, energy: -4 }); return [`One song, a round of applause, and you're back with the playbook by nine. Tiny calls you "Professor" for a week.`]; }, then: 'camp_scrim' },
+    { label: 'Stay in and learn the playbook.', do() { S.camp += 1; fx({ skill: 4, coach: 4 }); return [`By midnight you know every play in the first hundred pages. The next morning Okafor quizzes the room, and you're the only rookie who gets them all right.`]; }, then: 'camp_scrim' },
+    { label: 'Call {fam}.', do() { fx({ conf: 5, family: 5 }); return [`{fam} makes you describe everything: the locker room, the food, the coaches, Tiny. Especially Tiny.`]; }, then: 'camp_scrim' },
+  ],
+});
+
+P.camp_scrim = a => {
+  const i = a.i || 0;
+  const m = MOMENTS[S.pos][S.flags.scrim[i]];
+  const intro = i === 0
+    ? [`Day three is the scrimmage. Full pads, live hitting, and every coach in the building up in the stands with a clipboard.`, { s: 'Coach Okafor', t: `{last}, you're in. Show me something.` }]
+    : [`One more rep before the scrimmage ends. You can feel the coaches watching.`];
+  return {
+    kicker: 'Training camp · Day 3 · Scrimmage',
+    title: i === 0 ? 'Live Bullets' : 'Last Rep',
+    body: intro.concat([m.setup]),
+    mini: Object.assign(miniCfg(m, 1.3 + i * 0.4), {
+      onDone(r, x) {
+        S.camp += { great: 3, good: 2, bad: 0 }[r];
+        fx({ great: { conf: 3, coach: 3 }, good: { conf: 1, coach: 1 }, bad: { conf: -3 } }[r]);
+        const react = { great: `Okafor writes something on her clipboard and underlines it.`, good: `A nod from Okafor. You'll take it.`, bad: `Bramble's whistle. "Again!" You can feel ninety guys watching.` }[r];
+        go('_result', { body: [x && x.text ? x.text : fmtMoment(m, r), react], next: i === 0 ? { id: 'camp_scrim', args: { i: 1 } } : 'cut', kicker: 'Training camp · Day 3' });
+      },
+    }),
+  };
+};
+
+P.cut = () => ({
+  kicker: 'Cut day · 6:40 AM',
+  title: 'The Turk',
+  body: [
+    `Every team has a Turk. He's the staffer who finds you on cut day, taps you on the shoulder, and says: *Coach wants to see you. Bring your playbook.*`,
+    `If he says the second part, you're done. You hand the playbook back, and you go home.`,
+    `You're eating eggs you can't taste when you feel the tap.`,
+    { s: 'The Turk', t: `{last}. Coach wants to see you.` },
+    `You wait for the second part. Across the table, Tiny stops chewing.`,
+  ],
+  choices: [{ label: 'Walk to Coach Bramble\'s office.', do() { if (S.flags.made == null) S.flags.made = campScore() >= 6; return null; }, then: 'cut_result' }],
+});
+
+P.cut_result = () => (S.flags.made ? {
+  kicker: 'Cut day',
+  title: 'Fifty-Three',
+  body: [
+    `He doesn't say it.`,
+    `Bramble's office smells like coffee and old film. He doesn't look up from his desk.`,
+    { s: 'Coach Bramble', t: `You made the fifty-three. Backup {pos} behind Marcus Vane. Don't make me regret it.` },
+    `That's the whole meeting. In the hallway, Tiny lifts you off the ground like you weigh nothing, which, to Tiny, you do.`,
+  ],
+  choices: [{ label: 'Start the season', primary: true, do() { campDone(); return null; } }],
+} : {
+  kicker: 'Cut day',
+  title: 'Practice Squad',
+  body: [
+    `He says it. *Bring your playbook.*`,
+    `You carry the playbook down the hall like it weighs a thousand pounds. Bramble takes it without looking up.`,
+    { s: 'Coach Bramble', t: `You're cut. Tomorrow we sign you to the practice squad. You practice with us, but you don't dress on Sundays. Okafor went to bat for you. Make her look smart.` },
+    `It isn't the roster. But it isn't home, either.`,
+  ],
+  choices: [{ label: 'Start the season', primary: true, do() { campDone(); return null; } }],
+});
+
+// ---------- Fixed weekly story beats ----------
+P.w1_family = () => ({
+  kicker: 'Week 1 · Home opener',
+  title: 'Two Tickets',
+  body: [
+    `Players get two free tickets to every home game. {fam} has never seen you play as a pro.${S.role === 'practice' ? ' You won\'t even be in uniform, but {fam} doesn\'t care.' : ''}`,
+    S.origin === 'city' ? `{fam} lives eleven miles away, but would have to trade away a twelve-hour shift to come. Covering it costs real money.` : `Flights from {where} aren't cheap on a week's notice.`,
+  ],
+  choices: [
+    { label: 'Bring {fam} and get the good seats.', sub: 'Costs $2,400', do() { S.flags.famAtGame = true; fx({ money: -2400, family: 10, conf: 5 }); return [`{fam} arrives with a homemade sign that says {LAST} IS MY KID, which isn't technically true for everybody involved, but nobody's checking.`]; }, then: 'queue' },
+    { label: 'Give the tickets to your high school coach.', do() { fx({ fame: 3, conf: 2, family: -2 }); return [`Coach Delgado drives nine hours to be there. He sends you a selfie from the parking lot at 6 a.m.`]; }, then: 'queue' },
+    { label: 'Tell {fam} to watch on TV this time.', do() { fx({ family: -4, energy: 4 }); return [`"Of course, baby. Next time." There's a pause on the line before "next time."`]; }, then: 'queue' },
+  ],
+});
+
+P.w2_callup = () => ({
+  kicker: 'Week 2 · Tuesday',
+  title: 'The Call-Up',
+  body: [
+    `Tuesday morning, the backup {pos} pulls a hamstring in a walkthrough. A walkthrough. Nobody even runs in a walkthrough.`,
+    `Okafor finds you in the cafeteria.`,
+    { s: 'Coach Okafor', t: `You're on the fifty-three. Congratulations. Now go find the equipment guy and get a real jersey.` },
+  ],
+  choices: [
+    { label: 'Call {fam} from the parking lot.', do() { S.role = 'backup'; fx({ family: 6, conf: 4 }); return [`You can't get the words out at first. {fam} figures it out anyway.`]; }, then: 'queue' },
+    { label: 'Go straight to the film room.', do() { S.role = 'backup'; fx({ skill: 3, coach: 4 }); return [`Okafor finds you there an hour later. She doesn't say anything. She just turns the lights off so you can see the screen better.`]; }, then: 'queue' },
+  ],
+});
+
+P.w4_rehab = () => ({
+  kicker: 'Week 4 · Training room',
+  title: 'The Boot',
+  body: [
+    `Vane has a high ankle sprain. Four weeks, maybe five. He spends his days in the training room in a walking boot. During film sessions he watches you on the big screen with his arms crossed.`,
+    `Thursday after practice, you find him alone by the cold tubs, staring at a playbook he knows by heart.`,
+  ],
+  choices: [
+    { label: 'Ask him to coach you.', do() {
+        if (S.rel.vane >= 0) { S.items.notes = true; fx({ skill: 5, vane: 12 }); return [`He looks at you for a long time.`, { s: 'Marcus Vane', t: `Fine. Sit down. You're doing seven things wrong.` }, `It turns out to be eleven things. By the time you leave, it's dark out, and you have three pages of notes in his handwriting.`, { note: 'New item: Vane\'s notes. You\'ll see film notes on every read, every week.' }]; }
+        fx({ skill: 2, vane: 8 }); return [{ s: 'Marcus Vane', t: `You want me to help you take my job?` }, `He laughs without smiling. But the next morning there's a sticky note on your locker with three bullet points in tiny handwriting. All three are right.`];
+      }, then: 'queue' },
+    { label: 'Bring him a plate of Tiny\'s barbecue and talk about anything but football.', do() { fx({ vane: 15, chem: 3 }); return [`He talks about his kids, his knees, and his first coach, who cut him twice before he made it. You talk about {fam}. Neither of you mentions the depth chart.`]; }, then: 'queue' },
+    { label: 'Leave him alone. He wouldn\'t want company.', do() { fx({ vane: -5, energy: 5 }); return [`You go home early and sleep well. Vane eats his lunch alone in the training room again.`]; }, then: 'queue' },
+  ],
+});
+
+P.w5_trash = () => ({
+  kicker: 'Week 5 · Rivalry week',
+  title: 'The Crown',
+  body: [
+    `Monarchs week. On his podcast, Dante Kingsley, an All-Pro {king} with a crown tattoo and eleven million followers, spends four minutes talking about you.`,
+    { s: 'Dante Kingsley', t: `Who? The undrafted kid? Man, I didn't know you could just walk into this league. Did they hold a raffle? I'm gonna make him famous Sunday. For all the wrong reasons.` },
+    `The clip has two million views by lunch. Your phone is warm to the touch.`,
+  ],
+  choices: [
+    { label: 'Fire back: "Bring your crown Sunday. I\'ll bring a receipt."', do() { S.flags.trash = 'fire'; fx({ fame: 10, conf: 4, coach: -4 }); return [`The internet explodes. Sports talk shows argue about it for two days. Bramble pins the clip to the locker room wall, and you can't tell if it's a warning or a compliment. The Monarchs will be fired up.`]; }, then: 'queue' },
+    { label: 'Post a photo of a crown-shaped cake: "Congrats on the podcast!"', do() { S.flags.trash = 'cake'; fx({ fame: 7, chem: 4 }); return [`Tiny ate most of the cake for the photo. The post gets more likes than Kingsley's clip. Even some Monarchs fans think it's funny.`]; }, then: 'queue' },
+    { label: 'Say nothing. Pin the clip inside your locker.', do() { S.flags.trash = 'quiet'; S.flags.focus = true; fx({ conf: 6, coach: 4 }); return [`You watch it every morning. You don't say a word all week. Okafor notices, and she puts in extra film time with you.`, { note: 'Locked in: you\'ll have film notes on your reads this week.' }]; }, then: 'queue' },
+  ],
+});
+
+P.w6_agent = () => ({
+  kicker: 'Week 6',
+  title: 'Sly',
+  body: [
+    `Sly Pemberton has a convertible, a fresh manicure, and a business card made of metal.`,
+    { s: 'Sly Pemberton', t: `Kid, you're a story. Undrafted, overlooked, chip on the shoulder? Sponsors eat that up with a spoon. Sign with me and you'll have three endorsement deals by Thanksgiving. Standard three percent.` },
+  ],
+  choices: [
+    { label: 'Sign with Sly.', do() { S.flags.agent = 'sly'; fx({ money: 30000, fame: 6, chem: -3 }); return [`Within a week you have a shoe deal, a cereal box, and a $30,000 signing check. Tiny turns the metal card over in his huge hands. "Bro," he says. That's all he says.`, { note: 'Paid appearances now pay double.' }]; }, then: 'queue' },
+    { label: 'Hire a quiet, boring agent who answers emails.', do() { S.flags.agent = 'steady'; fx({ coach: 2, conf: 2 }); return [`Her name is Margaret. She wears cardigans. She reads every contract twice and has never been on TV. You love her.`, { note: 'Paid appearances are unlocked and pay a little more.' }]; }, then: 'queue' },
+    { label: 'Stay on your own for now.', do() { fx({ conf: 3 }); return [`Sly leaves the metal card on your windshield anyway. You use it as an ice scraper.`]; }, then: 'queue' },
+  ],
+});
+
+P.w7_return = () => {
+  if (S.flags.keep == null) S.flags.keep = keepJob();
+  const keep = S.flags.keep;
+  return {
+    kicker: 'Week 7 · Wednesday',
+    title: 'Depth Chart',
+    body: [
+      `Vane's walking boot comes off on Monday. On Wednesday, Coach Bramble tapes the depth chart to the locker room door, the way he has for twenty-two years.`,
+      `Everyone pretends not to look at it. Everyone looks at it.`,
+      keep ? `The top line reads {LAST}. The second line reads VANE.` : `The top line reads VANE. Under it, in smaller letters: {LAST} (packages).`,
+      keep ? { s: 'Coach Bramble', t: `You earned it. Now keep it.` } : { s: 'Coach Okafor', t: `You played well. He's a two-time Pro Bowler. You'll split snaps, and you'll get your chances. I promise you that.` },
+    ],
+    choices: keep ? [
+      { label: 'Go find Vane and talk to him.', do() { S.role = 'starter'; if (S.rel.vane >= 30) { fx({ vane: 10, chem: 5 }); return [`He's already waiting at your locker.`, { s: 'Marcus Vane', t: `You know the worst part? You're right for the job. I'll help however I can. Don't make me regret saying that.` }]; } fx({ vane: 3 }); return [`He listens to you stumble through it.`, { s: 'Marcus Vane', t: `Good for you, rookie.` }, `He walks away. It's going to be a long few weeks in that locker room.`]; }, then: 'queue' },
+      { label: 'Give him space.', do() { S.role = 'starter'; fx({ vane: S.rel.vane >= 30 ? 0 : -4, conf: 2 }); return [`You keep your head down. The locker room is very quiet that week.`]; }, then: 'queue' },
+      { label: 'Tell the media it\'s still Marcus\'s team.', do() { S.role = 'starter'; fx({ vane: 8, fame: -2, chem: 3 }); return [`Jules Park looks at you like you've grown a second head. Vane hears about it. That afternoon he moves his locker stool six inches closer to yours.`]; }, then: 'queue' },
+    ] : [
+      { label: 'Shake Vane\'s hand and congratulate him.', do() { S.role = 'rotation'; fx({ vane: 10, chem: 5, coach: 3 }); return [`He looks surprised. Then he grips your hand.`, { s: 'Marcus Vane', t: `You made this hard on me, rook. That's a compliment.` }]; }, then: 'queue' },
+      { label: 'Ask Bramble what you need to do better.', do() { S.role = 'rotation'; fx({ coach: 6, skill: 3 }); return [`Bramble hands you a list. It's typed. It's two pages long. He'd had it ready.`]; }, then: 'queue' },
+      { label: 'Sulk.', do() { S.role = 'rotation'; fx({ conf: -5, chem: -4 }); return [`You're short with everyone all week. Tiny gives you the last bowl of cereal without being asked, which somehow makes it worse.`]; }, then: 'queue' },
+    ],
+  };
+};
+
+P.w8_thanks = () => ({
+  kicker: 'Week 8 · Thanksgiving',
+  title: 'Three Ovens',
+  body: [
+    `The Thanksgiving game means a short week and the whole country watching.`,
+    `Tiny's family does their Thanksgiving a day early because of the game. Twenty-two cousins, three ovens, and his auntie's famous turkey tails.`,
+    { s: 'Tiny', t: `You're coming. That's not a question. My grandma already set you a plate.` },
+  ],
+  choices: [
+    { label: 'Go to Tiny\'s family dinner.', do() { fx({ chem: 10, conf: 4, energy: -4 }); return [`Tiny's grandmother puts a fourth helping on your plate before you finish the third. His uncle teaches you a card game, and you lose $40 to a nine-year-old. It's the best night you've had all season.`]; }, then: 'queue' },
+    { label: 'Fly {fam} in for a hotel-room dinner.', do() { fx({ money: -3000, family: 12, conf: 3 }); return [`Room service turkey on a hotel bed, with the parade on TV. {fam} says it's the best Thanksgiving ever. {fam} might be lying, but you don't think so.`]; }, then: 'queue' },
+    { label: 'Skip it. Cold tub, then sleep.', do() { fx({ energy: 18, skill: 1 }); return [`Tiny texts you a photo of your empty chair with a plate on it. Then he texts you a photo of himself eating what was on the plate.`]; }, then: 'queue' },
+  ],
+});
+
+P.w9_leo = () => ({
+  kicker: 'Week 9 · Harbor City Children\'s Hospital',
+  title: 'Room 412',
+  body: [
+    `The team visits the children's hospital every December. In room 412, there's a nine-year-old named Leo wearing your jersey, number {num}. It's three sizes too big. His IV pole has a Hammerheads sticker on it.`,
+    { s: 'Leo', t: `You're my favorite player. My mom says you didn't even get drafted. That's so cool. Nobody picks me for kickball either.` },
+  ],
+  choices: [
+    { label: 'Promise Leo a {big} on Sunday, just for him.', do() { S.flags.leoPromise = true; S.flags.leoVisit = true; fx({ conf: 3 }); return [`His eyes go huge. "For real?" You hook pinkies on it. Now you have to deliver.`]; }, then: 'queue' },
+    { label: 'Give him your game gloves and stay an extra hour.', do() { S.flags.leoVisit = true; fx({ conf: 4, fame: 3, family: 3 }); return [`You lose eleven straight games of a racing game to Leo. He is ruthless. The nurses take a picture of the two of you that ends up on the hospital's front page.`]; }, then: 'queue' },
+    { label: 'Tell him about getting passed over, and how it doesn\'t matter.', do() { S.flags.leoVisit = true; fx({ conf: 5, family: 2 }); return [`You tell him the whole story: the 257 names, the phone call at 11:52, the Turk. When you finish, Leo says, "So you're like a superhero origin story." You guess you are.`]; }, then: 'queue' },
+  ],
+});
+
+P.w10_stakes = () => {
+  const w = S.record.w;
+  const line = w >= 6 ? `You've already clinched a playoff spot. Bramble doesn't care. "Every game counts. This one counts more because it's the next one."`
+    : w === 5 ? `Win, and you're in the playoffs. Lose, and it comes down to tiebreakers.`
+    : w === 4 ? `Even a win might not be enough. At 5-5, you'd need the tiebreakers to break your way, and the tiebreakers favor teams that play together.`
+    : `The playoffs are out of reach. But it's the Monarchs, and it's your field, and that's enough.`;
+  return {
+    kicker: 'Week 10 · Season finale',
+    title: 'Last Regular-Season Game',
+    body: [
+      `The Monarchs rematch, on your field. The stadium has been sold out for a month.`,
+      line,
+      `Saturday night, the team meets at the hotel. Bramble asks if anyone wants to say something.`,
+    ],
+    choices: [
+      { label: 'Stand up and speak to the team.', do() { if (S.st.conf >= 60) { fx({ chem: 8, conf: 3 }); return [`You talk about draft night. About the phone not ringing. About how this room is the first place you've ever felt picked. When you sit down, nobody says anything for a long moment. Then Tiny starts clapping, and everybody joins in.`]; } fx({ chem: 4 }); return [`Your voice shakes and you lose your place twice. But you mean every word, and they can tell. Vane nods at you on the way out.`]; }, then: 'queue' },
+      { label: 'Let the captains talk. You listen.', do() { fx({ coach: 3, conf: 2, vane: 3 }); return [`Vane speaks last. He talks about how many of these games he has left. Not many. The room gets very quiet.`]; }, then: 'queue' },
+      { label: 'Headphones on. Lock in.', do() { S.flags.focus = true; fx({ conf: 2 }); return [`You run through every play in your head twice.`, { note: 'Locked in: you\'ll have film notes on your reads this week.' }]; }, then: 'queue' },
+    ],
+  };
+};
+
+P.po_gate = () => {
+  const w = S.record.w, l = S.record.l;
+  if (S.flags.inPO == null) S.flags.inPO = w >= 6 || (w === 5 && S.st.chem >= 55);
+  const inPO = S.flags.inPO;
+  if (inPO) award('playoffs');
+  return {
+    kicker: 'End of the regular season',
+    title: inPO ? 'Playoff Bound' : 'On the Outside',
+    body: inPO ? [
+      `Final record: **${w}-${l}**.`,
+      w === 5 ? `It comes down to tiebreakers, and the tiebreaker is a formula nobody understands. The short version: your team played together. You're in.` : `The Hammerheads are in the playoffs. Three wins from a championship.`,
+      `Tiny runs through the locker room spraying a bottle of sparkling cider. Bramble lets it happen, which is how you know it's real.`,
+    ] : [
+      `Final record: **${w}-${l}**.`,
+      `It isn't enough. The playoff picture is set, and the Hammerheads aren't in it.`,
+      `The locker room is quiet. Somebody starts packing.`,
+    ],
+    choices: [inPO ? { label: 'On to the playoffs', primary: true, then: 'beginWeek' } : { label: 'See how your season ends', primary: true, then: 'ending' }],
+  };
+};
+
+P.po1 = () => ({
+  kicker: 'Playoffs · Wild Card week',
+  title: 'Win or Go Home',
+  body: [
+    `Playoff week feels different. Practice is quieter. The music in the weight room is turned down. Even Tiny is only eating one bowl of cereal at a time.`,
+    `Lose on Sunday and the season is over. Everybody knows it, and nobody says it.`,
+  ],
+  choices: [
+    { label: 'Host a team film night at your place.', do() { fx({ chem: 6, skill: 2 }); return [`Twenty guys squeeze into your apartment, which still has no furniture. They sit on the floor, eat four pizzas, and watch every Grizzlies snap from the last month.`]; }, then: 'queue' },
+    { label: 'Extra session with Okafor.', do() { fx({ skill: 4, coach: 4, energy: -8 }); return [`She brings a whiteboard to the practice field. You go until the security guard flickers the stadium lights.`]; }, then: 'queue' },
+    { label: 'Call {fam}.', do() { fx({ conf: 6, family: 4 }); return [`{fam} has already booked a flight. "I'm not missing a playoff game," {fp} says. "I don't care what it costs."`]; }, then: 'queue' },
+  ],
+});
+
+P.po2 = () => {
+  const t = S.flags.trash;
+  const text = t === 'fire' ? `Third time. No podcast this week. You earned that. See you Sunday.` : t === 'cake' ? `Third time. Still thinking about that cake. Respect. See you Sunday.` : `Third time. You don't talk much. I respect that. See you Sunday.`;
+  return {
+    kicker: 'Playoffs · Conference Championship week',
+    title: 'Third Time',
+    body: [
+      `The winner of Sunday's game goes to the Championship. The Monarchs, again.`,
+      `Tuesday night, a text from a number you don't know.`,
+      { s: 'Dante Kingsley', t: text },
+    ],
+    choices: [
+      { label: 'Reply: "Respect. See you Sunday."', do() { fx({ conf: 4 }); return [`He reacts with a crown emoji. You'll take it.`]; }, then: 'queue' },
+      { label: 'Send him a photo of another crown cake.', do() { fx({ fame: 4, chem: 3 }); return [`"LMAOOO." He posts it. Two million people see it. Tiny eats this cake too.`]; }, then: 'queue' },
+      { label: 'Leave him on read.', do() { S.flags.focus = true; fx({ conf: 2, coach: 2 }); return [`You put the phone in your locker and leave it there until Sunday.`, { note: 'Locked in: you\'ll have film notes on your reads this week.' }]; }, then: 'queue' },
+    ],
+  };
+};
+
+P.po3_media = () => ({
+  kicker: 'The Championship · Media day',
+  title: 'Media Day',
+  body: [
+    `Championship media day: four thousand reporters, a stadium full of cameras, and a man dressed as a hammerhead shark holding a microphone.`,
+    { s: 'Shark Man', t: `{first}! If you were a sandwich, what kind of sandwich would you be?` },
+  ],
+  choices: [
+    { label: '"Turkey on wheat. Reliable."', do() { fx({ coach: 3, conf: 2 }); return [`Bramble watches the clip that night and almost, almost laughs.`]; }, then: 'po3_night' },
+    { label: '"A triple-decker with everything on it. Extra pickles."', do() { fx({ fame: 8 }); return [`The clip goes viral. A sandwich shop in Harbor City names a sandwich after you by Thursday. It's enormous.`]; }, then: 'po3_night' },
+    { label: 'Ignore the question and shout out {fam} and {where}.', do() { fx({ family: 10, fame: 4 }); return [`Back home, people scream at their TVs. {fam} watches it on repeat.`]; }, then: 'po3_night' },
+  ],
+});
+
+P.po3_night = () => {
+  const vane = S.rel.vane >= 40;
+  if (S.flags.night == null) {
+    S.flags.night = true;
+    if (vane) { S.items.band = true; if (S.role === 'rotation') { S.role = 'starter'; S.flags.vaneStart = true; } }
+    save();
+  }
+  return {
+    kicker: 'The Championship · The night before',
+    title: 'Knock Knock',
+    body: vane ? [
+      `11:40 p.m. You're staring at the hotel ceiling when someone knocks. It's Vane, holding something.`,
+      { s: 'Marcus Vane', t: `I wore this wristband in my first playoff game. Lost. I wore it in my last one. Lost. Maybe it needs somebody new.` },
+      `He tosses it to you.`,
+      S.flags.vaneStart ? { s: 'Marcus Vane', t: `And I told Bramble to start you tomorrow. He agreed. Don't look at your feet.` } : { s: 'Marcus Vane', t: `Don't look at your feet.` },
+      { note: S.flags.vaneStart ? 'New item: Vane\'s wristband. You\'re starting the Championship.' : 'New item: Vane\'s wristband. Bigger window on clutch plays.' },
+    ] : [
+      `11:40 p.m. You're staring at the hotel ceiling when someone knocks. It's Tiny, holding two bowls of cereal.`,
+      { s: 'Tiny', t: `Couldn't sleep either.` },
+      `You eat cereal on the floor and talk about nothing until one in the morning. It helps more than you'd think.`,
+    ],
+    choices: [
+      { label: 'Call {fam} before bed.', do() { fx({ family: 6, conf: 6, chem: vane ? 0 : 3 }); return [{ s: '{fam}', t: `Whatever happens tomorrow, you already did the impossible thing. Now go have fun.` }]; }, then: 'queue' },
+      { label: 'Watch film until 2 a.m.', do() { S.flags.focus = true; fx({ skill: 3, energy: -10, chem: vane ? 0 : 3 }); return [`You know their tendencies better than they do.`, { note: 'Locked in: you\'ll have film notes on your reads this week.' }]; }, then: 'queue' },
+      { label: 'Sleep. Actually sleep.', do() { fx({ energy: 20, chem: vane ? 0 : 3 }); return [`Eight hours. You don't dream about anything.`]; }, then: 'queue' },
+    ],
+  };
+};
+
+// ---------- Endings ----------
+const ENDINGS = {
+  legend: { title: 'A Legend Is Born', body: () => [
+    `The confetti is orange and white, and it gets everywhere. In your helmet. In your mouth. In Tiny's beard, where it will stay until March.`,
+    `They hand you the Championship MVP trophy. It's heavier than it looks. A man in a blazer holds a microphone in front of your face and asks how it feels.`,
+    `Two hundred and fifty-seven players were drafted ahead of you. You think about every single one of them for exactly one second. Then you let it go.`,
+    { s: 'You', t: `I just want to say hi to {fam}.` },
+  ] },
+  ring: { title: 'Ring Bearer', body: () => [
+    `You didn't win MVP. You don't care at all. You're a champion.`,
+    `The parade route runs eleven miles through Harbor City. People stand on mailboxes. A man dressed as a hammerhead shark cries the entire way.`,
+    `In the locker room afterward, Bramble finds you. He has never said "good job" to anyone, and he doesn't now either. He puts a hand on your shoulder pad and leaves it there for a second.`,
+    `That's better than "good job."`,
+  ] },
+  close: { title: 'Confetti for Somebody Else', body: () => [
+    `The confetti falls, and it's the wrong colors.`,
+    `You sit on the bench with your helmet on for a long time. Tiny sits next to you and doesn't say anything, which is the nicest thing he could do.`,
+    `On the flight home, Okafor drops into the seat next to you with her laptop already open.`,
+    { s: 'Coach Okafor', t: `The offseason starts now. You were one game away, {last}. One. Let's go find it.` },
+  ] },
+  climb: { title: 'The Climb', body: () => [
+    `Playoff football ends fast. One day you're preparing for the next round. The next morning you're cleaning out your locker into a trash bag.`,
+    `But you got here. Undrafted rookies don't usually make the playoffs. They basically never do.`,
+    { s: 'Coach Bramble', t: `Report date is March 30th. Don't be late. And {last}? Don't be average, either.` },
+    `It is, by a wide margin, the nicest thing he has ever said to you.`,
+  ] },
+  hype: { title: 'All Hype', body: () => [
+    `You have two million followers, a sports drink commercial, and a hoodie line. You do not have a playoff game.`,
+    `In the final team meeting, guys don't quite look at you. Tiny still does. Tiny always does.`,
+    { s: 'Tiny', t: `You're good, bro. Real good. But the guys need to know you're one of us. Get off your phone a little, yeah?` },
+    `You put it face-down on the table. It buzzes. You leave it there.`,
+  ] },
+  heart: { title: 'Heart of the Team', body: () => [
+    `You missed the playoffs. It stings like nothing has stung before.`,
+    `But on the last day, the team votes on its own rookie award, and you win it in a landslide. Tiny voted for you twice. That's not allowed. Nobody stops him.`,
+    `Bramble hands you the plaque. It's crooked, because the equipment guy made it in his garage.`,
+    `It's the best thing you own.`,
+  ] },
+  next: { title: 'Next Year', body: () => [
+    `The season ends before the playoffs start. You clean out your locker into a trash bag, the way everyone does.`,
+    `But you're still here. The undrafted kid from {where} made a roster and finished the season on it. Most camp bodies never get that far.`,
+    { s: 'Coach Okafor', t: `You know the difference between you and the guys who got drafted? Nothing anymore. See you in March.` },
+  ] },
+};
+const FAMILY_RICH = {
+  town: `With your first-year money, you put a new roof on the Bluebird Diner. Grandma Bea hangs your jersey next to the pie case and charges a dollar for photos with it. All proceeds go to pie.`,
+  city: `With your first-year money, you pay off Mom's mortgage. She still works her night shifts. "I like my job," she says. "You'll understand when you're older."`,
+  base: `With your first-year money, you buy Dad the fishing boat he's talked about since you were six. He names it *Undrafted* and makes you swab the deck.`,
+};
+const FAMILY_MODEST = {
+  town: `Grandma Bea frames your first game check stub and hangs it in the diner, right above the register.`,
+  city: `Mom tapes a newspaper clipping of you to the fridge at the nurses' station. Somebody adds googly eyes to it.`,
+  base: `Dad salutes you at the airport on the way home. In front of everyone. You pretend to be embarrassed.`,
+};
+
+// =========================================================
+//   ENGINE
+// =========================================================
+let S = null;          // the whole career (saved to the browser)
+let screen = 'title';  // title | setup | trophies | play
+let curPage = null;
+let busy = false;
+let mini = null;       // the running mini-game, if any
+let menuKilledMini = false;
+let trophyBack = 'title';
+
+function newState(cfg) {
+  const s = {
+    v: 1, first: cfg.first, last: cfg.last, pos: cfg.pos, origin: cfg.origin, num: cfg.num,
+    st: { skill: 40, conf: 50, energy: 80, fame: 5, chem: 30, money: 4000 },
+    rel: { coach: 40, vane: -10, family: 70 },
+    items: {}, flags: {}, camp: 0,
+    slate: 0, role: 'camp', record: { w: 0, l: 0 },
+    line: {}, grades: [], hist: [], used: [], queue: [], at: null, game: null, wk: null,
+    runTrophies: [], recentMoments: [],
+  };
+  const b = ORIGINS[cfg.origin].bonus;
+  for (const k in b) if (k in s.st) s.st[k] += b[k];
+  const idx = shuffle(MOMENTS[cfg.pos].map((_, i) => i));
+  s.flags.scrim = [idx[0], idx[1]];
+  return s;
+}
+function save() { if (S) store.set(SAVE_KEY, S); }
+function loadSave() { const s = store.get(SAVE_KEY, null); return s && s.v === 1 && s.at && P[s.at.id] ? s : null; }
+
+// ---------- Text ----------
+function tokens() {
+  if (!S) return {};
+  const o = ORIGINS[S.origin];
+  return {
+    first: S.first, last: S.last, LAST: S.last.toUpperCase(), fam: o.fam, fp: o.fp, fpos: o.fpos, fobj: o.fobj, where: o.where,
+    pos: POS[S.pos].name.toLowerCase(), POS: S.pos, num: S.num, vnum: VANE_NUM[S.pos], poscoach: POSCOACH[S.pos],
+    verb: POS[S.pos].verb, inj: INJ[S.pos], big: S.pos === 'LB' ? 'takeaway' : 'touchdown', king: S.pos === 'LB' ? 'quarterback' : 'linebacker',
+  };
+}
+function fmt(text) {
+  const t = tokens();
+  let h = esc(text).replace(/\{(\w+)\}/g, (m, k) => (t[k] != null ? esc(t[k]) : m));
+  return h.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>').replace(/\*(.+?)\*/g, '<em>$1</em>');
+}
+function paraHTML(p) {
+  if (p == null || p === '') return '';
+  if (typeof p === 'string') return `<p>${fmt(p)}</p>`;
+  if (p.s) return `<p class="say"><span class="who">${fmt(p.s)}</span>“${fmt(p.t)}”</p>`;
+  if (p.note) return `<p class="note">${fmt(p.note)}</p>`;
+  if (p.warn) return `<p class="warn">${fmt(p.warn)}</p>`;
+  return '';
+}
+function textFor(m, r) {
+  if (m[r]) return m[r];
+  if (m.read) { const o = m.read.opts.find(x => x[1] === r); if (o) return o[2]; }
+  return '';
+}
+const fmtMoment = textFor;
+
+// ---------- Stats, toasts, trophies ----------
+const LABELS = { skill: 'Skill', conf: 'Confidence', energy: 'Energy', fame: 'Fame', chem: 'Chemistry', coach: 'Coaches', vane: 'Vane', family: 'Family' };
+function fx(d, quiet) {
+  if (!d || !S) return;
+  const parts = [];
+  for (const k in d) {
+    const v = Math.round(d[k]);
+    if (!v) continue;
+    if (k === 'money') {
+      const before = S.st.money;
+      S.st.money = Math.max(0, S.st.money + v);
+      const real = S.st.money - before;
+      if (!quiet && real) { parts.push([(real > 0 ? '+' : '−') + money(Math.abs(real)), real > 0 ? 'cash' : 'down']); if (real > 0) Sound.play('cash'); }
+      continue;
+    }
+    let before, after;
+    if (k in S.st) { before = S.st[k]; S.st[k] = clamp(before + v, 0, 100); after = S.st[k]; }
+    else if (k === 'vane') { before = S.rel.vane; S.rel.vane = clamp(before + v, -100, 100); after = S.rel.vane; }
+    else if (k in S.rel) { before = S.rel[k]; S.rel[k] = clamp(before + v, 0, 100); after = S.rel[k]; }
+    else continue;
+    const real = after - before;
+    if (!quiet && real) parts.push([`${real > 0 ? '+' : '−'}${Math.abs(real)} ${LABELS[k]}`, real > 0 ? 'up' : 'down']);
+  }
+  if (parts.length) toast(parts);
+  checkTrophies();
+  renderCard();
+}
+// toast('text', cls) for one message, or toast([[text, cls], ...]) for a row of stat changes.
+function toast(text, cls) {
+  const box = $('#toasts');
+  if (!box) return;
+  const t = document.createElement('div');
+  t.className = 'toast ' + (cls || '');
+  if (Array.isArray(text)) t.innerHTML = text.map(([s, c]) => `<span class="tp ${c}">${esc(s)}</span>`).join('');
+  else t.textContent = text;
+  box.appendChild(t);
+  while (box.children.length > 3) box.firstElementChild.remove();
+  setTimeout(() => { t.classList.add('out'); setTimeout(() => t.remove(), 320); }, cls === 'trophy' ? 3800 : 2300);
+}
+function trophyData() { const d = store.get(TROPHY_KEY, null) || {}; d.got = d.got || {}; d.pos = d.pos || []; return d; }
+function award(id) {
+  if (S && !S.runTrophies.includes(id)) S.runTrophies.push(id);
+  const d = trophyData();
+  if (d.got[id]) return;
+  d.got[id] = Date.now();
+  store.set(TROPHY_KEY, d);
+  const t = TROPHIES.find(x => x[0] === id);
+  if (t) { toast('Trophy unlocked: ' + t[1], 'trophy'); Sound.play('trophy'); }
+}
+function checkTrophies() {
+  if (!S) return;
+  if (S.st.fame >= 80) award('fame');
+  if (S.st.chem >= 85) award('chem');
+  if (S.rel.vane >= 60) award('torch');
+  if (S.rel.family >= 95) award('family');
+}
+
+// ---------- Navigation ----------
+const ACTIONS = {
+  queue: () => nextInQueue(),
+  advance: () => advanceGame(),
+  finish: () => finishGame(),
+  weekEnd: () => weekEnd(),
+  beginWeek: () => beginWeek(),
+};
+function go(id, args, keepScroll) {
+  S.at = { id, args: args || {} };
+  save();
+  screen = 'play';
+  renderPlay(!keepScroll);
+}
+function goNext(n) {
+  if (n == null) return;
+  if (typeof n === 'string') return ACTIONS[n] ? ACTIONS[n]() : go(n);
+  if (n.id) return go(n.id, n.args);
+}
+P._result = a => ({ kicker: a.kicker, title: a.title, body: a.body, next: a.next == null ? 'queue' : a.next });
+
+function choose(c) {
+  if (busy) return;
+  busy = true;
+  Sound.play('click');
+  const out = c.do ? c.do() : null;
+  const next = typeof c.then === 'function' ? c.then() : c.then;
+  if (Array.isArray(out) && out.length) {
+    return go('_result', { body: out, next: next == null ? 'queue' : next, kicker: curPage && curPage.kicker, title: c.rt || (curPage && curPage.title) });
+  }
+  if (next != null) return goNext(next);
+  busy = false;
+}
+
+function renderPlay(scroll) {
+  const main = $('#screen');
+  if (!$('#sheet')) {
+    main.innerHTML = `<div class="wrap"><div class="play"><section class="sheet" id="sheet"></section><aside class="card" id="card" aria-label="Player card"></aside></div></div>`;
+  }
+  renderCard();
+  let page;
+  try { page = P[S.at.id](S.at.args || {}); }
+  catch (e) {
+    console.error(e);
+    page = { kicker: 'Timeout', title: 'Something Went Sideways', body: ['This page failed to load. Your career is still saved.'],
+      choices: [{ label: 'Back to the title screen', do() { showTitle(); return null; } }] };
+  }
+  showPage(page);
+  updateTopbar();
+  if (scroll) {
+    const top = $('#sheet').getBoundingClientRect().top + window.scrollY - 76;
+    if (window.scrollY > top) window.scrollTo({ top: Math.max(0, top), behavior: reduceMotion ? 'auto' : 'smooth' });
+  }
+}
+function showPage(pg) {
+  stopMini();
+  curPage = pg;
+  busy = false;
+  const el = $('#sheet');
+  let h = '';
+  if (pg.kicker) h += `<div class="kicker">${fmt(pg.kicker)}</div>`;
+  if (pg.title) h += `<h2 class="title">${fmt(pg.title)}</h2>`;
+  if (pg.board) h += boardHTML(pg.final);
+  if (pg.html) h += pg.html;
+  h += `<div class="story reveal">${(pg.body || []).map(paraHTML).join('')}</div>`;
+  if (pg.after) h += pg.after;
+  h += `<div id="mini"></div><div class="choices" id="choices"></div>`;
+  el.innerHTML = h;
+  if (pg.mini) startMini(pg.mini, $('#mini'));
+  else renderChoices(pg);
+  if (pg.custom) pg.custom(el);
+}
+function renderChoices(pg) {
+  const box = $('#choices');
+  if (!box) return;
+  let list = (pg.choices || []).filter(c => !c.if || c.if());
+  if (!list.length && pg.next != null) list = [{ label: pg.nextLabel || 'Continue', then: pg.next, primary: true }];
+  box.innerHTML = '';
+  list.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.type = 'button';
+    b.className = 'choice' + (c.primary ? ' primary' : '');
+    b.dataset.k = String(i + 1);
+    b.innerHTML = `<span class="k">${i + 1}</span><span class="t">${fmt(c.label)}${c.sub ? `<small>${fmt(c.sub)}</small>` : ''}</span>`;
+    b.addEventListener('click', () => choose(c));
+    box.appendChild(b);
+  });
+}
+
+// ---------- Player card ----------
+function renderCard() {
+  const el = $('#card');
+  if (!el || !S) return;
+  const open = el.classList.contains('open');
+  const p = POS[S.pos], st = S.st, rel = S.rel;
+  const roleName = { camp: 'Camp invite', practice: 'Practice squad', backup: 'Backup', rotation: 'Split snaps', starter: 'Starter' }[S.role] || '';
+  const meter = (label, v, color) => `<div class="meter-row"><span class="ml">${label}</span><span class="bar"><i style="width:${v}%;background:${color}"></i></span><span class="mv">${v}</span></div>`;
+  const vane = rel.vane, vw = Math.abs(vane) / 2, vl = vane >= 0 ? 50 : 50 - vw;
+  const vaneRow = `<div class="meter-row" title="Marcus Vane: -100 to +100"><span class="ml">Vane</span><span class="bar center"><i style="left:${vl}%;width:${vw}%;background:${vane >= 0 ? 'var(--m-energy)' : 'var(--m-neg)'}"></i></span><span class="mv">${vane > 0 ? '+' : ''}${vane}</span></div>`;
+  const items = Object.keys(S.items).filter(k => S.items[k] && ITEMS[k]).map(k => `<span class="pc-item" title="${esc(ITEMS[k][1])}">${esc(ITEMS[k][0])}</span>`);
+  if (S.flags.agent) items.push(`<span class="pc-item" title="Your agent">Agent: ${S.flags.agent === 'sly' ? 'Sly' : 'Margaret'}</span>`);
+  const stats = p.stats.map(([k, l]) => `<div><b>${S.line[k] || 0}</b><span>${l}</span></div>`).join('');
+  el.innerHTML = `
+    <div class="pc-head"><div class="pc-num">${esc(S.num)}</div><div style="min-width:0"><div class="pc-name">${esc(S.first)} ${esc(S.last)}</div><div class="pc-role">${S.pos} · ${roleName}</div></div></div>
+    <button class="pc-toggle" type="button" aria-expanded="${open}"><span class="pc-mini"><span>Skill <b>${st.skill}</b></span><span>Conf <b>${st.conf}</b></span><span>Energy <b>${st.energy}</b></span><span><b>${money(st.money)}</b></span></span><span>${open ? 'Hide' : 'Show card'}</span></button>
+    <div class="pc-body">
+      <div class="pc-sec"><div class="pc-h">Attributes</div>
+        ${meter('Skill', st.skill, 'var(--m-skill)')}${meter('Confidence', st.conf, 'var(--m-conf)')}${meter('Energy', st.energy, st.energy < 30 ? 'var(--m-neg)' : 'var(--m-energy)')}${meter('Fame', st.fame, 'var(--m-fame)')}${meter('Chemistry', st.chem, 'var(--m-chem)')}
+      </div>
+      <div class="pc-sec"><div class="pc-h">Relationships</div>
+        ${meter('Coaches', rel.coach, 'var(--m-conf)')}${vaneRow}${meter(esc(ORIGINS[S.origin].fam), rel.family, 'var(--m-skill)')}
+      </div>
+      <div class="pc-money"><span>Bank</span><b>${money(st.money)}</b></div>
+      ${items.length ? `<div class="pc-sec"><div class="pc-h">Items</div><div class="pc-items">${items.join('')}</div></div>` : ''}
+      <div class="pc-sec"><div class="pc-h">Season stats · ${S.record.w}-${S.record.l}</div><div class="pc-stats">${stats}</div></div>
+    </div>`;
+  el.querySelector('.pc-toggle').addEventListener('click', () => { el.classList.toggle('open'); renderCard(); });
+}
+function updateTopbar() {
+  const st = $('#status'), mb = $('#menuBtn');
+  if (screen === 'play' && S) {
+    let s;
+    const id = S.at && S.at.id;
+    if (id === 'ending') s = 'Season over';
+    else if (id === 'draft' || id === 'call') s = 'Draft night';
+    else if (S.role === 'camp') s = 'Training camp';
+    else if (S.slate < 10) s = `Week ${S.slate + 1} of 10 · ${S.record.w}-${S.record.l}`;
+    else s = `Playoffs · ${PLAYOFFS[Math.min(S.slate, 12) - 10].round}`;
+    st.textContent = s;
+    mb.hidden = false;
+    document.body.classList.add('in-play');
+  } else { st.textContent = ''; mb.hidden = true; document.body.classList.remove('in-play'); }
+}
+
+// ---------- Camp → season ----------
+function campScore() { return S.camp + (S.st.skill - 40) / 4 + (S.rel.coach - 40) / 8; }
+function campDone() {
+  S.role = S.flags.made ? 'backup' : 'practice';
+  if (!S.flags.made) S.flags.wasSquad = true;
+  award('camp');
+  const d = trophyData();
+  if (!d.pos.includes(S.pos)) { d.pos.push(S.pos); store.set(TROPHY_KEY, d); }
+  if (d.pos.length >= 4) award('all4');
+  S.slate = 0;
+  beginWeek();
+}
+function keepJob() {
+  const gs = S.grades.filter(g => g.n >= 2 && g.n <= 5).map(g => g.v);
+  const avg = gs.length ? gs.reduce((a, b) => a + b, 0) / gs.length : 1.5;
+  return avg >= 2.0 || (avg >= 1.6 && S.rel.coach >= 60);
+}
+
+// ---------- The week ----------
+const FIXED = { 0: 'w1_family', 1: () => (S.role === 'practice' ? 'w2_callup' : null), 3: 'w4_rehab', 4: 'w5_trash', 5: 'w6_agent', 6: 'w7_return', 7: 'w8_thanks', 8: 'w9_leo', 9: 'w10_stakes', 10: 'po1', 11: 'po2', 12: 'po3_media' };
+function beginWeek() {
+  const n = S.slate;
+  S.wk = { picks: 2, done: [], log: [], film: false };
+  S.flags.focus = false;
+  S.game = null;
+  const pay = S.role === 'practice' ? 13000 : n >= 10 ? 60000 : 48000;
+  // Things drift if you don't tend to them: confidence settles, chemistry and fame fade, home feels farther away.
+  fx({ energy: 12, conf: Math.round((55 - S.st.conf) * 0.2) + (S.items.blitz ? 2 : 0), chem: -2, fame: S.st.fame > 20 ? -2 : 0, family: -2 }, true);
+  fx({ money: pay }, true);
+  toast(`${n >= 10 ? 'Playoff' : 'Game'} check +${money(pay)}`, 'cash');
+  const q = ['week_intro', 'week_hub'];
+  let f = FIXED[n];
+  if (typeof f === 'function') f = f();
+  if (f) q.push(f);
+  if (RANDOM_SLATES.includes(n)) { const e = drawEvent(); if (e) q.push({ id: 'event', args: { e } }); }
+  q.push('game_pre');
+  S.queue = q;
+  nextInQueue();
+}
+function nextInQueue() {
+  const n = S.queue.shift();
+  if (!n) return go('game_pre');
+  if (typeof n === 'string') go(n); else go(n.id, n.args);
+}
+function drawEvent() {
+  const pool = Object.keys(EVENTS).filter(k => !S.used.includes(k) && (!EVENTS[k].if || EVENTS[k].if()));
+  if (!pool.length) return null;
+  const k = pick(pool);
+  S.used.push(k);
+  return k;
+}
+function weekKicker() { const n = S.slate; return n < 10 ? `Week ${n + 1} of 10` : `Playoffs · ${PLAYOFFS[n - 10].round}`; }
+function roleLine() {
+  return {
+    practice: `You're on the practice squad. You'll practice all week, but you won't dress on Sunday.`,
+    backup: `You're the backup {pos} behind Marcus Vane. Stay ready. Coach may call your number for a few plays.`,
+    rotation: `You and Vane are splitting snaps. Make the most of yours.`,
+    starter: `You're the starting {pos}. The ${S.pos === 'LB' ? 'defense' : 'offense'} runs through you.`,
+  }[S.role] || '';
+}
+function matchupHTML(opp) {
+  const threat = clamp(Math.round((opp.r - 40) / 8), 1, 5);
+  const ti = Array.from({ length: 5 }, (_, i) => `<i class="${i < threat ? 'on' : ''}"></i>`).join('');
+  return `<div class="matchup"><div class="mu-side"><div class="mu-team">Hammerheads</div><div class="mu-sub">${S.slate < 10 ? `Record ${S.record.w}-${S.record.l}` : 'Harbor City'}</div></div><div class="mu-vs">vs</div><div class="mu-side right"><div class="mu-team">${esc(opp.team)}</div><div class="mu-sub">Threat <span class="threat" role="img" aria-label="Threat ${threat} of 5">${ti}</span></div></div></div>`;
+}
+
+P.week_intro = () => {
+  const n = S.slate, opp = oppOf(n);
+  const body = [opp.blurb];
+  const last = S.hist[S.hist.length - 1];
+  if (last) body.push(`Last week: ${last.won ? 'beat' : 'lost to'} the ${last.opp}, ${Math.max(last.us, last.them)}-${Math.min(last.us, last.them)}.`);
+  body.push(roleLine());
+  if (S.st.energy < 30) body.push({ warn: `You're running on fumes (Energy ${S.st.energy}). Your timing will be off on Sunday. A recovery day would help.` });
+  return { kicker: weekKicker(), title: opp.team, html: matchupHTML(opp), body, next: 'queue', nextLabel: 'Plan your week' };
+};
+
+P.week_hub = () => ({
+  kicker: weekKicker(),
+  title: 'Plan Your Week',
+  body: [`You have time for **two** things before game day. Energy carries into Sunday, so choose with care.`],
+  custom: renderHub,
+});
+function renderHub(el) {
+  const wk = S.wk, left = wk.picks - wk.done.length;
+  const wrap = document.createElement('div');
+  let h = `<div class="picks-left">${left > 0 ? `${left} pick${left > 1 ? 's' : ''} left` : 'Week planned'}</div><div class="acts">`;
+  let k = 0;
+  ACTS.forEach(a => {
+    const ok = !a.req || a.req();
+    const picked = wk.done.includes(a.id);
+    const dis = picked || !ok || left <= 0;
+    const key = dis ? 0 : ++k;
+    h += `<button type="button" class="act${picked ? ' picked' : ''}" data-act="${a.id}"${key ? ` data-k="${key}"` : ''}${dis ? ' disabled' : ''}>
+      <span class="act-top"><span class="act-name">${fmt(a.name)}</span>${key ? `<kbd>${key}</kbd>` : picked ? '<span class="fxc up">Done</span>' : ''}</span>
+      <span class="act-desc">${fmt(a.desc())}</span>
+      <span class="act-fx">${ok ? a.chips.map(c => `<span class="fxc ${c[1]}">${c[0]}</span>`).join('') : `<span class="fxc lock">${esc(a.lock)}</span>`}</span>
+    </button>`;
+  });
+  h += '</div>';
+  if (wk.log.length) h += `<div class="hub-log">${wk.log.map(l => `<p><b>${fmt(l[0])}.</b> ${fmt(l[1])}</p>`).join('')}</div>`;
+  wrap.innerHTML = h;
+  el.querySelector('.story').after(wrap);
+  $$('.act', wrap).forEach(b => b.addEventListener('click', () => {
+    if (busy) return;
+    const a = ACTS.find(x => x.id === b.dataset.act);
+    if (!a || S.wk.done.length >= S.wk.picks || S.wk.done.includes(a.id) || (a.req && !a.req())) return;
+    busy = true;
+    Sound.play('click');
+    S.wk.done.push(a.id);
+    S.wk.log.push([a.name, a.run()]);
+    go('week_hub', {}, true);
+  }));
+  if (left <= 0) renderChoices({ next: 'queue', nextLabel: 'On to the week' });
+}
+
+P.event = a => {
+  const e = EVENTS[a.e];
+  return { kicker: weekKicker(), title: e.title, body: e.body, choices: e.choices };
+};
+
+// ---------- Game day ----------
+const TEAM_TD = ['A twelve-play drive ends with a Hammerheads touchdown.', 'Tiny flattens a defensive end, and the Hammerheads punch it in from the 2.', 'Trick play! The Hammerheads score on a flea-flicker.', 'A 71-yard punt return sets up a quick Hammerheads touchdown.'];
+const TEAM_FG = ['The Hammerheads kick a 43-yard field goal.', 'A drive stalls at the 20. Field goal, Hammerheads.'];
+const OPP_TD = ['The {opp} hit a deep pass for a touchdown.', 'The {opp} grind out a long drive and score.', 'A fumble gives the {opp} a short field, and they cash in.'];
+const OPP_FG = ['The {opp} kick a field goal.', 'The Hammerheads defense holds in the red zone. The {opp} settle for three.'];
+const WIN_LINES = ['The locker room is loud enough to rattle the lockers. Tiny is standing on a bench, shirtless, for reasons nobody can explain.', 'Bramble hands out game balls. He says nine words in total. It\'s the longest speech he\'s given all year.', 'Somebody turns the music up so loud the equipment guy has to unplug it.'];
+const LOSS_LINES = ['The locker room is silent except for the sound of tape being cut off ankles.', 'Bramble says, "Film at eight," and walks out. That\'s the whole speech.', 'Nobody talks on the bus. Tiny shares his headphones with you without saying anything.'];
+
+P.game_pre = () => {
+  const n = S.slate;
+  const flavor = [
+    'The tunnel smells like popcorn and cut grass. Sixty-eight thousand people make a noise you can feel in your teeth.',
+    'Fireworks go off at the end of the tunnel. The smoke hasn\'t cleared when the team starts running.',
+    'Tiny bangs his helmet against yours three times, the way he does every week. Your ears ring. It\'s tradition.',
+    'A kid in the front row holds up a sign with your number on it. You point at it. The kid nearly faints.',
+  ];
+  const body = [flavor[n % flavor.length]];
+  if (n === 0 && S.flags.famAtGame) body.push(`You spot {fam} in the stands, waving the sign with both arms.`);
+  if (n >= 10) body.push(`Playoff football. Every snap feels twice as loud.`);
+  body.push({ practice: `You're on the practice squad, so you watch from the sideline in a team hoodie. Next week, maybe.`, backup: `You're the backup. Helmet on, stay loose. Your number might get called.`, rotation: `You and Vane will trade series today.`, starter: `You're starting. Here we go.` }[S.role]);
+  return {
+    kicker: `${weekKicker()} · Game day`,
+    title: `Kickoff vs ${oppOf(n).team}`,
+    html: matchupHTML(oppOf(n)),
+    body,
+    choices: [{ label: S.role === 'practice' ? 'Watch the game' : 'Run out of the tunnel', primary: true, do() { startGame(); return null; } }],
+  };
+};
+
+function clockStr(late) { const m = late ? ri(1, 2) : ri(1, 14); return `${m}:${String(ri(0, 59)).padStart(2, '0')}`; }
+function teamRating() {
+  let r = 50 + (S.st.chem - 30) * 0.15;
+  if (S.role === 'starter') r += (S.st.skill - 50) * 0.25;
+  else if (S.role === 'rotation') r += (S.st.skill - 50) * 0.12;
+  return r;
+}
+function drive(off, def, mult) {
+  const edge = (off - def) / 100;
+  const pTD = clamp(0.26 + edge * 0.7, 0.08, 0.5) * mult;
+  const pFG = 0.2 * mult;
+  const x = Math.random();
+  return x < pTD ? 7 : x < pTD + pFG ? 3 : 0;
+}
+function gameDiff() { const g = S.game, opp = oppOf(g.n); return clamp(1 + (opp.r - 45) / 9 + (g.n >= 10 ? 0.3 : 0), 0.8, 5); }
+function hasEdge() { return !!((S.wk && S.wk.film) || S.items.notes || S.flags.focus); }
+function miniCfg(m, diff) { return { type: m.type, diff, prompt: m.prompt, btn: m.btn, read: m.read, fakes: m.fakes, edge: hasEdge() }; }
+
+function startGame() {
+  const n = S.slate;
+  let qs = { starter: [1, 2, 3], rotation: [2, 3], backup: [3], practice: [] }[S.role] || [];
+  let special = null;
+  if (n === 2 && !S.flags.vaneHurt) { special = 'injury'; qs = [2, 3]; }
+  const lib = MOMENTS[S.pos], recent = S.recentMoments || [];
+  const order = shuffle(lib.map((_, i) => i)).sort((a, b) => (recent.includes(a) ? 1 : 0) - (recent.includes(b) ? 1 : 0));
+  const plan = qs.map((q, i) => ({ q, m: order[i], clock: clockStr() }));
+  S.recentMoments = plan.map(p => p.m);
+  S.game = { n, us: 0, them: 0, q: 0, plan, mi: 0, res: [], recap: [], seen: 0, special, line: {}, bgTD: 0, done: false, clock: clockStr(true) };
+  if (S.role !== 'practice' && S.st.energy < 15) award('empty');
+  Sound.play('whistle');
+  advanceGame();
+}
+function simQuarter(q) {
+  const g = S.game, opp = oppOf(g.n);
+  const us = teamRating(), them = opp.r + (g.n === 4 && S.flags.trash === 'fire' ? 3 : 0);
+  const mult = q === 4 ? 0.85 : 1;
+  const a = drive(us, them, mult), b = drive(them, us, mult);
+  const nick = shortName(opp.team);
+  if (a) { g.us += a; if (a === 7) g.bgTD++; g.recap.push(`Q${q}: ${pick(a === 7 ? TEAM_TD : TEAM_FG)}`); }
+  if (b) { g.them += b; g.recap.push(`Q${q}: ${pick(b === 7 ? OPP_TD : OPP_FG).replace('{opp}', nick)}`); }
+}
+function advanceGame() {
+  const g = S.game;
+  while (g.q < 4) {
+    g.q++;
+    simQuarter(g.q);
+    if (g.special === 'injury' && g.q === 2 && !g.injured) { g.injured = true; return go('g_injury'); }
+    if (g.plan[g.mi] && g.plan[g.mi].q === g.q) return go('g_moment');
+  }
+  return endRegulation();
+}
+function endRegulation() {
+  const g = S.game, d = g.us - g.them;
+  if (S.role !== 'practice' && Math.abs(d) <= 8) return go('g_clutch');
+  if (d === 0) {
+    if (chance(0.5 + (teamRating() - oppOf(g.n).r) / 100)) g.us += 3; else g.them += 3;
+    g.recap.push('OT: A field goal decides it in overtime.');
+  }
+  return finishGame();
+}
+function recapLines() { const g = S.game; return g.recap.slice(g.seen).map(t => ({ note: t })); }
+function boardHTML(final) {
+  const g = S.game;
+  if (!g) return '';
+  const opp = oppOf(g.n);
+  return `<div class="board" role="group" aria-label="Scoreboard: Hammerheads ${g.us}, ${esc(opp.team)} ${g.them}"><div class="bteam"><span class="bname">Hammerheads</span><span class="bscore">${g.us}</span></div><div class="bmid">${final ? 'Final' : 'Q' + Math.max(1, g.q)}</div><div class="bteam right"><span class="bscore">${g.them}</span><span class="bname">${esc(shortName(opp.team))}</span></div></div>`;
+}
+
+P.g_injury = () => {
+  const opp = oppOf(S.game.n);
+  const setStarter = () => { S.role = 'starter'; S.flags.vaneHurt = true; };
+  return {
+    kicker: `Q2 · 9:14 · vs ${opp.team}`,
+    title: 'Vane Is Down',
+    board: true,
+    body: [
+      `Second quarter. Marcus Vane {inj}, and a 300-pound lineman lands on his ankle. You hear it from the sideline. Sixty thousand people go quiet at the same time.`,
+      `The cart comes out. Vane waves it off, tries to stand, can't, and gets on the cart.`,
+      { s: 'Coach Okafor', t: `{last}. Helmet. You're in.` },
+    ],
+    choices: [
+      { label: 'Jog to the cart and tap helmets with Vane first.', do() { setStarter(); fx({ vane: 12, coach: 2 }); return [`Vane grabs your facemask and pulls you close.`, { s: 'Marcus Vane', t: `Eyes up. Don't look at your feet.` }, `It's the nicest thing he's ever said to you.`]; }, then: 'g_moment' },
+      { label: 'Grab your helmet and sprint onto the field.', do() { setStarter(); fx({ conf: 5, coach: 3 }); return [`No hesitation. The crowd sees you running out and gets loud again.`]; }, then: 'g_moment' },
+      { label: 'Take three deep breaths, the way {fam} taught you.', do() { setStarter(); fx({ conf: 4, family: 2 }); return [`In for four, hold for four, out for four. Your hands stop shaking by the time you reach the huddle.`]; }, then: 'g_moment' },
+    ],
+  };
+};
+
+P.g_moment = () => {
+  const g = S.game, p = g.plan[g.mi], m = MOMENTS[S.pos][p.m], opp = oppOf(g.n);
+  const body = recapLines();
+  if (S.role === 'backup' && g.mi === 0) body.push({ s: 'Coach Okafor', t: pick([`{last}! You're in for this series. Go.`, `Package play. {last}, you're up.`]) });
+  body.push(m.setup);
+  return {
+    kicker: `Q${g.q} · ${p.clock} · vs ${opp.team}`,
+    title: m.title,
+    board: true,
+    body,
+    mini: Object.assign(miniCfg(m, gameDiff()), { onDone: momentDone }),
+  };
+};
+function momentDone(r, x) {
+  const g = S.game, m = MOMENTS[S.pos][g.plan[g.mi].m];
+  const body = [];
+  let text = x && x.text ? x.text : textFor(m, r);
+  if (r === 'bad' && S.items.luck) {
+    delete S.items.luck;
+    r = 'good';
+    text = textFor(m, 'good');
+    body.push({ note: `The rabbit's foot in your sock goes warm. The play turns around.` });
+  }
+  body.push(text);
+  const res = playResult(r, m);
+  body.push({ note: res.note });
+  g.res.push(r);
+  g.mi++;
+  g.seen = g.recap.length;
+  go('g_mres', { body, r });
+}
+P.g_mres = a => ({
+  kicker: `Q${S.game.q} · vs ${oppOf(S.game.n).team}`,
+  title: { great: 'Big Play!', good: 'Nice Work', bad: 'Rough One' }[a.r],
+  board: true,
+  body: a.body,
+  next: 'advance',
+});
+function playResult(r, m) {
+  const g = S.game;
+  let note = '', td = false;
+  if (S.pos !== 'LB') {
+    if (r === 'great') {
+      if (chance(0.75)) { g.us += 7; td = true; note = '**Touchdown, Hammerheads!**'; }
+      else { g.us += 3; note = 'The drive stalls in the red zone. Field goal is good.'; }
+    } else if (r === 'good') {
+      if (chance(0.45)) { g.us += 3; note = 'The drive ends with a field goal.'; }
+      else note = 'Good field position, but the drive ends in a punt.';
+    } else {
+      const x = Math.random();
+      if (x < 0.3) { g.them += 7; note = 'They turn it into a touchdown the other way.'; }
+      else if (x < 0.6) { g.them += 3; note = 'They turn it into a field goal.'; }
+      else note = 'Your defense bails you out with a stop.';
+    }
+  } else {
+    if (r === 'great') {
+      const x = Math.random();
+      if (m.tag === 'take' && x < 0.25) { g.us += 7; td = true; note = '**Defensive touchdown!** You take it all the way back.'; }
+      else if (x < 0.65) { g.us += 3; note = 'The offense turns the short field into a field goal.'; }
+      else note = 'Three and out. The crowd is on its feet.';
+    } else if (r === 'good') note = 'Drive stalled. They have to punt.';
+    else if (chance(0.6)) { g.them += 7; note = 'They punch it in for a touchdown.'; }
+    else { g.them += 3; note = 'They settle for a field goal.'; }
+  }
+  statsFor(r, td, m);
+  const f = { great: { conf: 2, fame: 1, coach: 2 }, good: { conf: 1 }, bad: { conf: -3, coach: -2 } }[r];
+  if (td) f.fame += 2;
+  fx(f);
+  if (r === 'great') award('bigplay');
+  if (td) award('six');
+  return { note, td };
+}
+function addLine(L) {
+  const g = S.game;
+  for (const k in L) {
+    if (k === 'long') { S.line.long = Math.max(S.line.long || 0, L.long); g.line.long = Math.max(g.line.long || 0, L.long); continue; }
+    S.line[k] = (S.line[k] || 0) + L[k];
+    g.line[k] = (g.line[k] || 0) + L[k];
+  }
+}
+function statsFor(r, td, m, clutch) {
+  const L = {};
+  switch (S.pos) {
+    case 'QB':
+      L.passYds = r === 'great' ? ri(28, 58) : r === 'good' ? ri(7, 19) : 0;
+      if (r === 'bad' && m.type === 'read' && !clutch && chance(0.5)) L.int = 1;
+      break;
+    case 'RB': { const y = r === 'great' ? ri(18, 64) : r === 'good' ? ri(4, 12) : ri(-3, 1); L.rushYds = y; L.long = y; break; }
+    case 'WR':
+      if (r !== 'bad') { L.rec = 1; L.recYds = r === 'great' ? ri(24, 61) : ri(7, 18); }
+      break;
+    case 'LB':
+      if (r !== 'bad') L.tkl = ri(1, 2);
+      if (r === 'great' && m.tag === 'take') L.take = 1;
+      if (r === 'great' && m.tag === 'sack') L.sacks = 1;
+      break;
+  }
+  if (td) L.td = 1;
+  addLine(L);
+}
+
+P.g_clutch = () => {
+  const g = S.game, opp = oppOf(g.n), d = g.us - g.them, chase = d <= 0;
+  const c = CLUTCH[S.pos][chase ? 'chase' : 'hold'];
+  const sit = d < 0 ? `Down ${-d}` : d > 0 ? `Up ${d}` : `Tied ${g.us}-${g.them}`;
+  const body = recapLines();
+  body.push(`**${sit}, ${g.clock} left in the fourth quarter.** ${chase ? needLine(-d) : (S.pos === 'LB' ? 'Hold them, and it\'s over.' : 'Close it out.')}`);
+  if (S.role === 'backup' || S.role === 'rotation') body.push({ s: S.role === 'backup' ? 'Coach Okafor' : 'Coach Bramble', t: `{last}. You're in. Win us the game.` });
+  body.push(c.setup);
+  return {
+    kicker: `Q4 · ${g.clock} · vs ${opp.team}`,
+    title: c.title,
+    board: true,
+    body,
+    mini: Object.assign(miniCfg(c, gameDiff() + 1), { clutch: true, onDone: clutchDone }),
+  };
+};
+function needLine(def) {
+  if (S.pos === 'LB') return def === 0 ? 'Get the ball back and the offense can win it.' : `They're trying to run out the clock. Get the ball back.`;
+  return def === 0 ? 'Any score wins it.' : def <= 2 ? 'A field goal wins it.' : def <= 6 ? 'You need a touchdown.' : def === 7 ? 'You need a touchdown and a two-point conversion.' : 'You need a touchdown and a two-point conversion just to force overtime.';
+}
+const CLUTCH_NOTES = {
+  hold: '**Ballgame.** The offense lines up in victory formation.',
+  fg: 'Your kicker drills a 41-yarder as time expires. **Hammerheads win!**',
+  td: '**Touchdown!** The defense holds on the final snap. **Hammerheads win!**',
+  td2: '**Touchdown,** and the two-point try is good! **Hammerheads win by one!**',
+  ot: 'Touchdown and two points to tie it. **Overtime.** The Hammerheads win the coin toss, march down the field, and kick the winner.',
+  short: 'That was the last chance. They kneel it out. **Final.**',
+  lost: 'They score in the final seconds. The stadium goes silent. **Final.**',
+  otl: 'They tie it with seconds left, then win it in overtime. **Final.**',
+};
+function clutchResolve(success) {
+  const g = S.game, d = g.us - g.them;
+  if (success) {
+    if (d > 0) return 'hold';
+    const need = -d, add = need <= 2 ? 3 : need <= 6 ? 7 : 8;
+    g.us += add;
+    if (g.us === g.them) { g.us += 3; return 'ot'; }
+    return add === 3 ? 'fg' : add === 7 ? 'td' : 'td2';
+  }
+  if (d < 0) return 'short';
+  const add = d <= 2 ? 3 : d <= 6 ? 7 : 8;
+  g.them += add;
+  if (g.us === g.them) { g.them += 3; return 'otl'; }
+  return 'lost';
+}
+function clutchDone(r, x) {
+  const g = S.game, chase = g.us - g.them <= 0, c = CLUTCH[S.pos][chase ? 'chase' : 'hold'];
+  const body = [];
+  let text = x && x.text ? x.text : textFor(c, r);
+  if (r === 'bad' && S.items.luck) {
+    delete S.items.luck;
+    r = 'good';
+    text = textFor(c, 'good');
+    body.push({ note: `The rabbit's foot in your sock goes warm. The play turns around.` });
+  }
+  body.push(text);
+  const success = r !== 'bad';
+  const note = clutchResolve(success);
+  g.res.push(r);
+  const td = success && S.pos !== 'LB' && (note === 'td' || note === 'td2' || note === 'ot');
+  statsFor(r, td, c, true);
+  if (S.pos === 'LB' && chase && success) body.push({ note: 'The offense takes over on a short field.' });
+  body.push({ note: CLUTCH_NOTES[note] });
+  if (success) {
+    fx({ conf: 4, fame: r === 'great' ? 4 : 3, coach: 3 });
+    award('clutch');
+    if (r === 'great') award('bigplay');
+    if (td) award('six');
+  } else fx({ conf: -5 });
+  go('g_cres', { body, success });
+}
+P.g_cres = a => ({
+  kicker: `Q4 · 0:00 · vs ${oppOf(S.game.n).team}`,
+  title: a.success ? 'Clutch!' : 'So Close',
+  board: true,
+  final: true,
+  body: a.body,
+  next: 'finish',
+  nextLabel: 'Final whistle',
+});
+
+function binom(n, p) { let k = 0; for (let i = 0; i < n; i++) if (Math.random() < p) k++; return k; }
+function letter(v) { return v >= 2.75 ? 'A+' : v >= 2.5 ? 'A' : v >= 2.25 ? 'A−' : v >= 2 ? 'B+' : v >= 1.75 ? 'B' : v >= 1.5 ? 'B−' : v >= 1.25 ? 'C' : v >= 1 ? 'D' : 'F'; }
+function lineText(L) {
+  switch (S.pos) {
+    case 'QB': return `${L.passYds || 0} passing yards, ${L.td || 0} TD, ${L.int || 0} INT`;
+    case 'RB': return `${L.rushYds || 0} rushing yards, ${L.td || 0} TD, long of ${L.long || 0}`;
+    case 'WR': return `${L.rec || 0} catches, ${L.recYds || 0} yards, ${L.td || 0} TD`;
+    default: return `${L.tkl || 0} tackles, ${L.sacks || 0} sacks, ${L.take || 0} takeaways`;
+  }
+}
+function finishGame() {
+  const g = S.game;
+  if (g.done) return go('g_final');
+  g.done = true;
+  // The plays you weren't the star of still add to your stat line.
+  const mult = { starter: 1, rotation: 0.5, backup: 0.12, practice: 0 }[S.role] || 0;
+  if (mult) {
+    const L = {};
+    if (S.pos === 'QB') { L.passYds = Math.round(ri(120, 200) * mult); L.td = binom(g.bgTD, 0.6 * mult); }
+    if (S.pos === 'RB') { L.rushYds = Math.round(ri(30, 65) * mult); L.td = binom(g.bgTD, 0.35 * mult); }
+    if (S.pos === 'WR') { L.rec = Math.round(ri(2, 4) * mult); L.recYds = Math.round(ri(20, 45) * mult); L.td = binom(g.bgTD, 0.3 * mult); }
+    if (S.pos === 'LB') { L.tkl = Math.round(ri(3, 6) * mult); }
+    addLine(L);
+  }
+  const won = g.us > g.them;
+  g.won = won;
+  if (g.n < 10) { if (won) S.record.w++; else S.record.l++; }
+  else if (!won) S.flags.lostRound = g.n;
+  else if (g.n === 12) S.flags.champion = true;
+  if (g.res.length) {
+    const v = g.res.reduce((a, r) => a + { great: 3, good: 2, bad: 0.5 }[r], 0) / g.res.length;
+    g.grade = v;
+    S.grades.push({ n: g.n, v });
+    if (v >= 2.75 && g.res.length >= 2) award('perfect');
+  }
+  if (g.n === 8 && S.flags.leoPromise) {
+    const kept = S.pos === 'LB' ? !!(g.line.take || g.line.sacks || g.line.td) : !!g.line.td;
+    S.flags.leoKept = kept;
+    if (kept) award('leo');
+  }
+  if (g.n === 9 && S.record.w === 10) award('undefeated');
+  if (g.n >= 10 && won && S.flags.wasSquad) award('squad');
+  if (g.n === 12 && won) award('champ');
+  S.hist.push({ n: g.n, opp: shortName(oppOf(g.n).team), us: g.us, them: g.them, won });
+  const cost = { starter: 16, rotation: 11, backup: 7, practice: 2 }[S.role] || 5;
+  g.press = g.n !== 12 && S.role !== 'practice' && (g.n >= 10 || chance(0.45));
+  fx({ energy: -cost, conf: won ? 2 : -3, chem: won ? 2 : -1, coach: g.grade != null ? Math.round((g.grade - 1.75) * 4) : 0, fame: S.flags.leoKept && g.n === 8 ? 5 : 0 });
+  go('g_final');
+}
+P.g_final = () => {
+  const g = S.game, opp = oppOf(g.n), won = g.won, m = Math.abs(g.us - g.them);
+  const title = won
+    ? (g.n === 12 ? 'Champions!' : m >= 14 ? 'Statement Win' : m <= 3 ? 'Survive and Advance' : 'Hammerheads Win')
+    : (m >= 14 ? 'Blown Out' : m <= 3 ? 'Heartbreaker' : 'A Tough Loss');
+  const body = recapLines();
+  if (g.n === 12 && won) body.push(`The clock hits zero. The Hammerheads are champions. You don't remember the next ten minutes at all.`);
+  else if (g.n >= 10 && !won) body.push(`The clock hits zero, and just like that, the season is over.`);
+  else body.push(won ? pick(WIN_LINES) : pick(LOSS_LINES));
+  if (g.n === 8 && S.flags.leoPromise) body.push(S.flags.leoKept
+    ? `After the game, a nurse sends you a video from room 412. Leo is standing on his bed in your jersey, screaming. You kept your promise.`
+    : `You call Leo after the game. "It's okay," he says. "You'll get the next one."`);
+  if (g.n === 0 && S.flags.famAtGame) body.push(`{fam} waits outside the locker room with that sign. It's a little crumpled now.`);
+  const after = g.res.length
+    ? `<div class="grade-row"><span class="grade">${letter(g.grade)}</span><div><div class="kicker">Your game grade</div><div>${esc(lineText(g.line))}</div></div></div>`
+    : `<div class="story"><p class="note">You watched this one from the sideline.</p></div>`;
+  return {
+    kicker: `Final · vs ${opp.team}`,
+    title,
+    board: true,
+    final: true,
+    body,
+    after,
+    next: g.n === 12 ? 'ending' : g.press ? 'g_press' : 'weekEnd',
+    nextLabel: g.n === 12 || (g.n >= 10 && !won && !g.press) ? 'Epilogue' : g.press ? 'Postgame press conference' : 'Next week',
+  };
+};
+P.g_press = () => {
+  const g = S.game, won = g.won, opp = oppOf(g.n);
+  return {
+    kicker: `Postgame · vs ${opp.team}`,
+    title: 'The Podium',
+    body: [
+      `Jules Park from the Harbor City Ledger gets the first question, like always.`,
+      { s: 'Jules Park', t: won ? pick([`Walk us through today. What was working?`, `Big win. What's the mood in there?`, `You looked comfortable out there. Where does that come from?`]) : pick([`Tough one. What went wrong today?`, `What do you say to the fans after a loss like that?`]) },
+    ],
+    choices: won ? [
+      { label: '"Credit the guys up front. None of that happens without them."', do() { fx({ chem: 4 }); return [`Tiny watches the clip eleven times on the bus home.`]; }, then: 'weekEnd' },
+      { label: '"I expect to make those plays. That\'s my job."', do() { fx({ conf: 3, fame: 4 }); return [`It plays on every sports show that night. Some people call it confident. Some call it cocky. Everybody calls it something.`]; }, then: 'weekEnd' },
+      { label: 'Make a joke about Tiny\'s cereal habit.', do() { fx({ fame: 3, chem: 3 }); return [`The room laughs. A cereal company sends Tiny forty boxes by Wednesday. He finishes them by Friday.`]; }, then: 'weekEnd' },
+    ] : [
+      { label: '"That one\'s on me."', do() { fx({ coach: 4, chem: 2, conf: -1 }); return [`Bramble watches the press conference from his office. He nods at the TV.`]; }, then: 'weekEnd' },
+      { label: '"They made more plays than we did. Credit to them."', do() { fx({ coach: 2, conf: 1 }); return [`Classy, boring, safe. Okafor gives you a thumbs-up on the way out.`]; }, then: 'weekEnd' },
+      { label: 'Blame the referees.', do() { fx({ fame: 3, coach: -5, money: -11817 }); return [`The league fines you $11,817 for criticizing officials. Bramble makes you pay it in person, and then makes you run.`]; }, then: 'weekEnd' },
+    ],
+  };
+};
+function weekEnd() {
+  const g = S.game;
+  if (g && g.n >= 10 && !g.won) return go('ending');
+  if (g && g.n === 12) return go('ending');
+  S.slate++;
+  if (S.slate === 10) return go('po_gate');
+  beginWeek();
+}
+
+// ---------- Endings ----------
+function avgGrade() { return S.grades.length ? S.grades.reduce((a, g) => a + g.v, 0) / S.grades.length : 0; }
+function pickEnding() {
+  if (S.flags.champion) return (avgGrade() >= 2.3 || S.st.fame >= 75) ? 'legend' : 'ring';
+  if (S.flags.lostRound === 12) return 'close';
+  if (S.flags.inPO) return 'climb';
+  if (S.st.fame >= 60 && S.st.chem < 40) return 'hype';
+  if (S.st.chem >= 60) return 'heart';
+  return 'next';
+}
+function codas() {
+  const out = [];
+  if (S.rel.vane >= 60) out.push(`In March, Marcus Vane retires after twelve seasons. He leaves something in your locker: the brass nameplate from his. On the back, scratched in with a key: *Your turn. Eyes up.*`);
+  else if (S.rel.vane >= 20) out.push(`Marcus Vane signs with another team in the spring. The day he leaves, you get a text: *Stop looking at your feet. Proud of you, rook.*`);
+  else out.push(`Marcus Vane is released in the offseason. You never really talk again. Some bridges you build. Some you don't.`);
+  out.push(S.st.money >= 500000 ? FAMILY_RICH[S.origin] : FAMILY_MODEST[S.origin]);
+  if (S.items.blitz) out.push(`Blitz, the practice-field dog, now has his own fan account. It has more followers than Coach Bramble.`);
+  if (S.flags.leoKept) out.push(`Leo goes home from the hospital in April. He mails you a photo from recess: somebody picked him first for kickball.`);
+  else if (S.flags.leoPromise) out.push(`You didn't keep your promise to Leo. He writes to you anyway: *It's ok. You'll get the next one.* You tape the letter inside your locker.`);
+  else if (S.flags.leoVisit) out.push(`Leo sends you a crayon drawing of you in your number {num}, about forty feet tall.`);
+  if (S.st.chem >= 70) out.push(`Tiny gets your jersey number tattooed on his calf. He tells everyone it's his lucky lottery number.`);
+  out.push(`The report date for next season is March 30th. You're already counting the days.`);
+  return out;
+}
+function summaryHTML() {
+  const po = S.flags.champion ? 'Champions' : S.flags.lostRound != null ? { 10: 'Lost wild card', 11: 'Lost conf. final', 12: 'Lost the final' }[S.flags.lostRound] : S.flags.inPO ? 'Playoffs' : 'Missed';
+  const tiles = [[`${S.record.w}-${S.record.l}`, 'Record'], [po, 'Playoffs'], [S.grades.length ? letter(avgGrade()) : '–', 'Avg grade'], [money(S.st.money), 'Bank']]
+    .concat(POS[S.pos].stats.map(([k, l]) => [S.line[k] || 0, l]));
+  const res = S.hist.map(h => `<span class="res ${h.won ? 'w' : 'l'}">${h.won ? 'W' : 'L'} ${esc(h.opp)} ${h.us}-${h.them}</span>`).join('');
+  const tr = S.runTrophies.map(id => TROPHIES.find(t => t[0] === id)).filter(Boolean);
+  return `<div class="ending-mark">Season summary</div>
+    <div class="sumgrid">${tiles.map(t => `<div><b>${esc(t[0])}</b><span>${esc(t[1])}</span></div>`).join('')}</div>
+    <div class="results">${res}</div>
+    ${tr.length ? `<div class="ending-mark">Trophies this career</div><div class="how-games" style="margin-bottom:8px">${tr.map(t => `<span class="chip">${esc(t[1])}</span>`).join('')}</div>` : ''}`;
+}
+P.ending = () => {
+  if (!S.flags.ending) {
+    S.flags.ending = pickEnding();
+    if (S.flags.ending === 'legend') award('mvp');
+    if (S.flags.champion) award('champ');
+    if (S.st.money >= 750000) award('rich');
+    save();
+  }
+  const E = ENDINGS[S.flags.ending];
+  return {
+    kicker: 'Epilogue',
+    title: E.title,
+    body: E.body().concat(codas()),
+    after: summaryHTML(),
+    choices: [
+      { label: 'Start a new career', sub: 'Try another position or hometown. There are seven endings.', primary: true, do() { newCareer(); return null; } },
+      { label: 'Open the trophy case', do() { showTrophies('play'); return null; } },
+    ],
+  };
+};
+
+// =========================================================
+//   MINI-GAMES
+// =========================================================
+const TAGS = { timing: 'Timing', reaction: 'Reaction', combo: 'Moves', read: 'The read' };
+const DEFAULT_PROMPT = { timing: 'Stop the needle in the window. Orange is perfect.', reaction: 'Move on the orange GO, not before.', combo: 'Hit the moves in order before time runs out.', read: 'Make the call before the play clock runs out.' };
+function stopMini() { if (mini) { mini.stop(); mini = null; } }
+function startMini(cfg, host) {
+  const f = { timing: miniTiming, reaction: miniReaction, combo: miniCombo, read: miniRead }[cfg.type];
+  f(cfg, host);
+}
+function mgHead(cfg) {
+  const tag = (cfg.clutch ? 'Clutch · ' : '') + (cfg.label || TAGS[cfg.type]);
+  return `<div class="mg-head"><span class="mg-tag">${esc(tag)}</span><span class="mg-prompt">${fmt(cfg.prompt || DEFAULT_PROMPT[cfg.type])}</span></div>`;
+}
+function endMini(host, r, label, cb, extra) {
+  Sound.play(r === 'great' ? 'great' : r === 'good' ? 'good' : 'bad');
+  const mg = host.querySelector('.mg');
+  if (mg) {
+    const f = document.createElement('div');
+    f.className = 'flash ' + r;
+    f.innerHTML = `<b>${{ great: 'Perfect!', good: 'Good', bad: 'Missed' }[r]}</b>${label ? `<span>${esc(label)}</span>` : ''}`;
+    mg.appendChild(f);
+  }
+  const t = setTimeout(() => { mini = null; cb(r, extra); }, reduceMotion ? 700 : 1050);
+  mini = { stop() { clearTimeout(t); }, key() { return true; }, finish() {} };
+}
+
+// Timing: stop a sweeping needle inside the window.
+function miniTiming(cfg, host) {
+  const s = S.st, d = cfg.diff;
+  const band = cfg.clutch && S.items.band ? 5 : 0;
+  const goodW = clamp(13 + s.skill * 0.17 + (s.conf - 50) * 0.06 - d * 1.8 + band, 7, 36);
+  const perfW = goodW * 0.36;
+  const speed = 50 + d * 13 + (s.energy < 30 ? 16 : 0);
+  const c = rand(goodW / 2 + 6, 100 - goodW / 2 - 6);
+  host.innerHTML = `<div class="mg">${mgHead(cfg)}
+    <div class="meter" role="presentation"><div class="zone good" style="left:${c - goodW / 2}%;width:${goodW}%"></div><div class="zone perfect" style="left:${c - perfW / 2}%;width:${perfW}%"></div><div class="needle" style="left:0%"></div></div>
+    <div class="mg-row"><span class="mg-help">Press <kbd>Space</kbd> or tap the button once to start and again to stop.</span><button class="mg-btn" type="button">Snap it</button></div></div>`;
+  const needle = host.querySelector('.needle'), btn = host.querySelector('.mg-btn');
+  let running = false, pos = 0, dir = 1, last = 0, passes = 0, raf = 0, done = false;
+  function frame(t) {
+    if (!last) last = t;
+    const dt = Math.min(0.05, (t - last) / 1000);
+    last = t;
+    pos += dir * speed * dt;
+    if (pos >= 100) { pos = 100; dir = -1; passes++; }
+    else if (pos <= 0) { pos = 0; dir = 1; passes++; }
+    needle.style.left = pos + '%';
+    if (passes >= 4) return stopAt(true);
+    raf = requestAnimationFrame(frame);
+  }
+  function stopAt(timeout) {
+    if (done) return;
+    done = true;
+    cancelAnimationFrame(raf);
+    const dist = Math.abs(pos - c);
+    const r = timeout ? 'bad' : dist <= perfW / 2 ? 'great' : dist <= goodW / 2 ? 'good' : 'bad';
+    endMini(host, r, timeout ? 'Too late' : null, cfg.onDone);
+  }
+  function act() {
+    if (done) return;
+    if (!running) { running = true; btn.textContent = cfg.btn || 'Now!'; Sound.play('tick'); raf = requestAnimationFrame(frame); }
+    else stopAt(false);
+  }
+  btn.addEventListener('click', act);
+  host.querySelector('.meter').addEventListener('pointerdown', e => { e.preventDefault(); act(); });
+  mini = {
+    stop() { done = true; cancelAnimationFrame(raf); },
+    key(e) { if (e.key === ' ' || e.key === 'Enter') { if (!e.repeat) act(); return true; } return false; },
+    finish(r) { if (done) return; done = true; cancelAnimationFrame(raf); endMini(host, r, null, cfg.onDone); },
+  };
+}
+
+// Reaction: go on the real signal, ignore the fake ones.
+function miniReaction(cfg, host) {
+  const s = S.st, d = cfg.diff;
+  const great = 300 + s.skill * 1.3 - d * 12 - (s.energy < 30 ? 40 : 0);
+  const good = great + 230;
+  const nFakes = cfg.fakes != null ? cfg.fakes : ri(0, 2);
+  host.innerHTML = `<div class="mg">${mgHead(cfg)}
+    <button class="react-pad" type="button"><span class="rp-text">Tap to get set</span></button>
+    <div class="mg-row"><span class="mg-help">Tap the pad or press <kbd>Space</kbd>. Jumping on a fake call is a penalty.</span></div></div>`;
+  const pad = host.querySelector('.react-pad'), txt = pad.querySelector('.rp-text');
+  const fakes = ['Hut!', 'Blue 80!', 'Omaha!', 'Hut-hut!'];
+  let phase = 'idle', t0 = 0, done = false;
+  const timers = [];
+  const later = (fn, ms) => timers.push(setTimeout(fn, ms));
+  function arm() {
+    phase = 'wait';
+    pad.className = 'react-pad wait';
+    txt.textContent = 'Set…';
+    let t = rand(900, 1700);
+    for (let i = 0; i < nFakes; i++) {
+      later(() => { if (phase !== 'wait') return; txt.textContent = pick(fakes); pad.classList.add('fake'); later(() => { pad.classList.remove('fake'); if (phase === 'wait') txt.textContent = 'Set…'; }, 420); }, t);
+      t += rand(800, 1400);
+    }
+    later(() => {
+      if (phase !== 'wait') return;
+      phase = 'go';
+      t0 = performance.now();
+      pad.className = 'react-pad go';
+      txt.textContent = 'GO';
+      Sound.play('tick');
+      later(() => { if (phase === 'go') finish('bad', 'Too slow'); }, good + 500);
+    }, t);
+  }
+  function press() {
+    if (done) return;
+    if (phase === 'idle') return arm();
+    if (phase === 'wait') return finish('bad', 'False start');
+    if (phase === 'go') { const rt = performance.now() - t0; finish(rt <= great ? 'great' : rt <= good ? 'good' : 'bad', `${Math.round(rt)} ms`); }
+  }
+  function finish(r, label) {
+    if (done) return;
+    done = true;
+    phase = 'done';
+    timers.forEach(clearTimeout);
+    endMini(host, r, label, cfg.onDone);
+  }
+  pad.addEventListener('pointerdown', e => { e.preventDefault(); press(); });
+  pad.addEventListener('click', e => { if (e.detail === 0) press(); }); // keyboard activation only
+  mini = {
+    stop() { done = true; timers.forEach(clearTimeout); },
+    key(e) { if (e.key === ' ' || e.key === 'Enter') { if (!e.repeat) press(); return true; } return false; },
+    finish(r) { finish(r); },
+  };
+}
+
+// Combo: enter the arrow sequence before the clock runs out.
+function miniCombo(cfg, host) {
+  const s = S.st, d = cfg.diff;
+  const len = clamp(3 + Math.round(d / 2), 3, 6);
+  const band = cfg.clutch && S.items.band ? 0.4 : 0;
+  const total = clamp(2.5 + s.skill * 0.018 + (s.conf - 50) * 0.006 - d * 0.18 - (s.energy < 30 ? 0.3 : 0) + band, 1.8, 4.6);
+  const keys = ['ArrowLeft', 'ArrowUp', 'ArrowRight', 'ArrowDown'];
+  const glyph = { ArrowLeft: '←', ArrowUp: '↑', ArrowRight: '→', ArrowDown: '↓' };
+  const alias = { a: 'ArrowLeft', w: 'ArrowUp', d: 'ArrowRight', s: 'ArrowDown', A: 'ArrowLeft', W: 'ArrowUp', D: 'ArrowRight', S: 'ArrowDown' };
+  const seq = Array.from({ length: len }, () => pick(keys));
+  host.innerHTML = `<div class="mg">${mgHead(cfg)}
+    <div class="combo-seq">${seq.map((k, i) => `<span class="arrow-box${i === 0 ? ' cur' : ''}">${glyph[k]}</span>`).join('')}</div>
+    <div class="timer"><i></i></div>
+    <div class="combo-pad">${keys.map(k => `<button class="pad-btn" type="button" data-key="${k}" aria-label="${k.replace('Arrow', '')}">${glyph[k]}</button>`).join('')}</div>
+    <div class="mg-row"><span class="mg-help">Arrow keys, WASD, or the pad. The clock starts on your first move. A wrong move costs time.</span></div></div>`;
+  const boxes = $$('.arrow-box', host), bar = host.querySelector('.timer > i'), seqEl = host.querySelector('.combo-seq');
+  let started = false, idx = 0, left = total, last = 0, raf = 0, done = false;
+  function frame(t) {
+    if (!last) last = t;
+    left -= Math.min(0.05, (t - last) / 1000);
+    last = t;
+    bar.style.transform = `scaleX(${Math.max(0, left / total)})`;
+    if (left <= 0) return finish('bad', 'Brought down');
+    raf = requestAnimationFrame(frame);
+  }
+  function input(k) {
+    if (done) return;
+    if (!started) { started = true; raf = requestAnimationFrame(frame); }
+    if (k === seq[idx]) {
+      boxes[idx].classList.remove('cur');
+      boxes[idx].classList.add('done');
+      idx++;
+      Sound.play('tick');
+      if (idx === len) return finish(left / total >= 0.4 ? 'great' : 'good');
+      boxes[idx].classList.add('cur');
+    } else {
+      left -= 0.5;
+      seqEl.classList.remove('shake');
+      void seqEl.offsetWidth;
+      seqEl.classList.add('shake');
+    }
+  }
+  function finish(r, label) {
+    if (done) return;
+    done = true;
+    cancelAnimationFrame(raf);
+    endMini(host, r, label, cfg.onDone);
+  }
+  $$('.pad-btn', host).forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); input(b.dataset.key); }));
+  $$('.pad-btn', host).forEach(b => b.addEventListener('click', e => { if (e.detail === 0) input(b.dataset.key); }));
+  mini = {
+    stop() { done = true; cancelAnimationFrame(raf); },
+    key(e) { const k = keys.includes(e.key) ? e.key : alias[e.key]; if (k) { if (!e.repeat) input(k); return true; } return e.key === ' '; },
+    finish(r) { finish(r); },
+  };
+}
+
+// Read: pick the right call before the play clock runs out.
+function miniRead(cfg, host) {
+  const rd = cfg.read, d = cfg.diff;
+  const total = clamp(11 - d * 0.7, 6, 11);
+  const opts = shuffle(rd.opts);
+  host.innerHTML = `<div class="mg">${mgHead(cfg)}
+    <div class="mg-prompt" style="margin-bottom:10px">${fmt(rd.q)}</div>
+    ${cfg.edge ? `<div class="film-note"><b>Film note</b>${fmt(rd.tell)}</div>` : ''}
+    <div class="read-zone"><div class="mg-row" style="margin-top:12px"><span class="mg-help">You'll have ${Math.round(total)} seconds once you break the huddle.</span><button class="mg-btn" type="button">Break the huddle</button></div></div></div>`;
+  const zone = host.querySelector('.read-zone');
+  let started = false, left = total, last = 0, raf = 0, done = false, bar = null;
+  function start() {
+    if (started || done) return;
+    started = true;
+    zone.innerHTML = `<div class="timer"><i></i></div><div class="read-opts">${opts.map((o, i) => `<button class="read-opt" type="button" data-i="${i}"><span class="k">${i + 1}</span><span>${fmt(o[0])}</span></button>`).join('')}</div>`;
+    bar = zone.querySelector('.timer > i');
+    $$('.read-opt', zone).forEach(b => b.addEventListener('click', () => choosePick(+b.dataset.i)));
+    raf = requestAnimationFrame(frame);
+  }
+  function frame(t) {
+    if (!last) last = t;
+    left -= Math.min(0.05, (t - last) / 1000);
+    last = t;
+    bar.style.transform = `scaleX(${Math.max(0, left / total)})`;
+    if (left <= 0) {
+      done = true;
+      endMini(host, 'bad', 'Delay of game', cfg.onDone, { text: 'The play clock hits zero before you can decide. Flag. Delay of game.' });
+      return;
+    }
+    raf = requestAnimationFrame(frame);
+  }
+  function choosePick(i) {
+    if (done || !started) return;
+    done = true;
+    cancelAnimationFrame(raf);
+    const o = opts[i];
+    endMini(host, o[1], null, cfg.onDone, { text: o[2] });
+  }
+  host.querySelector('.mg-btn').addEventListener('click', start);
+  mini = {
+    stop() { done = true; cancelAnimationFrame(raf); },
+    key(e) {
+      if (!started) { if (e.key === ' ' || e.key === 'Enter') { start(); return true; } return false; }
+      const n = parseInt(e.key, 10);
+      if (n >= 1 && n <= opts.length) { choosePick(n - 1); return true; }
+      return false;
+    },
+    finish(r) {
+      if (done) return;
+      done = true;
+      cancelAnimationFrame(raf);
+      const o = opts.find(x => x[1] === r);
+      endMini(host, r, null, cfg.onDone, { text: o ? o[2] : '' });
+    },
+  };
+}
+
+// =========================================================
+//   SCREENS
+// =========================================================
+function contLabel(s) {
+  if (s.at && s.at.id === 'ending') return 'Season over';
+  if (s.role === 'camp') return s.at && (s.at.id === 'draft' || s.at.id === 'call') ? 'Draft night' : 'Training camp';
+  if (s.slate < 10) return `Week ${s.slate + 1}, ${s.record.w}-${s.record.l}`;
+  return PLAYOFFS[Math.min(s.slate, 12) - 10].round;
+}
+function renderTitle() {
+  const saved = (S && S.at) ? S : loadSave();
+  const got = Object.keys(trophyData().got).length;
+  const cont = saved ? `<button class="btn btn-primary" id="tContinue" type="button">Continue <small>${esc(saved.first)} ${esc(saved.last)} · ${saved.pos} · ${esc(contLabel(saved))}</small></button>` : '';
+  $('#screen').innerHTML = `<div class="wrap">
+    <section class="hero">
+      <div class="hero-field" aria-hidden="true"></div>
+      <div class="yardnums" aria-hidden="true"><span>10</span><span>20</span><span>30</span><span>40</span><span>50</span><span>40</span><span>30</span><span>20</span><span>10</span></div>
+      <div class="pylon-mark" aria-hidden="true"></div>
+      <div class="hero-inner">
+        <div class="eyebrow">A football story game</div>
+        <h1 class="logo">Undrafted</h1>
+        <p class="tagline">257 names got called on draft night. Yours wasn't. Now you have one tryout, one season, and a veteran who wants you gone.</p>
+        <div class="hero-actions">
+          ${cont}
+          <button class="btn ${saved ? 'btn-ghost' : 'btn-primary'}" id="tNew" type="button">Start a new career</button>
+          <button class="btn btn-ghost" id="tTrophy" type="button">Trophy case <small>${got}/${TROPHIES.length}</small></button>
+        </div>
+      </div>
+    </section>
+    <section class="how">
+      <div><h3>Make the calls</h3><p>Every choice moves your stats and your relationships: the coaches, the veteran whose job you want, and the family watching from home.</p></div>
+      <div><h3>Play the big moments</h3><p>Game days come down to a few key snaps. Each one is a quick skill game, and better stats make it easier.</p><div class="how-games"><span class="chip">Timing</span><span class="chip">Reaction</span><span class="chip">Moves</span><span class="chip">Reads</span></div></div>
+      <div><h3>Write your ending</h3><p>Ten games, maybe three more in the playoffs, and seven endings. Four positions to try and ${TROPHIES.length} trophies to collect.</p></div>
+    </section>
+    <p class="foot-note">Number keys pick choices. Space or Enter for timing plays. Arrow keys for moves. Your career saves automatically in this browser.</p>
+  </div>`;
+  if (saved) $('#tContinue').addEventListener('click', () => { Sound.play('click'); S = saved; screen = 'play'; renderPlay(true); updateTopbar(); });
+  let armed = false;
+  $('#tNew').addEventListener('click', e => {
+    Sound.play('click');
+    if (saved && !armed) { armed = true; e.currentTarget.innerHTML = 'Replace your saved career? <small>Tap again</small>'; return; }
+    newCareer();
+  });
+  $('#tTrophy').addEventListener('click', () => { Sound.play('click'); showTrophies('title'); });
+}
+function renderSetup() {
+  const posKeys = Object.keys(POS), oKeys = Object.keys(ORIGINS);
+  $('#screen').innerHTML = `<div class="wrap narrow"><div class="sheet">
+    <div class="kicker">Hammerheads rookie intake form</div>
+    <h2 class="title">Who Are You?</h2>
+    <form id="setupForm" class="form-grid" novalidate>
+      <div class="name-row">
+        <label><span class="lbl">First name</span><input class="txt" id="fFirst" name="first" maxlength="14" autocomplete="off" spellcheck="false" /></label>
+        <label><span class="lbl">Last name</span><input class="txt" id="fLast" name="last" maxlength="16" autocomplete="off" spellcheck="false" /></label>
+        <button class="btn btn-plain" id="fRandom" type="button">Random</button>
+      </div>
+      <fieldset><legend class="lbl">Position</legend><div class="opt-grid">
+        ${posKeys.map((k, i) => `<label class="opt"><input type="radio" name="pos" value="${k}"${i === 0 ? ' checked' : ''} /><span class="opt-body"><span class="opt-big">${k}</span><span class="opt-name">${POS[k].name}</span><span class="opt-desc">${POS[k].blurb}</span><span class="opt-tag">${POS[k].games.join(' · ')}</span></span></label>`).join('')}
+      </div></fieldset>
+      <fieldset><legend class="lbl">Where you're from</legend><div class="opt-grid three">
+        ${oKeys.map((k, i) => `<label class="opt"><input type="radio" name="origin" value="${k}"${i === 0 ? ' checked' : ''} /><span class="opt-body"><span class="opt-name">${ORIGINS[k].name}</span><span class="opt-desc">${ORIGINS[k].blurb}</span><span class="opt-tag">${ORIGINS[k].tag}</span></span></label>`).join('')}
+      </div></fieldset>
+      <fieldset><legend class="lbl">Jersey number</legend><div class="num-row" id="fNum"></div></fieldset>
+      <p class="confirm-text" id="fErr" hidden>Give your player a first and last name.</p>
+      <div><button class="btn btn-primary" type="submit">Report to camp</button></div>
+    </form></div></div>`;
+  const form = $('#setupForm');
+  const rnd = () => { $('#fFirst').value = pick(FIRST_NAMES); $('#fLast').value = pick(LAST_NAMES); };
+  rnd();
+  const nums = () => {
+    const p = form.querySelector('input[name=pos]:checked').value;
+    $('#fNum').innerHTML = POS[p].nums.map((n, i) => `<label class="opt"><input type="radio" name="num" value="${n}"${i === 0 ? ' checked' : ''} /><span class="opt-body">${n}</span></label>`).join('');
+  };
+  nums();
+  $('#fRandom').addEventListener('click', () => { Sound.play('click'); rnd(); });
+  $$('input[name=pos]', form).forEach(r => r.addEventListener('change', nums));
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    const clean = v => v.replace(/\s+/g, ' ').trim();
+    const first = clean($('#fFirst').value), last = clean($('#fLast').value);
+    if (!first || !last) { $('#fErr').hidden = false; return; }
+    Sound.play('whistle');
+    S = newState({
+      first, last,
+      pos: form.querySelector('input[name=pos]:checked').value,
+      origin: form.querySelector('input[name=origin]:checked').value,
+      num: +form.querySelector('input[name=num]:checked').value,
+    });
+    go('draft');
+  });
+}
+function renderTrophies() {
+  const d = trophyData(), got = d.got;
+  $('#screen').innerHTML = `<div class="wrap"><div class="sheet">
+    <div class="kicker">Trophy case</div>
+    <h2 class="title">${Object.keys(got).length} of ${TROPHIES.length} Unlocked</h2>
+    <p style="margin:0 0 16px">Positions that made it through camp: ${['QB', 'RB', 'WR', 'LB'].map(p => `<span class="chip" style="opacity:${d.pos.includes(p) ? 1 : 0.45}">${p}${d.pos.includes(p) ? ' ✓' : ''}</span>`).join(' ')}</p>
+    <div class="trophies">${TROPHIES.map(([id, n, desc]) => `<div class="trophy${got[id] ? ' on' : ''}"><span class="ti" aria-hidden="true">${got[id] ? '★' : '?'}</span><div style="min-width:0"><b>${esc(n)}</b><span>${esc(desc)}</span></div></div>`).join('')}</div>
+    <div class="choices"><button class="choice primary" id="trBack" type="button" data-k="1"><span class="k">1</span><span class="t">Back</span></button></div>
+  </div></div>`;
+  $('#trBack').addEventListener('click', () => { Sound.play('click'); if (trophyBack === 'play' && S && S.at) { screen = 'play'; render(); } else showTitle(); });
+}
+function showTitle() { stopMini(); screen = 'title'; render(); }
+function showTrophies(from) { stopMini(); trophyBack = from || 'title'; screen = 'trophies'; render(); }
+function newCareer() { stopMini(); S = null; store.del(SAVE_KEY); screen = 'setup'; render(); window.scrollTo(0, 0); }
+
+function openMenu() {
+  if ($('#menu') || screen !== 'play') return;
+  if (mini) { stopMini(); menuKilledMini = true; }
+  const ov = document.createElement('div');
+  ov.className = 'overlay';
+  ov.id = 'menu';
+  ov.innerHTML = `<div class="sheet menu" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
+    <div class="kicker">Timeout</div><h2 class="title" id="menuTitle">Menu</h2>
+    <button class="btn btn-primary" type="button" data-m="resume">Resume</button>
+    <button class="btn btn-plain" type="button" data-m="trophies">Trophy case</button>
+    <button class="btn btn-plain" type="button" data-m="title">Title screen</button>
+    <button class="btn btn-plain" type="button" data-m="restart">Start a new career</button>
+    <p class="confirm-text" hidden>This erases your current career. Tap again to confirm.</p></div>`;
+  document.body.appendChild(ov);
+  let armed = false;
+  ov.addEventListener('click', e => {
+    if (e.target === ov) return closeMenu();
+    const b = e.target.closest('[data-m]');
+    if (!b) return;
+    Sound.play('click');
+    const m = b.dataset.m;
+    if (m === 'resume') closeMenu();
+    if (m === 'trophies') { closeMenu(true); showTrophies('play'); }
+    if (m === 'title') { closeMenu(true); showTitle(); }
+    if (m === 'restart') {
+      if (!armed) { armed = true; ov.querySelector('.confirm-text').hidden = false; return; }
+      closeMenu(true); newCareer();
+    }
+  });
+  ov.querySelector('[data-m=resume]').focus();
+}
+function closeMenu(silent) {
+  const ov = $('#menu');
+  if (ov) ov.remove();
+  if (menuKilledMini) { menuKilledMini = false; if (!silent && screen === 'play' && S && S.at) renderPlay(false); }
+}
+
+function render() {
+  closeMenu(true);
+  if (screen === 'play' && S && S.at) renderPlay(false);
+  else if (screen === 'setup') renderSetup();
+  else if (screen === 'trophies') renderTrophies();
+  else { screen = 'title'; renderTitle(); }
+  updateTopbar();
+}
+
+// ---------- Global controls ----------
+document.addEventListener('keydown', e => {
+  if (e.metaKey || e.ctrlKey || e.altKey) return;
+  const tag = e.target && e.target.tagName;
+  if (tag === 'INPUT' || tag === 'TEXTAREA' || tag === 'SELECT') return;
+  if ($('#menu')) { if (e.key === 'Escape') closeMenu(); return; }
+  if (e.key === 'Escape' && screen === 'play') { openMenu(); return; }
+  if (mini && mini.key) { if (mini.key(e)) e.preventDefault(); return; }
+  if (screen !== 'play' && screen !== 'trophies') return;
+  const n = parseInt(e.key, 10);
+  if (n >= 1 && n <= 9) {
+    const b = $$('[data-k]:not([disabled])', $('#screen')).find(x => x.dataset.k === String(n));
+    if (b) { e.preventDefault(); b.click(); }
+    return;
+  }
+  if ((e.key === 'Enter' || e.key === ' ') && (!document.activeElement || document.activeElement === document.body)) {
+    const ch = $$('#choices .choice');
+    if (ch.length === 1) { e.preventDefault(); ch[0].click(); }
+  }
+});
+$('#soundBtn').addEventListener('click', e => {
+  const on = Sound.toggle();
+  e.currentTarget.textContent = on ? 'Sound on' : 'Sound off';
+  e.currentTarget.setAttribute('aria-pressed', String(on));
+  Sound.play('click');
+});
+$('#soundBtn').textContent = Sound.on ? 'Sound on' : 'Sound off';
+$('#soundBtn').setAttribute('aria-pressed', String(Sound.on));
+$('#menuBtn').addEventListener('click', () => { Sound.play('click'); openMenu(); });
+$('#brandBtn').addEventListener('click', () => { Sound.play('click'); showTitle(); });
+
+// Small hook so automated tests can drive the game.
+window.__undrafted = {
+  get state() { return S; },
+  get screen() { return screen; },
+  finishMini(r) { if (mini && mini.finish) mini.finish(r); },
+};
+
+// ---------- Boot ----------
+const hot = window.claude && window.claude.hot;
+if (hot && typeof hot.snapshot === 'function') { try { hot.snapshot(() => ({ S, screen })); } catch (e) { /* ignore */ } }
+function boot(data) {
+  if (data && data.S) { S = data.S; screen = data.screen || 'title'; }
+  else { S = loadSave(); screen = 'title'; }
+  render();
+}
+if (hot && typeof hot.ready === 'function') hot.ready(boot); else boot(hot && hot.data);
+})();
+</script>
+</body>
+</html>

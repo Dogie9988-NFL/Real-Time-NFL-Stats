@@ -1,0 +1,26 @@
+/* ---------- Arcade pass games: 'throw' (QB) and 'catch' (WR) ---------- */
+/* Pre-snap: keep the chalk play diagram readable; the snap button floats near the top of the field. */
+.mg-pass .arcade-overlay { background: linear-gradient(180deg, rgba(0, 0, 0, .34), rgba(0, 0, 0, 0) 38%); place-items: start center; padding-top: clamp(38px, 9%, 54px); pointer-events: none; }
+.mg-pass .arcade-overlay .arcade-start { pointer-events: auto; width: auto; min-width: 0; padding: 10px 26px; font-size: 19px; box-shadow: 0 4px 0 rgba(0, 0, 0, .3), 0 0 0 3px rgba(255, 255, 255, .22); }
+.mg-pass .arcade-overlay .arcade-start:focus-visible { outline: 3px solid var(--led); outline-offset: 3px; }
+.mg-pass .arcade-canvas { cursor: default; }
+.mg-pass .mg-help { line-height: 1.45; }
+.mg-pass .mg-help b { font-weight: 700; }
+.mg-pass .ap-g { color: #7BE3A2; }
+.mg-pass .ap-y { color: var(--led); }
+.mg-pass .ap-r { color: #FF8E84; }
+.mg-pass .arcade-pad .pad-btn { touch-action: none; -webkit-touch-callout: none; }
+.mg-pass .arcade-pad .pad-btn[data-ctl="action"] { font-family: var(--f-label); font-weight: 700; letter-spacing: .1em; }
+/* Short red-zone field: the snap button sits in the top corner, clear of the end zone and the routes. */
+.mg-pass.ap-short .arcade-overlay { place-items: start end; padding: 6px 8px 0 0; background: none; }
+.mg-pass.ap-short .arcade-overlay .arcade-start { padding: 7px 16px; font-size: 15px; }
+/* Phones: keyboard hints are noise, and every pixel of field counts. */
+@media (hover: none), (pointer: coarse) { .mg-pass .kb-only { display: none; } }
+@media (max-width: 520px) {
+  .mg.mg-pass { padding: 12px 10px; }
+  .mg-pass .mg-prompt { font-size: 16px; }
+  .mg-pass .mg-help { font-size: 13.5px; }
+  .mg-pass .arcade-pad { gap: 6px; }
+  .mg-pass .arcade-pad .pad-btn { height: 56px; font-size: 22px; }
+  .mg-pass .arcade-pad .pad-btn[data-ctl="action"] { font-size: 18px; }
+}

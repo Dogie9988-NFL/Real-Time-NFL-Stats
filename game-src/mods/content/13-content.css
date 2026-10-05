@@ -1,0 +1,62 @@
+/* ---------- Content module: scouting card on kickoff day, signature-play tag ---------- */
+.ct-scout {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 6px 10px;
+  margin: -6px 0 18px;
+  padding: 9px 12px;
+  border: 1.5px dashed var(--line);
+  border-left: 4px solid var(--c-them, var(--pylon));
+  border-radius: 8px;
+  background: var(--sheet);
+  min-width: 0;
+}
+.ct-scout .ct-lbl {
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: 12.5px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: var(--muted);
+}
+.ct-scout .ct-name {
+  font-family: var(--f-display);
+  font-size: 16px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  color: var(--ink);
+}
+.ct-scout .ct-chips { display: inline-flex; flex-wrap: wrap; gap: 6px; }
+.ct-sig {
+  display: inline-block;
+  margin: -10px 0 14px;
+  padding: 2px 9px;
+  border: 1.5px solid var(--pylon);
+  border-radius: 4px;
+  background: var(--pylon-soft);
+  color: var(--pylon);
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .12em;
+  text-transform: uppercase;
+}
+@media (max-width: 560px) {
+  .ct-scout { padding: 8px 10px; }
+  .ct-scout .ct-name { font-size: 15px; }
+}
+.ct-scout .ct-tip {
+  flex: 1 1 100%;
+  font-size: 15px;
+  line-height: 1.4;
+  color: var(--ink);
+}
+.ct-scout .ct-tip b {
+  font-family: var(--f-label);
+  font-weight: 700;
+  letter-spacing: .06em;
+  text-transform: uppercase;
+  color: var(--muted);
+  margin-right: 4px;
+}

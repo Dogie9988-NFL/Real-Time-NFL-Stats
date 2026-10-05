@@ -1,0 +1,12 @@
+/* ---------- Arcade mini-games (shared) ---------- */
+.mg-arcade { padding: 14px; }
+.arcade-wrap { position: relative; border-radius: 8px; overflow: hidden; border: 2px solid rgba(255, 255, 255, .55); background: rgba(0, 0, 0, .2); }
+.arcade-canvas { display: block; width: 100%; touch-action: none; cursor: crosshair; }
+.arcade-overlay { position: absolute; inset: 0; display: grid; place-items: center; background: rgba(0, 0, 0, .35); }
+.arcade-overlay[hidden] { display: none !important; }
+.arcade-pad { display: flex; gap: 8px; margin-top: 10px; }
+.arcade-pad .pad-btn { flex: 1; min-width: 0; height: 60px; font-family: var(--f-label); letter-spacing: .06em; }
+.arcade-pad .pad-btn[data-ctl="action"] { flex: 1.6; background: var(--pylon); border-color: var(--pylon); color: var(--pylon-ink); font-size: 20px; text-transform: uppercase; }
+.arcade-pad .pad-btn.on { background: rgba(255, 255, 255, .3); }
+.arcade-pad .pad-btn[data-ctl="action"].on { filter: brightness(1.15); }
+@media (hover: hover) and (pointer: fine) { .arcade-pad.touch-only { display: none; } }

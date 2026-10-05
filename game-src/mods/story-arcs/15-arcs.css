@@ -1,0 +1,66 @@
+/* ---------- Story arcs ---------- */
+/* "Tiny will remember that." */
+.story p.note.mem, .inline-result p.note.mem {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  margin-top: .2em;
+  padding: 4px 12px 4px 10px;
+  border-radius: 999px;
+  background: var(--pylon-soft);
+  color: var(--ink);
+  font-size: 15px;
+  letter-spacing: .04em;
+}
+.story p.note.mem::before, .inline-result p.note.mem::before {
+  content: '';
+  flex: none;
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  background: var(--pylon);
+  box-shadow: 0 0 0 3px var(--pylon-soft);
+}
+
+/* "Where they landed" recap on the ending page */
+.arc-land { margin: 4px 0 20px; }
+.arc-list { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.arc-row {
+  display: grid;
+  grid-template-columns: 44px minmax(0, 1fr);
+  gap: 12px;
+  align-items: start;
+  padding: 10px 12px;
+  border: 1px solid var(--line);
+  border-left: 3px solid var(--pylon);
+  border-radius: 8px;
+  background: var(--sheet);
+}
+.arc-art {
+  width: 44px;
+  height: 44px;
+  border-radius: 10px;
+  overflow: hidden;
+  background: var(--board);
+  display: grid;
+  place-items: center;
+}
+.arc-art svg { width: 100%; height: 100%; display: block; }
+.arc-mono { font-family: var(--f-display); font-size: 17px; color: var(--led); letter-spacing: .02em; }
+.arc-txt { min-width: 0; }
+.arc-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 2px 10px; }
+.arc-who { font-family: var(--f-display); font-weight: 400; font-size: 16.5px; line-height: 1.2; }
+.arc-tag {
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .08em;
+  text-transform: uppercase;
+  color: var(--pylon);
+}
+.arc-line { margin: 3px 0 0; font-size: 15.5px; line-height: 1.4; color: var(--muted); }
+@media (max-width: 520px) {
+  .arc-row { grid-template-columns: 36px minmax(0, 1fr); gap: 10px; padding: 9px 10px; }
+  .arc-art { width: 36px; height: 36px; border-radius: 8px; }
+  .arc-mono { font-size: 14px; }
+}

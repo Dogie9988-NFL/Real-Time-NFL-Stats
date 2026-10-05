@@ -99,6 +99,13 @@ if you do.
 
 `docs/game/index.html` is a self-contained football story game. You play an
 undrafted rookie trying to survive camp, win a starting job, and chase a
-championship, with quick skill mini-games on game day. It has no
-dependencies and no build step. Open the file in any browser to play, or
-visit `/game/` on the hosted site. Progress saves in the browser.
+championship. Pick a position (QB, RB, WR or LB), make the calls that shape
+your relationships, and play the big snaps yourself in eight kinds of skill
+mini-games, including arcade passing, running and tackling plays. Earn a
+second season, level up with perks, shop for gear, take on weekly
+challenges, follow the league, and chase 15 endings and 30 trophies on three
+difficulty levels.
+
+Open the file in any browser to play, or visit `/game/` on the hosted site.
+It needs no install, and progress saves in the browser. The source code and
+build script live in [`game-src/`](game-src/README.md).

@@ -1,0 +1,81 @@
+/* ---------- Story events (module: story-events) ---------- */
+/* Category chip under the kicker on every random-event page. */
+.ev-meta { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 -2px; }
+.ev-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  max-width: 100%;
+  padding: 3px 10px 3px 8px;
+  border-radius: 999px;
+  background: var(--pylon-soft);
+  color: var(--ink);
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: 13px;
+  letter-spacing: .1em;
+  text-transform: uppercase;
+  line-height: 1.3;
+}
+.ev-tag svg { flex: none; width: 15px; height: 15px; fill: none; stroke: var(--pylon); stroke-width: 1.6; stroke-linecap: round; stroke-linejoin: round; }
+.ev-tag.cb { background: transparent; border: 1.5px dashed var(--pylon); padding: 2px 10px 2px 8px; }
+
+/* A handwritten-looking letter on lined paper. */
+.ev-letter {
+  position: relative;
+  max-width: 54ch;
+  margin: 6px 0 4px;
+  padding: 22px 22px 18px 40px;
+  background-color: var(--sheet);
+  background-image: repeating-linear-gradient(to bottom, transparent 0 27px, color-mix(in srgb, var(--muted) 24%, transparent) 27px 28px);
+  background-position: 0 17px;
+  border: 1px solid var(--line);
+  border-radius: 3px;
+  box-shadow: var(--shadow);
+  transform: rotate(-.5deg);
+  font-style: italic;
+  font-size: 17px;
+  line-height: 28px;
+}
+.ev-letter::before { content: ''; position: absolute; top: 0; bottom: 0; left: 26px; width: 1.5px; background: var(--bad); opacity: .4; }
+.ev-letter p { margin: 0; text-indent: 1.6em; }
+.ev-letter p:first-child { text-indent: 0; margin-bottom: 28px; }
+.ev-letter .ev-sign { text-align: right; font-weight: 600; text-indent: 0; margin-top: 28px; }
+.ev-letter .ev-ps { color: var(--muted); text-indent: 0; margin-top: 28px; }
+
+/* HammerCoin price card (always on the dark scoreboard surface). */
+.ev-ticker {
+  max-width: 460px;
+  margin: 6px 0 4px;
+  padding: 12px 16px 10px;
+  border-radius: 10px;
+  background: var(--board);
+  color: var(--board-ink);
+  box-shadow: var(--shadow);
+}
+.ev-ticker.up { --evt: var(--m-energy); }
+.ev-ticker.down { --evt: var(--m-neg); }
+.evt-top { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 10px; font-family: var(--f-label); text-transform: uppercase; letter-spacing: .08em; }
+.evt-sym { font-weight: 700; color: var(--led); font-size: 14px; }
+.evt-name { color: var(--board-muted); font-size: 14px; flex: 1 1 auto; }
+.evt-price { font-family: var(--f-display); font-size: 24px; letter-spacing: 0; font-variant-numeric: tabular-nums; }
+.evt-ch { font-weight: 700; font-size: 16px; color: var(--evt); }
+.ev-ticker svg { display: block; width: 100%; height: 76px; margin-top: 6px; color: var(--evt); border-bottom: 1px solid rgba(255, 255, 255, .12); }
+
+/* The napkin play gets called during a game. */
+.ev-callout {
+  margin: 0 0 1em;
+  padding: 10px 14px 10px 14px;
+  border-left: 4px solid var(--pylon);
+  border-radius: 0 8px 8px 0;
+  background: var(--pylon-soft);
+  max-width: 64ch;
+}
+.ev-callout-k { display: block; font-family: var(--f-label); font-weight: 700; font-size: 13px; letter-spacing: .14em; text-transform: uppercase; color: var(--pylon); }
+.story .ev-callout p { margin: 2px 0 0; font-weight: 600; }
+
+@media (max-width: 520px) {
+  .ev-letter { padding: 18px 16px 12px 34px; font-size: 16.5px; transform: none; }
+  .ev-letter::before { left: 21px; }
+  .evt-price { font-size: 21px; }
+}

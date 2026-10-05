@@ -1,0 +1,153 @@
+/* ---------- Art: portraits, scene banners, the player card avatar, the look picker, cover art ---------- */
+
+/* Dialogue portraits */
+.say-art { box-shadow: 0 1px 0 rgba(0, 0, 0, .06), 0 6px 14px -8px rgba(0, 0, 0, .55); }
+.say-art svg { border-radius: inherit; }
+
+/* Scene banners bleed to the edges of the sheet, like a magazine header. */
+.art-banner {
+  position: relative;
+  height: 150px;
+  margin: calc(-1 * clamp(20px, 4vw, 36px)) calc(-1 * clamp(18px, 4vw, 40px)) 20px;
+  border-radius: 5px 5px 0 0;
+  overflow: hidden;
+  background: #0E1626;
+  border-bottom: 3px solid var(--pylon);
+  isolation: isolate;
+}
+.art-banner svg { display: block; width: 100%; height: 100%; animation: uaSettle 1.1s cubic-bezier(.2, .7, .2, 1) both; transform-origin: 50% 60%; }
+.art-banner::after {
+  content: '';
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  box-shadow: inset 0 -18px 24px -18px rgba(0, 0, 0, .45);
+}
+@media (max-width: 520px) {
+  .art-banner { height: 118px; margin-bottom: 16px; }
+}
+
+/* Player card avatar */
+.pc-head.has-ava { gap: 12px; }
+.pc-ava {
+  flex: none;
+  width: 64px;
+  height: 64px;
+  border-radius: 12px;
+  overflow: hidden;
+  display: block;
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, .16), 0 8px 16px -8px rgba(0, 0, 0, .7);
+}
+.pc-ava svg { display: block; width: 100%; height: 100%; }
+.pc-ava.pop { animation: uaPop .55s cubic-bezier(.2, 1.6, .4, 1); }
+.pc-head.has-ava .pc-num { order: 3; margin-left: auto; font-size: 34px; opacity: .95; }
+@media (max-width: 880px) {
+  .pc-ava { width: 50px; height: 50px; border-radius: 10px; }
+  .pc-head.has-ava .pc-num { font-size: 28px; }
+}
+
+/* The "Your look" picker on the setup form */
+.look-wrap { display: grid; grid-template-columns: 148px minmax(0, 1fr); gap: 18px; align-items: start; }
+.look-card { display: grid; gap: 8px; justify-items: start; }
+.look-preview {
+  display: block;
+  width: 148px;
+  height: 148px;
+  border-radius: 16px;
+  overflow: hidden;
+  box-shadow: 0 0 0 1.5px var(--line), var(--shadow);
+}
+.look-preview svg { display: block; width: 100%; height: 100%; }
+.look-cap { display: grid; gap: 4px; font-size: 14px; line-height: 1.35; color: var(--muted); }
+.look-num { font-family: var(--f-label); font-weight: 700; font-size: 15px; letter-spacing: .06em; text-transform: uppercase; color: var(--ink); }
+.look-shuffle { justify-self: start; margin-top: 4px; padding: 7px 12px; font-size: 15px; }
+.look-rows { display: grid; gap: 8px; min-width: 0; }
+.look-h { font-family: var(--f-label); font-weight: 700; font-size: 13px; letter-spacing: .1em; text-transform: uppercase; color: var(--muted); }
+.look-h + .look-row { margin-bottom: 6px; }
+.look-row { display: flex; flex-wrap: wrap; gap: 8px; }
+.look-opt .opt-body { width: 60px; height: 60px; padding: 3px; border-radius: 12px; }
+.look-opt .opt-body svg { display: block; width: 100%; height: 100%; border-radius: 9px; }
+.look-opt input:checked + .opt-body { transform: translateY(-2px); }
+.look-tone .opt-body { width: 40px; height: 40px; padding: 4px; border-radius: 50%; display: grid; }
+.look-tone .opt-body i { display: block; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .25), inset 0 -5px 8px -4px rgba(0, 0, 0, .35); }
+.look-opt .opt-body { transition: border-color .12s ease, box-shadow .12s ease, transform .12s ease; }
+@media (max-width: 600px) {
+  .look-wrap { grid-template-columns: minmax(0, 1fr); gap: 12px; }
+  .look-card { grid-template-columns: 96px minmax(0, 1fr); align-items: center; gap: 12px; }
+  .look-preview { width: 96px; height: 96px; border-radius: 12px; }
+  .look-opt .opt-body { width: 48px; height: 48px; padding: 2px; border-radius: 10px; }
+  .look-opt .opt-body svg { border-radius: 8px; }
+  .look-row { gap: 6px; }
+  .look-tone .opt-body { width: 40px; height: 40px; padding: 4px; border-radius: 50%; }
+}
+
+/* Cover art on the title screen */
+.hero.has-art .pylon-mark { display: none; }
+.hero-art {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  right: 0;
+  width: min(34%, 360px);
+  pointer-events: none;
+}
+.hero-art svg { position: absolute; inset: 0; width: 100%; height: 100%; display: block; overflow: visible; }
+.hero-art .ha-wide { display: none; }
+@media (max-width: 1000px) and (min-width: 641px) {
+  .hero.has-art .hero-inner { max-width: 66%; }
+}
+@media (max-width: 640px) {
+  .hero-art { position: relative; inset: auto; width: auto; height: auto; aspect-ratio: 2 / 1; max-height: 210px; }
+  .hero-art .ha-tall { display: none; }
+  .hero-art .ha-wide { display: block; overflow: hidden; }
+  /* the figure is cut at the thighs; fade it into the field so it never runs into the eyebrow text */
+  .hero-art { -webkit-mask-image: linear-gradient(#000 72%, transparent 98%); mask-image: linear-gradient(#000 72%, transparent 98%); }
+  .hero.has-art .hero-inner { padding-top: 4px; }
+}
+
+/* Little animations inside the art (all dropped under reduced motion) */
+.ua-tw { animation: uaTw 3s ease-in-out infinite; }
+.ua-flash { animation: uaFlash 3s steps(1, end) infinite; opacity: 0; }
+.ua-flicker { animation: uaFlicker 2.6s linear infinite; }
+.ua-glow { animation: uaGlow 3.4s ease-in-out infinite; }
+.ua-pulse { animation: uaPulse 1.6s ease-in-out infinite; transform-box: fill-box; transform-origin: center; }
+.ua-shake { animation: uaShake 1.6s ease-in-out infinite; }
+.ua-buzzmark { animation: uaBuzz 1.6s ease-in-out infinite; }
+.ua-ring { animation: uaBlink 1s steps(2, end) infinite; }
+.ua-ticker { animation: uaTicker 16s linear infinite; }
+.ua-drip { animation: uaDrip 2.4s ease-in infinite; transform-box: fill-box; }
+.ua-scrub { animation: uaScrub 1.4s ease-in-out infinite; transform-box: fill-box; transform-origin: 0 0; }
+.ua-blink { animation: uaBlink 1.2s steps(2, end) infinite; }
+.ua-blink2 { animation: uaBlink 2.4s steps(2, end) infinite; }
+.ua-snow { animation: uaSnow 7s linear infinite; }
+.ua-sway { animation: uaSway 4s ease-in-out infinite; transform-box: fill-box; transform-origin: 50% 100%; }
+.ua-wave { animation: uaWave 1.2s ease-in-out infinite; }
+.ua-burst { animation: uaBurst 2.4s ease-out infinite; transform-box: fill-box; transform-origin: center; }
+.ua-conf { animation: uaConf 6s linear infinite; transform-box: fill-box; transform-origin: center; }
+.ua-knock { animation: uaKnock 2.2s ease-out infinite; }
+@keyframes uaSettle { from { transform: scale(1.045); opacity: .4; } to { transform: none; opacity: 1; } }
+@keyframes uaPop { 0% { transform: scale(.82); } 60% { transform: scale(1.08); } 100% { transform: none; } }
+@keyframes uaTw { 0%, 100% { opacity: 1; } 50% { opacity: .25; } }
+@keyframes uaFlash { 0%, 92% { opacity: 0; } 94% { opacity: 1; } }
+@keyframes uaFlicker { 0%, 100% { opacity: 1; } 20% { opacity: .82; } 22% { opacity: 1; } 55% { opacity: .9; } 70% { opacity: .72; } 72% { opacity: .95; } }
+@keyframes uaGlow { 0%, 100% { opacity: 1; } 50% { opacity: .78; } }
+@keyframes uaPulse { 0%, 100% { transform: scale(.94); opacity: .85; } 50% { transform: scale(1.06); opacity: 1; } }
+@keyframes uaShake { 0%, 40%, 100% { transform: none; } 5%, 15%, 25%, 35% { transform: translateX(-1.6px); } 10%, 20%, 30% { transform: translateX(1.6px); } }
+@keyframes uaBuzz { 0%, 40%, 100% { opacity: 0; } 5%, 35% { opacity: .85; } }
+@keyframes uaBlink { 0% { opacity: 1; } 50% { opacity: .35; } }
+@keyframes uaTicker { from { transform: translateX(0); } to { transform: translateX(-440px); } }
+@keyframes uaDrip { 0%, 30% { transform: translateY(0); opacity: 1; } 80% { transform: translateY(24px); opacity: 1; } 81%, 100% { transform: translateY(24px); opacity: 0; } }
+@keyframes uaScrub { 0%, 100% { transform: rotate(0deg); } 50% { transform: rotate(-9deg); } }
+@keyframes uaSnow { from { transform: translateY(-20px) translateX(0); } to { transform: translateY(130px) translateX(-14px); } }
+@keyframes uaSway { 0%, 100% { transform: rotate(-3deg); } 50% { transform: rotate(3deg); } }
+@keyframes uaWave { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-3px); } }
+@keyframes uaBurst { 0% { transform: scale(.2); opacity: 0; } 15% { opacity: 1; } 70% { transform: scale(1.1); opacity: .9; } 100% { transform: scale(1.25); opacity: 0; } }
+@keyframes uaConf { from { transform: translateY(-160px) rotate(0deg); } to { transform: translateY(160px) rotate(1turn); } }
+@keyframes uaKnock { 0%, 30% { opacity: 0; } 35%, 60% { opacity: .8; } 100% { opacity: 0; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .art-banner svg, .pc-ava.pop,
+  .ua-tw, .ua-flash, .ua-flicker, .ua-glow, .ua-pulse, .ua-shake, .ua-buzzmark, .ua-ring, .ua-ticker, .ua-drip, .ua-scrub,
+  .ua-blink, .ua-blink2, .ua-snow, .ua-sway, .ua-wave, .ua-burst, .ua-conf, .ua-knock { animation: none !important; }
+  .ua-flash { opacity: 0; }
+}

@@ -1,0 +1,65 @@
+/* ---------- Arcade ground games: 'run' (RB) and 'pursuit' (LB) ---------- */
+.ag .arcade-wrap { border-color: rgba(255, 255, 255, .7); box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .25); }
+/* The start bar sits at the bottom of the field so you can read the defense (and the hint arrow) before the snap. */
+.ag .arcade-overlay { place-items: end center; background: linear-gradient(180deg, rgba(4, 10, 6, 0) 42%, rgba(4, 10, 6, .45) 64%, rgba(4, 10, 6, .8)); padding: 12px 12px 14px; }
+.ag-intro-wrap { display: grid; justify-items: center; gap: 9px; text-align: center; max-width: 100%; }
+.ag-play {
+  font-family: var(--f-label);
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: .14em;
+  text-transform: uppercase;
+  color: #1A1200;
+  background: var(--led);
+  padding: 3px 10px;
+  border-radius: 4px;
+  max-width: 100%;
+  overflow-wrap: anywhere;
+}
+.ag .arcade-start { width: auto; min-width: 170px; font-size: 21px; padding: 12px 30px; box-shadow: 0 5px 0 rgba(0, 0, 0, .35), 0 0 0 4px rgba(255, 255, 255, .14); }
+.ag .arcade-start:focus-visible { outline: 3px solid var(--led); outline-offset: 3px; }
+.ag-tips { display: flex; flex-wrap: wrap; justify-content: center; gap: 4px 16px; font-size: 14px; color: #FFFFFF; text-shadow: 0 1px 2px rgba(0, 0, 0, .8); }
+.ag-tips b { font-family: var(--f-label); font-weight: 700; letter-spacing: .1em; text-transform: uppercase; color: var(--led); margin-right: 6px; }
+
+/* Action button doubles as the cooldown meter: it refills left to right. */
+.ag .arcade-pad .pad-btn[data-ctl="action"] {
+  --cd: 1;
+  background: linear-gradient(90deg, var(--pylon) 0 calc(var(--cd) * 100%), rgba(0, 0, 0, .38) calc(var(--cd) * 100%) 100%);
+  transition: filter .15s;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, .45);
+}
+.ag .arcade-pad .pad-btn[data-ctl="action"].cooling { border-color: rgba(255, 255, 255, .45); color: rgba(255, 255, 255, .78); }
+.ag .arcade-pad .pad-btn { touch-action: none; -webkit-touch-callout: none; }
+
+/* Pursuit: a D-pad on the left, a big BURST on the right. */
+.ag-pursuit .arcade-pad {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(0, 1.7fr);
+  grid-template-rows: 50px 50px;
+  grid-template-areas: "l u r act" "l d r act";
+  gap: 6px;
+}
+.ag-pursuit .arcade-pad .pad-btn { height: auto; font-size: 22px; }
+.ag-pursuit .arcade-pad .pad-btn[data-ctl="left"] { grid-area: l; }
+.ag-pursuit .arcade-pad .pad-btn[data-ctl="right"] { grid-area: r; }
+.ag-pursuit .arcade-pad .pad-btn[data-ctl="up"] { grid-area: u; }
+.ag-pursuit .arcade-pad .pad-btn[data-ctl="down"] { grid-area: d; }
+.ag-pursuit .arcade-pad .pad-btn[data-ctl="action"] { grid-area: act; font-size: 20px; }
+
+.ag .mg-help { line-height: 1.55; }
+.ag .ag-ht { display: none; }
+@media (hover: none) and (pointer: coarse) { .ag .ag-hk { display: none; } .ag .ag-ht { display: inline; } }
+.ag-tips .ag-hk, .ag-tips .ag-ht { white-space: nowrap; }
+.ag .mg-help kbd { font-size: 12px; }
+
+@media (max-width: 520px) {
+  .ag.mg-arcade { padding: 12px; }
+  .ag .arcade-overlay { padding: 8px 8px 10px; }
+  .ag-intro-wrap { gap: 7px; }
+  .ag .arcade-start { min-width: 150px; font-size: 18px; padding: 10px 22px; }
+  .ag-play { font-size: 12px; letter-spacing: .08em; padding: 2px 8px; }
+  .ag-tips { font-size: 12.5px; gap: 2px 12px; }
+  .ag .arcade-pad .pad-btn { height: 56px; }
+  .ag-pursuit .arcade-pad { grid-template-rows: 46px 46px; }
+  .ag-pursuit .arcade-pad .pad-btn { height: auto; }
+}

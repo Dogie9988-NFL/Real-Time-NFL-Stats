@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-09T06:44:20.999Z",
+  "generatedAt": "2026-10-09T07:27:40.088Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -163,7 +163,7 @@
           "id": "rushing-yards-wr",
           "label": "Rushing Yards (WR)",
           "section": "position",
-          "count": 31,
+          "count": 32,
           "available": true
         },
         {
@@ -191,7 +191,7 @@
           "id": "rushing-td-wr",
           "label": "Rushing TD (WR)",
           "section": "position",
-          "count": 3,
+          "count": 4,
           "available": true
         },
         {
@@ -247,7 +247,7 @@
           "id": "receiving-td-rb",
           "label": "Receiving TD (RB)",
           "section": "position",
-          "count": 16,
+          "count": 17,
           "available": true
         },
         {
@@ -303,7 +303,7 @@
           "id": "interceptions-lb",
           "label": "Interceptions (LB)",
           "section": "position",
-          "count": 21,
+          "count": 23,
           "available": true
         },
         {
@@ -380,14 +380,14 @@
           "id": "forced-fumbles-lb",
           "label": "Forced Fumbles (LB)",
           "section": "position",
-          "count": 40,
+          "count": 39,
           "available": true
         },
         {
           "id": "forced-fumbles-db",
           "label": "Forced Fumbles (DB)",
           "section": "position",
-          "count": 32,
+          "count": 33,
           "available": true
         },
         {
@@ -415,7 +415,7 @@
           "id": "fumbles-recovered-db",
           "label": "Fumbles Recovered (DB)",
           "section": "position",
-          "count": 21,
+          "count": 22,
           "available": true
         },
         {

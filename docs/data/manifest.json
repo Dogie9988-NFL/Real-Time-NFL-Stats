@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-09T08:38:11.773Z",
+  "generatedAt": "2026-10-09T08:47:58.707Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -303,7 +303,7 @@
           "id": "interceptions-lb",
           "label": "Interceptions (LB)",
           "section": "position",
-          "count": 21,
+          "count": 23,
           "available": true
         },
         {
@@ -380,14 +380,14 @@
           "id": "forced-fumbles-lb",
           "label": "Forced Fumbles (LB)",
           "section": "position",
-          "count": 40,
+          "count": 39,
           "available": true
         },
         {
           "id": "forced-fumbles-db",
           "label": "Forced Fumbles (DB)",
           "section": "position",
-          "count": 32,
+          "count": 33,
           "available": true
         },
         {
@@ -415,7 +415,7 @@
           "id": "fumbles-recovered-db",
           "label": "Fumbles Recovered (DB)",
           "section": "position",
-          "count": 21,
+          "count": 22,
           "available": true
         },
         {

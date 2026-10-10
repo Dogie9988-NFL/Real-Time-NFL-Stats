@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-10T20:16:59.457Z",
+  "generatedAt": "2026-10-10T20:33:44.628Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -617,7 +617,7 @@
           "id": "rushing-td-wr",
           "label": "Rushing TD (WR)",
           "section": "position",
-          "count": 13,
+          "count": 14,
           "available": true
         },
         {
@@ -729,14 +729,14 @@
           "id": "interceptions-lb",
           "label": "Interceptions (LB)",
           "section": "position",
-          "count": 49,
+          "count": 50,
           "available": true
         },
         {
           "id": "interceptions-other",
           "label": "Interceptions (Non LB/DB)",
           "section": "position",
-          "count": 16,
+          "count": 17,
           "available": true
         },
         {

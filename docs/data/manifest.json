@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-10T19:31:28.777Z",
+  "generatedAt": "2026-10-10T19:32:35.955Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -596,7 +596,7 @@
           "id": "rushing-yards-te",
           "label": "Rushing Yards (TE)",
           "section": "position",
-          "count": 17,
+          "count": 18,
           "available": true
         },
         {
@@ -624,7 +624,7 @@
           "id": "rushing-td-te",
           "label": "Rushing TD (TE)",
           "section": "position",
-          "count": 2,
+          "count": 3,
           "available": true
         },
         {

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-11T03:32:39.028Z",
+  "generatedAt": "2026-10-11T03:37:04.344Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -547,7 +547,7 @@
           "id": "punt-return-td",
           "label": "Punt Return Touchdowns",
           "section": "overall",
-          "count": 20,
+          "count": 21,
           "available": true
         },
         {
@@ -561,7 +561,7 @@
           "id": "passing-yards-non-qb",
           "label": "Passing Yards (Non-QB)",
           "section": "position",
-          "count": 14,
+          "count": 15,
           "available": true
         },
         {
@@ -575,7 +575,7 @@
           "id": "passing-td-non-qb",
           "label": "Passing TD (Non-QB)",
           "section": "position",
-          "count": 4,
+          "count": 5,
           "available": true
         },
         {

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-12T07:42:24.713Z",
+  "generatedAt": "2026-10-12T08:27:05.433Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -303,7 +303,7 @@
           "id": "interceptions-lb",
           "label": "Interceptions (LB)",
           "section": "position",
-          "count": 25,
+          "count": 23,
           "available": true
         },
         {
@@ -366,56 +366,56 @@
           "id": "forced-fumbles-dt",
           "label": "Forced Fumbles (DT)",
           "section": "position",
-          "count": 19,
+          "count": 11,
           "available": true
         },
         {
           "id": "forced-fumbles-edge",
           "label": "Forced Fumbles (Edge)",
           "section": "position",
-          "count": 16,
+          "count": 13,
           "available": true
         },
         {
           "id": "forced-fumbles-lb",
           "label": "Forced Fumbles (LB)",
           "section": "position",
-          "count": 46,
+          "count": 39,
           "available": true
         },
         {
           "id": "forced-fumbles-db",
           "label": "Forced Fumbles (DB)",
           "section": "position",
-          "count": 37,
+          "count": 33,
           "available": true
         },
         {
           "id": "fumbles-recovered-dt",
           "label": "Fumbles Recovered (DT)",
           "section": "position",
-          "count": 16,
+          "count": 13,
           "available": true
         },
         {
           "id": "fumbles-recovered-edge",
           "label": "Fumbles Recovered (Edge)",
           "section": "position",
-          "count": 9,
+          "count": 5,
           "available": true
         },
         {
           "id": "fumbles-recovered-lb",
           "label": "Fumbles Recovered (LB)",
           "section": "position",
-          "count": 28,
+          "count": 23,
           "available": true
         },
         {
           "id": "fumbles-recovered-db",
           "label": "Fumbles Recovered (DB)",
           "section": "position",
-          "count": 32,
+          "count": 22,
           "available": true
         },
         {

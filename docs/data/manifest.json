@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-12T14:44:27.409Z",
+  "generatedAt": "2026-10-12T14:46:40.959Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -107,7 +107,7 @@
           "id": "punt-return-yards",
           "label": "Punt Return Yards",
           "section": "overall",
-          "count": 41,
+          "count": 46,
           "available": true
         },
         {
@@ -275,7 +275,7 @@
           "id": "sacks-edge",
           "label": "Sacks (Edge)",
           "section": "position",
-          "count": 47,
+          "count": 48,
           "available": true
         },
         {
@@ -289,7 +289,7 @@
           "id": "sacks-db",
           "label": "Sacks (DB)",
           "section": "position",
-          "count": 27,
+          "count": 32,
           "available": true
         },
         {
@@ -359,7 +359,7 @@
           "id": "pass-deflections-other",
           "label": "Pass Deflections (Non DB/LB)",
           "section": "position",
-          "count": 49,
+          "count": 50,
           "available": true
         },
         {

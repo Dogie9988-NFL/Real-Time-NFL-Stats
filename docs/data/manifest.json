@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-13T06:50:54.448Z",
+  "generatedAt": "2026-10-13T07:12:55.978Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -205,7 +205,7 @@
           "id": "rushing-td-rb",
           "label": "Rushing TD (RB)",
           "section": "position",
-          "count": 47,
+          "count": 48,
           "available": true
         },
         {
@@ -380,7 +380,7 @@
           "id": "forced-fumbles-lb",
           "label": "Forced Fumbles (LB)",
           "section": "position",
-          "count": 46,
+          "count": 47,
           "available": true
         },
         {
@@ -394,7 +394,7 @@
           "id": "fumbles-recovered-dt",
           "label": "Fumbles Recovered (DT)",
           "section": "position",
-          "count": 16,
+          "count": 17,
           "available": true
         },
         {

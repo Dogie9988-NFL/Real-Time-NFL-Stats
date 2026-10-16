@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-16T08:54:34.862Z",
+  "generatedAt": "2026-10-16T09:07:28.193Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -107,7 +107,7 @@
           "id": "punt-return-yards",
           "label": "Punt Return Yards",
           "section": "overall",
-          "count": 47,
+          "count": 46,
           "available": true
         },
         {
@@ -205,7 +205,7 @@
           "id": "rushing-td-rb",
           "label": "Rushing TD (RB)",
           "section": "position",
-          "count": 50,
+          "count": 48,
           "available": true
         },
         {
@@ -387,7 +387,7 @@
           "id": "forced-fumbles-db",
           "label": "Forced Fumbles (DB)",
           "section": "position",
-          "count": 38,
+          "count": 37,
           "available": true
         },
         {

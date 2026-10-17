@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-17T03:48:25.958Z",
+  "generatedAt": "2026-10-17T03:50:50.102Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -673,7 +673,7 @@
           "id": "receiving-td-rb",
           "label": "Receiving TD (RB)",
           "section": "position",
-          "count": 43,
+          "count": 45,
           "available": true
         },
         {

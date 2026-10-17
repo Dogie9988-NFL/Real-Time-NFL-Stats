@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-17T22:23:53.390Z",
+  "generatedAt": "2026-10-17T22:42:11.884Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -694,7 +694,7 @@
           "id": "sacks-dt",
           "label": "Sacks (DT)",
           "section": "position",
-          "count": 41,
+          "count": 42,
           "available": true
         },
         {

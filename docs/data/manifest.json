@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-18T03:46:47.681Z",
+  "generatedAt": "2026-10-18T03:50:57.544Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -561,7 +561,7 @@
           "id": "passing-yards-non-qb",
           "label": "Passing Yards (Non-QB)",
           "section": "position",
-          "count": 15,
+          "count": 16,
           "available": true
         },
         {
@@ -575,7 +575,7 @@
           "id": "passing-td-non-qb",
           "label": "Passing TD (Non-QB)",
           "section": "position",
-          "count": 5,
+          "count": 6,
           "available": true
         },
         {
@@ -659,7 +659,7 @@
           "id": "receiving-yards-other",
           "label": "Receiving Yards (Non WR/RB/TE)",
           "section": "position",
-          "count": 21,
+          "count": 22,
           "available": true
         },
         {
@@ -687,7 +687,7 @@
           "id": "receiving-td-other",
           "label": "Receiving TD (Non WR/RB/TE)",
           "section": "position",
-          "count": 3,
+          "count": 4,
           "available": true
         },
         {

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-24T05:43:30.574Z",
+  "generatedAt": "2026-10-24T05:59:08.697Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -561,7 +561,7 @@
           "id": "passing-yards-non-qb",
           "label": "Passing Yards (Non-QB)",
           "section": "position",
-          "count": 16,
+          "count": 17,
           "available": true
         },
         {
@@ -575,7 +575,7 @@
           "id": "passing-td-non-qb",
           "label": "Passing TD (Non-QB)",
           "section": "position",
-          "count": 6,
+          "count": 7,
           "available": true
         },
         {
@@ -827,7 +827,7 @@
           "id": "fumbles-recovered-edge",
           "label": "Fumbles Recovered (Edge)",
           "section": "position",
-          "count": 11,
+          "count": 12,
           "available": true
         },
         {

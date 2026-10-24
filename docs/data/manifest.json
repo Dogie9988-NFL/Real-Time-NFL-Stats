@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-24T19:23:31.552Z",
+  "generatedAt": "2026-10-24T20:57:18.960Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -624,7 +624,7 @@
           "id": "rushing-td-te",
           "label": "Rushing TD (TE)",
           "section": "position",
-          "count": 6,
+          "count": 7,
           "available": true
         },
         {
@@ -659,7 +659,7 @@
           "id": "receiving-yards-other",
           "label": "Receiving Yards (Non WR/RB/TE)",
           "section": "position",
-          "count": 20,
+          "count": 21,
           "available": true
         },
         {
@@ -694,7 +694,7 @@
           "id": "sacks-dt",
           "label": "Sacks (DT)",
           "section": "position",
-          "count": 40,
+          "count": 41,
           "available": true
         },
         {

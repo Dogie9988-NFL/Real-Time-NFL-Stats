@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-10-31T19:20:07.377Z",
+  "generatedAt": "2026-10-31T22:34:23.097Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -624,7 +624,7 @@
           "id": "rushing-td-te",
           "label": "Rushing TD (TE)",
           "section": "position",
-          "count": 9,
+          "count": 10,
           "available": true
         },
         {
@@ -659,7 +659,7 @@
           "id": "receiving-yards-other",
           "label": "Receiving Yards (Non WR/RB/TE)",
           "section": "position",
-          "count": 22,
+          "count": 24,
           "available": true
         },
         {
@@ -694,7 +694,7 @@
           "id": "sacks-dt",
           "label": "Sacks (DT)",
           "section": "position",
-          "count": 46,
+          "count": 50,
           "available": true
         },
         {
@@ -820,14 +820,14 @@
           "id": "fumbles-recovered-dt",
           "label": "Fumbles Recovered (DT)",
           "section": "position",
-          "count": 11,
+          "count": 12,
           "available": true
         },
         {
           "id": "fumbles-recovered-edge",
           "label": "Fumbles Recovered (Edge)",
           "section": "position",
-          "count": 13,
+          "count": 14,
           "available": true
         },
         {

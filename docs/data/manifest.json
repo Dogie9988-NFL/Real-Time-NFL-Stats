@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-01T07:59:06.739Z",
+  "generatedAt": "2026-11-01T09:24:50.578Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -827,7 +827,7 @@
           "id": "fumbles-recovered-edge",
           "label": "Fumbles Recovered (Edge)",
           "section": "position",
-          "count": 14,
+          "count": 15,
           "available": true
         },
         {

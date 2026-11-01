@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-01T01:27:39.623Z",
+  "generatedAt": "2026-11-01T02:18:54.037Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -547,7 +547,7 @@
           "id": "punt-return-td",
           "label": "Punt Return Touchdowns",
           "section": "overall",
-          "count": 22,
+          "count": 23,
           "available": true
         },
         {
@@ -561,7 +561,7 @@
           "id": "passing-yards-non-qb",
           "label": "Passing Yards (Non-QB)",
           "section": "position",
-          "count": 19,
+          "count": 20,
           "available": true
         },
         {
@@ -617,7 +617,7 @@
           "id": "rushing-td-wr",
           "label": "Rushing TD (WR)",
           "section": "position",
-          "count": 16,
+          "count": 17,
           "available": true
         },
         {
@@ -736,7 +736,7 @@
           "id": "interceptions-other",
           "label": "Interceptions (Non LB/DB)",
           "section": "position",
-          "count": 21,
+          "count": 22,
           "available": true
         },
         {
@@ -820,7 +820,7 @@
           "id": "fumbles-recovered-dt",
           "label": "Fumbles Recovered (DT)",
           "section": "position",
-          "count": 12,
+          "count": 13,
           "available": true
         },
         {

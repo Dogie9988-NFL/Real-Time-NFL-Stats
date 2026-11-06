@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-06T19:38:32.965Z",
+  "generatedAt": "2026-11-06T23:19:59.384Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -29,7 +29,7 @@
         {
           "id": "te",
           "label": "All TE",
-          "count": 50
+          "count": 12
         },
         {
           "id": "def",

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-06T11:24:21.754Z",
+  "generatedAt": "2026-11-06T11:29:56.467Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -39,7 +39,7 @@
         {
           "id": "k",
           "label": "All Kicker",
-          "count": 35
+          "count": 36
         }
       ]
     },

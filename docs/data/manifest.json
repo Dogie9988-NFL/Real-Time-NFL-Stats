@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-08T02:40:36.943Z",
+  "generatedAt": "2026-11-08T06:16:54.549Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -547,7 +547,7 @@
           "id": "punt-return-td",
           "label": "Punt Return Touchdowns",
           "section": "overall",
-          "count": 23,
+          "count": 24,
           "available": true
         },
         {
@@ -561,7 +561,7 @@
           "id": "passing-yards-non-qb",
           "label": "Passing Yards (Non-QB)",
           "section": "position",
-          "count": 24,
+          "count": 26,
           "available": true
         },
         {
@@ -575,7 +575,7 @@
           "id": "passing-td-non-qb",
           "label": "Passing TD (Non-QB)",
           "section": "position",
-          "count": 9,
+          "count": 10,
           "available": true
         },
         {
@@ -596,7 +596,7 @@
           "id": "rushing-yards-te",
           "label": "Rushing Yards (TE)",
           "section": "position",
-          "count": 27,
+          "count": 28,
           "available": true
         },
         {
@@ -617,14 +617,14 @@
           "id": "rushing-td-wr",
           "label": "Rushing TD (WR)",
           "section": "position",
-          "count": 18,
+          "count": 22,
           "available": true
         },
         {
           "id": "rushing-td-te",
           "label": "Rushing TD (TE)",
           "section": "position",
-          "count": 10,
+          "count": 11,
           "available": true
         },
         {
@@ -659,7 +659,7 @@
           "id": "receiving-yards-other",
           "label": "Receiving Yards (Non WR/RB/TE)",
           "section": "position",
-          "count": 27,
+          "count": 30,
           "available": true
         },
         {
@@ -687,7 +687,7 @@
           "id": "receiving-td-other",
           "label": "Receiving TD (Non WR/RB/TE)",
           "section": "position",
-          "count": 4,
+          "count": 5,
           "available": true
         },
         {

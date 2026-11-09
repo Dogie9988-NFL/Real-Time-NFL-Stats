@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-09T11:47:36.726Z",
+  "generatedAt": "2026-11-09T15:58:07.281Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -23,7 +23,7 @@
           "id": "passing-td",
           "label": "Passing Touchdowns",
           "section": "overall",
-          "count": 44,
+          "count": 46,
           "available": true
         },
         {
@@ -135,14 +135,14 @@
           "id": "passing-yards-non-qb",
           "label": "Passing Yards (Non-QB)",
           "section": "position",
-          "count": 4,
+          "count": 6,
           "available": true
         },
         {
           "id": "passing-td-qb",
           "label": "Passing TD (QB)",
           "section": "position",
-          "count": 44,
+          "count": 46,
           "available": true
         },
         {
@@ -170,7 +170,7 @@
           "id": "rushing-yards-te",
           "label": "Rushing Yards (TE)",
           "section": "position",
-          "count": 12,
+          "count": 15,
           "available": true
         },
         {
@@ -198,7 +198,7 @@
           "id": "rushing-td-te",
           "label": "Rushing TD (TE)",
           "section": "position",
-          "count": 4,
+          "count": 5,
           "available": true
         },
         {
@@ -247,7 +247,7 @@
           "id": "receiving-td-rb",
           "label": "Receiving TD (RB)",
           "section": "position",
-          "count": 29,
+          "count": 30,
           "available": true
         },
         {
@@ -289,7 +289,7 @@
           "id": "sacks-db",
           "label": "Sacks (DB)",
           "section": "position",
-          "count": 49,
+          "count": 50,
           "available": true
         },
         {
@@ -303,7 +303,7 @@
           "id": "interceptions-lb",
           "label": "Interceptions (LB)",
           "section": "position",
-          "count": 36,
+          "count": 39,
           "available": true
         },
         {
@@ -366,14 +366,14 @@
           "id": "forced-fumbles-dt",
           "label": "Forced Fumbles (DT)",
           "section": "position",
-          "count": 20,
+          "count": 19,
           "available": true
         },
         {
           "id": "forced-fumbles-edge",
           "label": "Forced Fumbles (Edge)",
           "section": "position",
-          "count": 18,
+          "count": 20,
           "available": true
         },
         {
@@ -387,35 +387,35 @@
           "id": "forced-fumbles-db",
           "label": "Forced Fumbles (DB)",
           "section": "position",
-          "count": 49,
+          "count": 50,
           "available": true
         },
         {
           "id": "fumbles-recovered-dt",
           "label": "Fumbles Recovered (DT)",
           "section": "position",
-          "count": 23,
+          "count": 21,
           "available": true
         },
         {
           "id": "fumbles-recovered-edge",
           "label": "Fumbles Recovered (Edge)",
           "section": "position",
-          "count": 12,
+          "count": 9,
           "available": true
         },
         {
           "id": "fumbles-recovered-lb",
           "label": "Fumbles Recovered (LB)",
           "section": "position",
-          "count": 46,
+          "count": 44,
           "available": true
         },
         {
           "id": "fumbles-recovered-db",
           "label": "Fumbles Recovered (DB)",
           "section": "position",
-          "count": 46,
+          "count": 41,
           "available": true
         },
         {

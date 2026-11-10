@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-10T04:40:06.340Z",
+  "generatedAt": "2026-11-10T07:09:47.170Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -93,7 +93,7 @@
           "id": "interceptions-thrown",
           "label": "Interceptions Thrown",
           "section": "overall",
-          "count": 43,
+          "count": 44,
           "available": true
         },
         {
@@ -303,7 +303,7 @@
           "id": "interceptions-lb",
           "label": "Interceptions (LB)",
           "section": "position",
-          "count": 39,
+          "count": 40,
           "available": true
         },
         {
@@ -408,7 +408,7 @@
           "id": "fumbles-recovered-lb",
           "label": "Fumbles Recovered (LB)",
           "section": "position",
-          "count": 44,
+          "count": 45,
           "available": true
         },
         {

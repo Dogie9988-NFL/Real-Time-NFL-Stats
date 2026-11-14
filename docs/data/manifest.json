@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-14T19:41:14.940Z",
+  "generatedAt": "2026-11-14T23:03:33.795Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -575,7 +575,7 @@
           "id": "passing-td-non-qb",
           "label": "Passing TD (Non-QB)",
           "section": "position",
-          "count": 10,
+          "count": 11,
           "available": true
         },
         {
@@ -624,7 +624,7 @@
           "id": "rushing-td-te",
           "label": "Rushing TD (TE)",
           "section": "position",
-          "count": 11,
+          "count": 12,
           "available": true
         },
         {
@@ -659,7 +659,7 @@
           "id": "receiving-yards-other",
           "label": "Receiving Yards (Non WR/RB/TE)",
           "section": "position",
-          "count": 30,
+          "count": 31,
           "available": true
         },
         {
@@ -687,7 +687,7 @@
           "id": "receiving-td-other",
           "label": "Receiving TD (Non WR/RB/TE)",
           "section": "position",
-          "count": 5,
+          "count": 6,
           "available": true
         },
         {
@@ -736,7 +736,7 @@
           "id": "interceptions-other",
           "label": "Interceptions (Non LB/DB)",
           "section": "position",
-          "count": 25,
+          "count": 26,
           "available": true
         },
         {
@@ -820,7 +820,7 @@
           "id": "fumbles-recovered-dt",
           "label": "Fumbles Recovered (DT)",
           "section": "position",
-          "count": 14,
+          "count": 17,
           "available": true
         },
         {

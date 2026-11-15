@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-15T10:30:20.669Z",
+  "generatedAt": "2026-11-15T11:11:38.842Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -540,7 +540,7 @@
           "id": "kick-return-td",
           "label": "Kick Return Touchdowns",
           "section": "overall",
-          "count": 8,
+          "count": 9,
           "available": true
         },
         {
@@ -617,7 +617,7 @@
           "id": "rushing-td-wr",
           "label": "Rushing TD (WR)",
           "section": "position",
-          "count": 22,
+          "count": 23,
           "available": true
         },
         {
@@ -687,7 +687,7 @@
           "id": "receiving-td-other",
           "label": "Receiving TD (Non WR/RB/TE)",
           "section": "position",
-          "count": 6,
+          "count": 7,
           "available": true
         },
         {
@@ -820,7 +820,7 @@
           "id": "fumbles-recovered-dt",
           "label": "Fumbles Recovered (DT)",
           "section": "position",
-          "count": 17,
+          "count": 18,
           "available": true
         },
         {

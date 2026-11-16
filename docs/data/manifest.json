@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-16T02:50:14.216Z",
+  "generatedAt": "2026-11-16T08:35:20.901Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -23,7 +23,7 @@
           "id": "passing-td",
           "label": "Passing Touchdowns",
           "section": "overall",
-          "count": 46,
+          "count": 48,
           "available": true
         },
         {
@@ -93,7 +93,7 @@
           "id": "interceptions-thrown",
           "label": "Interceptions Thrown",
           "section": "overall",
-          "count": 45,
+          "count": 48,
           "available": true
         },
         {
@@ -135,21 +135,21 @@
           "id": "passing-yards-non-qb",
           "label": "Passing Yards (Non-QB)",
           "section": "position",
-          "count": 6,
+          "count": 7,
           "available": true
         },
         {
           "id": "passing-td-qb",
           "label": "Passing TD (QB)",
           "section": "position",
-          "count": 46,
+          "count": 47,
           "available": true
         },
         {
           "id": "passing-td-non-qb",
           "label": "Passing TD (Non-QB)",
           "section": "position",
-          "count": 0,
+          "count": 1,
           "available": true
         },
         {
@@ -170,7 +170,7 @@
           "id": "rushing-yards-te",
           "label": "Rushing Yards (TE)",
           "section": "position",
-          "count": 15,
+          "count": 16,
           "available": true
         },
         {
@@ -184,14 +184,14 @@
           "id": "rushing-td-qb",
           "label": "Rushing TD (QB)",
           "section": "position",
-          "count": 26,
+          "count": 28,
           "available": true
         },
         {
           "id": "rushing-td-wr",
           "label": "Rushing TD (WR)",
           "section": "position",
-          "count": 4,
+          "count": 6,
           "available": true
         },
         {
@@ -233,7 +233,7 @@
           "id": "receiving-yards-other",
           "label": "Receiving Yards (Non WR/RB/TE)",
           "section": "position",
-          "count": 13,
+          "count": 14,
           "available": true
         },
         {
@@ -247,7 +247,7 @@
           "id": "receiving-td-rb",
           "label": "Receiving TD (RB)",
           "section": "position",
-          "count": 30,
+          "count": 33,
           "available": true
         },
         {
@@ -303,7 +303,7 @@
           "id": "interceptions-lb",
           "label": "Interceptions (LB)",
           "section": "position",
-          "count": 40,
+          "count": 43,
           "available": true
         },
         {
@@ -366,14 +366,14 @@
           "id": "forced-fumbles-dt",
           "label": "Forced Fumbles (DT)",
           "section": "position",
-          "count": 19,
+          "count": 26,
           "available": true
         },
         {
           "id": "forced-fumbles-edge",
           "label": "Forced Fumbles (Edge)",
           "section": "position",
-          "count": 20,
+          "count": 23,
           "available": true
         },
         {
@@ -394,28 +394,28 @@
           "id": "fumbles-recovered-dt",
           "label": "Fumbles Recovered (DT)",
           "section": "position",
-          "count": 23,
+          "count": 21,
           "available": true
         },
         {
           "id": "fumbles-recovered-edge",
           "label": "Fumbles Recovered (Edge)",
           "section": "position",
-          "count": 12,
+          "count": 8,
           "available": true
         },
         {
           "id": "fumbles-recovered-lb",
           "label": "Fumbles Recovered (LB)",
           "section": "position",
-          "count": 50,
+          "count": 47,
           "available": true
         },
         {
           "id": "fumbles-recovered-db",
           "label": "Fumbles Recovered (DB)",
           "section": "position",
-          "count": 50,
+          "count": 41,
           "available": true
         },
         {

@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-21T08:52:23.564Z",
+  "generatedAt": "2026-11-21T11:23:13.400Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -659,7 +659,7 @@
           "id": "receiving-yards-other",
           "label": "Receiving Yards (Non WR/RB/TE)",
           "section": "position",
-          "count": 31,
+          "count": 32,
           "available": true
         },
         {
@@ -687,7 +687,7 @@
           "id": "receiving-td-other",
           "label": "Receiving TD (Non WR/RB/TE)",
           "section": "position",
-          "count": 7,
+          "count": 8,
           "available": true
         },
         {

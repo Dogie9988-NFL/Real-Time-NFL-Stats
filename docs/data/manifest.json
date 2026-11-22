@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-21T21:50:25.719Z",
+  "generatedAt": "2026-11-22T00:25:47.648Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -561,7 +561,7 @@
           "id": "passing-yards-non-qb",
           "label": "Passing Yards (Non-QB)",
           "section": "position",
-          "count": 27,
+          "count": 31,
           "available": true
         },
         {
@@ -575,7 +575,7 @@
           "id": "passing-td-non-qb",
           "label": "Passing TD (Non-QB)",
           "section": "position",
-          "count": 11,
+          "count": 13,
           "available": true
         },
         {
@@ -596,7 +596,7 @@
           "id": "rushing-yards-te",
           "label": "Rushing Yards (TE)",
           "section": "position",
-          "count": 28,
+          "count": 29,
           "available": true
         },
         {
@@ -617,7 +617,7 @@
           "id": "rushing-td-wr",
           "label": "Rushing TD (WR)",
           "section": "position",
-          "count": 23,
+          "count": 24,
           "available": true
         },
         {
@@ -659,7 +659,7 @@
           "id": "receiving-yards-other",
           "label": "Receiving Yards (Non WR/RB/TE)",
           "section": "position",
-          "count": 32,
+          "count": 34,
           "available": true
         },
         {
@@ -687,7 +687,7 @@
           "id": "receiving-td-other",
           "label": "Receiving TD (Non WR/RB/TE)",
           "section": "position",
-          "count": 8,
+          "count": 9,
           "available": true
         },
         {
@@ -736,7 +736,7 @@
           "id": "interceptions-other",
           "label": "Interceptions (Non LB/DB)",
           "section": "position",
-          "count": 26,
+          "count": 27,
           "available": true
         },
         {
@@ -820,14 +820,14 @@
           "id": "fumbles-recovered-dt",
           "label": "Fumbles Recovered (DT)",
           "section": "position",
-          "count": 18,
+          "count": 19,
           "available": true
         },
         {
           "id": "fumbles-recovered-edge",
           "label": "Fumbles Recovered (Edge)",
           "section": "position",
-          "count": 17,
+          "count": 19,
           "available": true
         },
         {

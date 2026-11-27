@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-27T13:13:16.070Z",
+  "generatedAt": "2026-11-27T22:05:13.547Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -659,7 +659,7 @@
           "id": "receiving-yards-other",
           "label": "Receiving Yards (Non WR/RB/TE)",
           "section": "position",
-          "count": 35,
+          "count": 36,
           "available": true
         },
         {
@@ -736,7 +736,7 @@
           "id": "interceptions-other",
           "label": "Interceptions (Non LB/DB)",
           "section": "position",
-          "count": 27,
+          "count": 28,
           "available": true
         },
         {

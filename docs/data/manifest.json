@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-27T03:49:40.297Z",
+  "generatedAt": "2026-11-27T12:43:42.113Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -547,7 +547,7 @@
           "id": "punt-return-td",
           "label": "Punt Return Touchdowns",
           "section": "overall",
-          "count": 24,
+          "count": 25,
           "available": true
         },
         {

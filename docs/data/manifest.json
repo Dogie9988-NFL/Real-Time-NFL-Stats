@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-28T03:58:38.184Z",
+  "generatedAt": "2026-11-28T12:29:02.224Z",
   "leagues": {
     "nfl": {
       "season": 2026,
@@ -394,28 +394,28 @@
           "id": "fumbles-recovered-dt",
           "label": "Fumbles Recovered (DT)",
           "section": "position",
-          "count": 24,
+          "count": 21,
           "available": true
         },
         {
           "id": "fumbles-recovered-edge",
           "label": "Fumbles Recovered (Edge)",
           "section": "position",
-          "count": 13,
+          "count": 8,
           "available": true
         },
         {
           "id": "fumbles-recovered-lb",
           "label": "Fumbles Recovered (LB)",
           "section": "position",
-          "count": 50,
+          "count": 47,
           "available": true
         },
         {
           "id": "fumbles-recovered-db",
           "label": "Fumbles Recovered (DB)",
           "section": "position",
-          "count": 50,
+          "count": 47,
           "available": true
         },
         {
